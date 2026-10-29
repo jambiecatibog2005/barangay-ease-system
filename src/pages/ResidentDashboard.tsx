@@ -4,8 +4,6 @@ import { collection, onSnapshot, query, where, doc, getDoc, updateDoc } from "fi
 import { updatePassword } from "firebase/auth";
 import { auth, db } from '../firebase'; 
 import logoImage from '../assets/logo.png';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 
 interface RequestData {
   id: string;
@@ -322,6 +320,10 @@ const ResidentDashboard: React.FC = () => {
     if (!claimSlipRef.current) return;
     
     try {
+      // ✅ Dito natin inilagay ang dynamic import para hindi mag-crash ang Vercel
+      const html2canvas = (await import('html2canvas')).default;
+      const { jsPDF } = await import('jspdf');
+
       const canvas = await html2canvas(claimSlipRef.current, {
         scale: 3,
         backgroundColor: '#ffffff',
