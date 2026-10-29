@@ -11,19 +11,22 @@ const LandingPage: React.FC = () => {
           {/* HEADER */}
           <header className="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
             
-            {/* TOP ADVISORY BAR - Full Width */}
-            <div className="bg-primary text-on-primary text-label-sm font-label-sm w-full">
-              <div className="w-full px-3 md:px-8 flex items-center justify-center md:justify-between h-8">
-                <div className="hidden md:flex items-center gap-space-lg">
-                  <div className="flex items-center gap-space-xs text-surface-container-high">
-                    <span className="material-symbols-outlined text-secondary-fixed text-[14px]">domain</span>
-                    <span>Office Hours: Monday-Sunday 8:00 AM – 5:00 PM</span>
-                  </div>
+            {/* TOP ADVISORY BAR - Inayos para laging nakikita ang Office Hours */}
+            <div className="bg-primary text-on-primary text-[10px] md:text-label-sm font-label-sm w-full">
+              <div className="w-full px-4 md:px-8 flex flex-col md:flex-row items-center justify-between py-1.5 md:py-0 md:h-8 gap-1 md:gap-0">
+                
+                {/* Office Hours - Laging Nakikita */}
+                <div className="flex items-center gap-1 md:gap-space-xs text-surface-container-high text-center md:text-left w-full md:w-auto justify-center md:justify-start">
+                  <span className="material-symbols-outlined text-secondary-fixed text-[12px] md:text-[14px] shrink-0">domain</span>
+                  <span className="truncate">Office Hours: Monday-Sunday 8:00 AM – 5:00 PM</span>
                 </div>
-                <div className="flex items-center gap-space-xs text-tertiary-fixed justify-center w-full md:w-auto">
-                  <span className="material-symbols-outlined text-[14px]">campaign</span>
-                  <span className="font-medium text-[10px] sm:text-sm truncate text-center md:text-left">Advisory: Regular document processing schedule active.</span>
+
+                {/* Advisory - Laging Nakikita */}
+                <div className="flex items-center gap-1 md:gap-space-xs text-tertiary-fixed text-center md:text-right w-full md:w-auto justify-center md:justify-end">
+                  <span className="material-symbols-outlined text-[12px] md:text-[14px] shrink-0">campaign</span>
+                  <span className="font-medium truncate">Advisory: Regular document processing schedule active.</span>
                 </div>
+
               </div>
             </div>
             
