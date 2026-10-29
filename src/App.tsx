@@ -11,7 +11,6 @@ import ResidentDashboard from './pages/ResidentDashboard';
 import DocumentCatalog from './pages/DocumentCatalog';
 import TrackStatus from './pages/TrackStatus';
 import TransactionHistory from './pages/TransactionHistory';
-// ❌ REMOVED: import ResidentSettings from './pages/ResidentSettings';
 
 // --- ADMIN/STAFF PAGES ---
 import AdminLogin from './pages/AdminLogin'; 
@@ -39,6 +38,28 @@ const App: React.FC = () => {
   const [isStaffLoggedIn, setIsStaffLoggedIn] = useState(false);
   
   const [isAuthLoading, setIsAuthLoading] = useState(true); 
+
+  // ✅ VERSION BUSTER PARA MAWALA ANG LUMANG CACHE (SETTINGS)
+  useEffect(() => {
+    const APP_VERSION = "v1.0.5"; // Binago ko ang version number para mag-trigger
+    const savedVersion = localStorage.getItem('appVersion');
+    
+    if (savedVersion !== APP_VERSION) {
+      localStorage.setItem('appVersion', APP_VERSION);
+      
+      // I-unregister ang lumang Service Worker kung meron
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+          } 
+        });
+      }
+      
+      // I-refresh ang page isang beses lang para makuha ang bago
+      window.location.reload(); 
+    }
+  }, []);
 
   useEffect(() => {
     const handlePopState = () => setCurrentPath(window.location.pathname || '/');
@@ -100,7 +121,6 @@ const App: React.FC = () => {
         <TrackStatus />
       ) : currentPath === '/history' ? (
         <TransactionHistory />
-      // ❌ REMOVED: /settings route for ResidentSettings
       
       ) : currentPath === '/admin-login' ? (
         <AdminLogin />
