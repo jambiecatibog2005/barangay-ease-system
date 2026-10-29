@@ -19,8 +19,8 @@ interface DocumentType {
   btnClass: string;
 }
 
-// --- MASTER DATA ---
-const masterData: Record<string, { title: string, desc: string, reqs: string[], icon: string, color: string }> = {
+// --- MASTER DATA (ENGLISH) ---
+const masterDataEn: Record<string, { title: string, desc: string, reqs: string[], icon: string, color: string }> = {
   'BRGY-CLR-01': { 
     title: 'Barangay Clearance', 
     desc: 'Required for employment, postal ID, bank transactions, and legal verification.', 
@@ -53,6 +53,45 @@ const masterData: Record<string, { title: string, desc: string, reqs: string[], 
     title: 'First-Time Jobseeker (RA 11261)',
     desc: 'Waives all local government fees for clearances for first-time Filipino jobseekers.',
     reqs: ['Signed Oath of Undertaking', 'Proof of Graduation', '1 Valid ID'],
+    icon: 'work',
+    color: 'text-secondary'
+  }
+};
+
+// ✅ MASTER DATA (FILIPINO)
+const masterDataFil: Record<string, { title: string, desc: string, reqs: string[], icon: string, color: string }> = {
+  'BRGY-CLR-01': { 
+    title: 'Barangay Clearance', 
+    desc: 'Kailangan para sa trabaho, postal ID, mga transaksyon sa bangko, at legal na beripikasyon.', 
+    reqs: ['1 Balidong ID na galing sa Gobyerno', 'Patunay ng Paninirahan (Proof of Residency)', 'Sedula (Cedula)'], 
+    icon: 'badge', 
+    color: 'text-primary' 
+  },
+  'BRGY-IND-02': { 
+    title: 'Certificate of Indigency', 
+    desc: 'Ipinagkakaloob sa mga residenteng mahirap para sa tulong medikal, bayarin sa ospital, at PCSO claims.', 
+    reqs: ['1 Balidong ID', 'Rekomendasyon mula sa Sitio Kagawad', 'Bill sa Ospital (kung meron)'], 
+    icon: 'volunteer_activism', 
+    color: 'text-tertiary-container' 
+  },
+  'BRGY-RES-03': {
+    title: 'Certificate of Residency',
+    desc: 'Nagpapatunay na ang aplikante ay tunay na residente ng Barangay Malinao nang hindi bababa sa 6 na buwan.',
+    reqs: ['1 Balidong ID', 'Barangay Household ID', 'Patunay ng 6 na Buwan na Paninirahan'],
+    icon: 'home_pin',
+    color: 'text-secondary'
+  },
+  'BRGY-BUS-04': {
+    title: 'Barangay Business Clearance',
+    desc: 'Sapilitang kailangan para sa bago o nagpapa-renew na micro, small, at medium businesses.',
+    reqs: ['DTI / SEC Registration', 'Kontrata ng Pag-upa (Contract of Lease)', 'Dating Clearance'],
+    icon: 'storefront',
+    color: 'text-primary'
+  },
+  'BRGY-JOB-05': {
+    title: 'First-Time Jobseeker (RA 11261)',
+    desc: 'Libre ang bayad sa clearance para sa mga first-time na jobseeker ayon sa batas.',
+    reqs: ['Pirmadong Oath of Undertaking', 'Patunay ng Pagtatapos (Proof of Graduation)', '1 Balidong ID'],
     icon: 'work',
     color: 'text-secondary'
   }
@@ -168,10 +207,13 @@ const DocumentCatalog: React.FC = () => {
         const data = doc.data();
         const code = data.code || '';
         
-        const localInfo = masterData[code] || {
+        // ✅ PINIPILI KUNG ENGLISH O FILIPINO ANG GAGAMITIN BASE SA WIKA
+        const activeMasterData = language === 'en' ? masterDataEn : masterDataFil;
+        
+        const localInfo = activeMasterData[code] || {
           title: data.title || 'Unknown Document',
-          desc: 'Official Barangay Document. Please prepare a valid ID.',
-          reqs: ['1 Valid ID', 'Proof of Residency (if applicable)'],
+          desc: language === 'en' ? 'Official Barangay Document. Please prepare a valid ID.' : 'Opisyal na Dokumento ng Barangay. Mangyaring maghanda ng valid ID.',
+          reqs: language === 'en' ? ['1 Valid ID', 'Proof of Residency (if applicable)'] : ['1 Balidong ID', 'Patunay ng Paninirahan (kung applicable)'],
           icon: 'description',
           color: 'text-primary'
         };
@@ -202,7 +244,7 @@ const DocumentCatalog: React.FC = () => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [language]); // ✅ Idinagdag ang 'language' dito para mag-refresh ang translation
 
   const filteredDocs = documents.filter(doc => {
     const matchesSearch = doc.title.toLowerCase().includes(searchQuery.toLowerCase()) || doc.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -277,13 +319,12 @@ const DocumentCatalog: React.FC = () => {
         requirementImage: uploadedFile,
       });
 
-      // ✅ IDINAGDAG: I-LOG ANG NEW DOCUMENT REQUEST SA AUDIT LOGS
       await logAction(
         "New Document Request",
         `Requested ${selectedDoc.title} (${refNo}). Purpose: ${purpose}.`,
         "info",
-        userData.fullName || 'Resident', // Pangalan ng Residente
-        "Resident"                       // Role
+        userData.fullName || 'Resident',
+        "Resident"
       );
 
       closeModal();
