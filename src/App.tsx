@@ -11,6 +11,7 @@ import ResidentDashboard from './pages/ResidentDashboard';
 import DocumentCatalog from './pages/DocumentCatalog';
 import TrackStatus from './pages/TrackStatus';
 import TransactionHistory from './pages/TransactionHistory';
+import ResidentSettings from './pages/ResidentSettings'; // ✅ IDINAGDAG
 
 // --- ADMIN/STAFF PAGES ---
 import AdminLogin from './pages/AdminLogin'; 
@@ -103,6 +104,8 @@ const App: React.FC = () => {
         <TrackStatus />
       ) : currentPath === '/history' ? (
         <TransactionHistory />
+      ) : currentPath === '/settings' ? (             /* ✅ IDINAGDAG */
+        <ResidentSettings />                           /* ✅ IDINAGDAG */
       
       ) : currentPath === '/admin-login' ? (
         <AdminLogin />
