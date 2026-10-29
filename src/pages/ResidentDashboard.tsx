@@ -552,15 +552,6 @@ const ResidentDashboard: React.FC = () => {
                   </button>
                 </div>
 
-                {/* ✅ BAGONG SETTINGS BUTTON */}
-                <button 
-                  onClick={() => window.location.href = '/settings'} 
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-surface-container-lowest text-gray-700 font-bold text-sm shadow-sm border border-outline-variant/50 hover:bg-surface-container transition-colors mt-2"
-                >
-                  <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
-                  <span>{t.settings}</span>
-                </button>
-
                 {/* ✅ UPCOMING HOLIDAYS SECTION */}
                 {holidays.length > 0 && (
                   <div className="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-outline-variant/30 flex flex-col gap-3">
