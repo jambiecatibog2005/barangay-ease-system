@@ -107,6 +107,10 @@ const translations = {
     tlReleasedLabel: "Released",
     tlReleasedDesc: "Resident has received the document",
 
+    // Print & Download Translations
+    print: "Print",
+    download: "Download PDF",
+
     // Logout Modal
     logoutTitle: "Are you sure you want to log out?",
     logoutMsg: "You will need to sign in again to view your requests and apply for new documents.",
@@ -197,6 +201,10 @@ const translations = {
     tlReadyDesc: "Pwede nang kunin ang dokumento",
     tlReleasedLabel: "Naibigay na",
     tlReleasedDesc: "Natanggap na ng residente ang dokumento",
+
+    // Print & Download Translations
+    print: "I-print",
+    download: "I-download",
 
     // Logout Modal
     logoutTitle: "Sigurado ka bang gusto mong mag-logout?",
@@ -846,74 +854,88 @@ const TrackStatus: React.FC = () => {
             </div>
           )}
 
-          {/* ================= CLAIM SLIP MODAL ================= */}
+          {/* ✅ CLAIM SLIP MODAL (UPDATED) */}
           {isClaimSlipOpen && claimRequestData && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary/50 backdrop-blur-sm p-4 print:bg-white print:p-0 print:static">
               
               <div 
-                id="printable-claim-slip" 
                 ref={claimSlipRef} 
                 className="w-full max-w-md bg-white p-5 sm:p-8 rounded-xl shadow-2xl border-t-8 border-primary print:shadow-none print:rounded-none print:max-w-none print:border-t-0 print:p-4 max-h-[90vh] overflow-y-auto"
               >
-                <div className="text-center border-b-2 border-gray-300 pb-4 mb-4">
-                  <img 
-                    src={logoImage} 
-                    alt="Logo" 
-                    style={{ width: '70px', height: '70px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', display: 'block' }} 
-                  />
-                  <h1 className="text-base font-bold text-gray-900 uppercase tracking-widest leading-tight">Barangay Malinao</h1>
-                  <p className="text-xs text-gray-600">Naujan, Oriental Mindoro</p>
-                  <p className="text-[10px] font-semibold text-primary mt-1.5 uppercase tracking-wider">Document Claim Slip</p>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 text-center">
-                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Reference Number</p>
-                    <p className="text-base font-mono font-bold text-primary tracking-widest">{claimRequestData.refNo}</p>
+                {/* ✅ ITO YUNG PAPEL NA MAKUKUHA SA PDF/PRINT */}
+                <div id="printable-claim-slip">
+                  <div className="text-center border-b-2 border-gray-300 pb-4 mb-4">
+                    <img src={logoImage} alt="Logo" style={{ width: '70px', height: '70px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', display: 'block' }} />
+                    <h1 className="text-base font-bold text-gray-900 uppercase tracking-widest leading-tight">Barangay Malinao</h1>
+                    <p className="text-xs text-gray-600">Naujan, Oriental Mindoro</p>
+                    <p className="text-[10px] font-semibold text-primary mt-1.5 uppercase tracking-wider">Document Claim Slip</p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-                    <div className="col-span-2">
-                      <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Document Requested</p>
-                      <p className="font-semibold text-gray-900">{claimRequestData.documentType}</p>
+                  <div className="space-y-4">
+                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 text-center">
+                      <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Reference Number</p>
+                      <p className="text-base font-mono font-bold text-primary tracking-widest">{claimRequestData.refNo}</p>
                     </div>
-                    <div>
-                      <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Date Issued</p>
-                      <p className="font-semibold text-gray-900 text-xs">{new Date().toLocaleDateString('en-PH', { dateStyle: 'medium' })}</p>
+
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                      <div className="col-span-2">
+                        <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Resident Name</p>
+                        <p className="font-semibold text-gray-900">{localStorage.getItem('residentName') || 'Resident'}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Document Requested</p>
+                        <p className="font-semibold text-gray-900">{claimRequestData.documentType}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Date Issued</p>
+                        <p className="font-semibold text-gray-900 text-xs">{new Date().toLocaleDateString('en-PH', { dateStyle: 'medium' })}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Purok</p>
+                        <p className="font-semibold text-gray-900 text-xs">{localStorage.getItem('residentPurok') || 'N/A'}</p>
+                      </div>
+                      
+                      {/* ✅ IDINAGDAG NA FEE */}
+                      <div className="col-span-2 bg-blue-50/50 p-2.5 rounded-lg border border-blue-100 mt-1">
+                        <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Amount to Pay / Fee</p>
+                        <p className="font-bold text-blue-900 text-sm">{claimRequestData.fee || '₱0.00'}</p>
+                      </div>
+
+                      <div className="col-span-2 mt-1">
+                        <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Status</p>
+                        <span className="inline-block px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase tracking-wider">Ready for Release</span>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Claiming Location</p>
-                      <p className="font-semibold text-gray-900 text-xs">Barangay Hall</p>
-                    </div>
-                    <div className="col-span-2 mt-1">
-                      <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Status</p>
-                      <span className="inline-block px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase tracking-wider">Ready for Release</span>
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-gray-200">
+                    <p className="text-[10px] text-gray-500 leading-relaxed text-center italic mb-5">
+                      "Please present this claim slip and a valid government-issued ID to the Barangay Hall to claim your document."
+                    </p>
+                    <div className="flex justify-between items-end px-2">
+                      <div className="text-center w-28 sm:w-32">
+                        <div className="border-b border-gray-400 mb-1"></div>
+                        <p className="text-[10px] text-gray-600">Resident Signature</p>
+                      </div>
+                      <div className="text-center w-28 sm:w-32">
+                        <div className="border-b border-gray-400 mb-1"></div>
+                        <p className="text-[10px] text-gray-600">Barangay Secretary</p>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-gray-200">
-                  <p className="text-[10px] text-gray-500 leading-relaxed text-center italic mb-5">
-                    "Please present this claim slip and a valid government-issued ID to the Barangay Hall to claim your document."
-                  </p>
-                  <div className="flex justify-between items-end px-2">
-                    <div className="text-center w-28 sm:w-32">
-                      <div className="border-b border-gray-400 mb-1"></div>
-                      <p className="text-[10px] text-gray-600">Resident Signature</p>
-                    </div>
-                    <div className="text-center w-28 sm:w-32">
-                      <div className="border-b border-gray-400 mb-1"></div>
-                      <p className="text-[10px] text-gray-600">Barangay Secretary</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="no-print mt-6 flex flex-wrap justify-end gap-2 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                {/* ✅ MGA BUTTONS (Nasa loob para maganda, pero naka-ignore sa Print at PDF) */}
+                <div 
+                  className="no-print mt-6 flex flex-wrap justify-end gap-2 bg-gray-50 p-3 rounded-xl border border-gray-200"
+                  data-html2canvas-ignore="true"
+                >
                   <button onClick={() => setIsClaimSlipOpen(false)} className="rounded-lg px-3 py-1.5 font-semibold text-gray-600 hover:bg-gray-200 transition-colors text-xs sm:text-sm" type="button">{t.close}</button>
-                  <button onClick={() => window.print()} className="inline-flex items-center gap-1.5 rounded-lg bg-gray-800 px-3 py-1.5 font-bold text-white hover:bg-gray-900 transition-colors text-xs sm:text-sm" type="button"><span className="material-symbols-outlined text-[16px]">print</span>Print</button>
-                  <button onClick={handleDownloadClaimSlip} className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 font-bold text-white hover:bg-primary-container transition-colors text-xs sm:text-sm" type="button"><span className="material-symbols-outlined text-[16px]">download</span>Download</button>
+                  <button onClick={() => window.print()} className="inline-flex items-center gap-1.5 rounded-lg bg-gray-800 px-3 py-1.5 font-bold text-white hover:bg-gray-900 transition-colors text-xs sm:text-sm" type="button"><span className="material-symbols-outlined text-[16px]">print</span>{t.print}</button>
+                  <button onClick={handleDownloadClaimSlip} className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 font-bold text-white hover:bg-primary-container transition-colors text-xs sm:text-sm" type="button"><span className="material-symbols-outlined text-[16px]">download</span>{t.download}</button>
                 </div>
               </div>
+
             </div>
           )}
 
