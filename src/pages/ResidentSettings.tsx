@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { updatePassword, updateEmail, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
+// ✅ Tinanggal ang updateEmail dahil hindi naman ginagamit
+import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 import { auth, db, logAction } from '../firebase'; 
 import logoImage from '../assets/logo.png';
 
 const ResidentSettings: React.FC = () => {
-  const [userData, setUserData] = useState<any>(null);
+  // ✅ Tinanggal ang userData state dahil hindi naman ginagamit sa display
   const [fullName, setFullName] = useState('');
   const [purok, setPurok] = useState('');
   
@@ -41,7 +42,6 @@ const ResidentSettings: React.FC = () => {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
-          setUserData(data);
           setFullName(data.fullName || '');
           setPurok(data.purok || '');
         }
@@ -91,7 +91,7 @@ const ResidentSettings: React.FC = () => {
     setIsSaving(true);
 
     try {
-      // Re-authenticate muna bago magpalit ng password (Security feature ng Firebase)
+      // Re-authenticate muna bago magpalit ng password
       const credential = EmailAuthProvider.credential(auth.currentUser.email!, currentPassword);
       await reauthenticateWithCredential(auth.currentUser, credential);
 
@@ -125,7 +125,7 @@ const ResidentSettings: React.FC = () => {
       <IonContent className="bg-surface">
         <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8f9ff', fontFamily: "'Public Sans', sans-serif", color: '#0b1c30' }}>
           
-          {/* SIDEBAR (Kapareho ng nasa Dashboard) */}
+          {/* SIDEBAR */}
           <aside style={{ width: '260px', position: 'fixed', top: 0, left: isMobile ? (sidebarOpen ? 0 : '-260px') : 0, height: '100vh', backgroundColor: '#ffffff', zIndex: 100, borderRight: '1px solid #e5eeff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', transition: 'left 0.3s ease-in-out', boxShadow: isMobile && sidebarOpen ? '4px 0 15px rgba(0,0,0,0.1)' : 'none' }}>
             <div>
               <div style={{ height: '64px', padding: '0 16px', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #eff4ff' }}>
