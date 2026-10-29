@@ -29,12 +29,10 @@ const AdminAuditLogs: React.FC = () => {
   const [pageHistory, setPageHistory] = useState<any[]>([]); 
   const [totalLogs, setTotalLogs] = useState(0);
 
-  // ✅ FIX: Tinanggal ang setIsMobile dahil hindi naman ito ginagamit.
-  // Fixed na lang ang isMobile base sa unang window size (walang resize listener).
   const [isMobile] = useState(window.innerWidth <= 1024);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // ✅ FETCH LOGS (May Server-Side Search na)
+  // ✅ FETCH LOGS
   const fetchLogs = async (isNext: boolean = false) => {
     setIsLoading(true);
     try {
@@ -43,7 +41,7 @@ const AdminAuditLogs: React.FC = () => {
         orderBy("timestamp", "desc")
       );
 
-      // 1. DATE FILTER LOGIC
+      // 1. DATE FILTER
       if (dateFilter !== 'All Time') {
         const now = new Date();
         let startDate = new Date();
@@ -63,12 +61,12 @@ const AdminAuditLogs: React.FC = () => {
         q = query(q, where("timestamp", ">=", startDate));
       }
 
-      // 2. ROLE FILTER LOGIC
+      // 2. ROLE FILTER
       if (roleFilter !== 'All') {
         q = query(q, where("role", "==", roleFilter));
       }
 
-      // 3. SERVER-SIDE SEARCH LOGIC (Naghahanap sa buong database)
+      // 3. SEARCH
       if (searchQuery.trim() !== '') {
         const searchTerm = searchQuery.trim();
         q = query(
@@ -78,7 +76,7 @@ const AdminAuditLogs: React.FC = () => {
         );
       }
 
-      // 4. PAGINATION LOGIC
+      // 4. PAGINATION
       q = query(q, limit(itemsPerPage));
 
       if (isNext && lastVisible) {
@@ -116,7 +114,6 @@ const AdminAuditLogs: React.FC = () => {
     }
   };
 
-  // ✅ MAG-FETCH KAPAG MAY NAGBAGO SA FILTER O SEARCH
   useEffect(() => {
     setCurrentPage(1);
     setPageHistory([]);
@@ -125,7 +122,6 @@ const AdminAuditLogs: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemsPerPage, dateFilter, roleFilter, searchQuery]);
 
-  // Kunin ang total count (Para sa display)
   useEffect(() => {
     const getTotalCount = async () => {
       try {
@@ -195,12 +191,10 @@ const AdminAuditLogs: React.FC = () => {
     return 'System';
   };
 
-  // Dito natin i-apply ang Client-Side fallback (para sure)
   const filteredLogs = logs.filter(log => {
     const rowRole = determineRole(log);
     const displayName = log.userName || log.performedBy || 'System';
 
-    // Kung may tinype sa search, i-check kung tugma sa Name, Action, o Details
     const matchesSearch = 
       searchQuery.trim() === '' ||
       displayName.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -356,7 +350,7 @@ const AdminAuditLogs: React.FC = () => {
                   </div>
                 </section>
 
-                {/* ✅ AYOS NA FILTER BAR */}
+                {/* ✅ FILTER BAR */}
                 <div style={{ 
                   backgroundColor: '#ffffff', 
                   borderRadius: '12px', 
@@ -366,7 +360,6 @@ const AdminAuditLogs: React.FC = () => {
                   flexDirection: isMobile ? 'column' : 'row', 
                   gap: '12px' 
                 }}>
-                  {/* Search Bar */}
                   <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
                     <span className="material-symbols-outlined" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', fontSize: '18px' }}>search</span>
                     <input
@@ -378,7 +371,6 @@ const AdminAuditLogs: React.FC = () => {
                     />
                   </div>
 
-                  {/* DATE DROPDOWN */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: isMobile ? '100%' : 'auto', flexShrink: 0 }}>
                     <span className="material-symbols-outlined" style={{ color: '#757682', fontSize: '20px' }}>calendar_month</span>
                     <select
@@ -395,7 +387,6 @@ const AdminAuditLogs: React.FC = () => {
                     </select>
                   </div>
 
-                  {/* ROLE FILTER */}
                   <select
                     value={roleFilter}
                     onChange={(e) => setRoleFilter(e.target.value)}
@@ -524,36 +515,38 @@ const AdminAuditLogs: React.FC = () => {
         {/* ================= LOGOUT MODAL ================= */}
         {showLogoutModal && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(11, 28, 48, 0.6)', backdropFilter: 'blur(4px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-            <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
+            <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '32px 24px', width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
               
-              <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#ffdad6', color: '#ba1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+              <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#ffe4e6', color: '#e11d48', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
                 <span className="material-symbols-outlined" style={{ fontSize: '32px' }}>logout</span>
               </div>
 
-              <h2 style={{ fontSize: '18px', fontWeight: 'bold', color: '#0b1c30', margin: '0 0 8px 0' }}>End Admin Session?</h2>
-              <p style={{ fontSize: '13px', color: '#444651', margin: '0 0 24px 0', lineHeight: 1.5 }}>
-                Sigurado ka bang gusto mong mag-log out? Kailangan mong mag-login muli para ma-access ang admin controls.
+              <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#0f172a', margin: '0 0 8px 0' }}>
+                End Admin Session?
+              </h2>
+              
+              <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 24px 0', lineHeight: 1.5 }}>
+                Are you sure you want to log out? You will need to log in again to access the admin portal.
               </p>
 
               <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
                 <button 
-                  onClick={() => setShowLogoutModal(false)}
-                  style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: '#eff4ff', color: '#00236f', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', transition: 'background 0.2s' }}
-                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#dce9ff'}
-                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#eff4ff'}
+                  onClick={() => setShowLogoutModal(false)} 
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: '#f1f5f9', color: '#334155', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', transition: 'background 0.2s' }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
                 >
                   Cancel
                 </button>
                 <button 
-                  onClick={handleLogout}
-                  style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: '#ba1a1a', color: '#ffffff', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', transition: 'background 0.2s' }}
-                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#93000a'}
-                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#ba1a1a'}
+                  onClick={handleLogout} 
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: '#dc2626', color: '#ffffff', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', transition: 'background 0.2s' }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#b91c1c'}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
                 >
                   Yes, Log Out
                 </button>
               </div>
-
             </div>
           </div>
         )}
