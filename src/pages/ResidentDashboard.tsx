@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
 import { collection, onSnapshot, query, where, doc, getDoc, updateDoc } from "firebase/firestore";
-import { updatePassword } from "firebase/auth";
+import { updatePassword, signOut } from "firebase/auth";
 import { auth, db } from '../firebase'; 
 import logoImage from '../assets/logo.png';
 
@@ -308,16 +308,35 @@ const ResidentDashboard: React.FC = () => {
     }
     setIsUpdating(true);
     setProfileMsg({ text: '', type: '' });
+    
     try {
       if (auth.currentUser) {
+        // ✅ SUBUKANG PALITAN ANG PASSWORD
         await updatePassword(auth.currentUser, newPassword);
-        setProfileMsg({ text: 'Password changed successfully!', type: 'success' });
+        
+        // ✅ KAPAG SUCCESS, MAGPAKITA NG MENSAHE
+        setProfileMsg({ text: 'Password changed successfully! Logging you out...', type: 'success' });
         setNewPassword('');
+        
+        // ✅ AUTOMATIC NA MAG-LOGOUT PAGKATAPOS NG 2 SEGUNDO
+        setTimeout(async () => {
+          localStorage.removeItem('residentUid');
+          await signOut(auth);
+          window.location.href = '/login';
+        }, 2000);
+
       } else {
         throw new Error("Session expired. Please logout and login again.");
       }
     } catch (error: any) {
-      setProfileMsg({ text: error.message || 'Failed to change password.', type: 'error' });
+      if (error.code === 'auth/requires-recent-login') {
+        setProfileMsg({ 
+          text: 'Security check: Please logout and login again before changing your password.', 
+          type: 'error' 
+        });
+      } else {
+        setProfileMsg({ text: error.message || 'Failed to change password.', type: 'error' });
+      }
     } finally {
       setIsUpdating(false);
     }
