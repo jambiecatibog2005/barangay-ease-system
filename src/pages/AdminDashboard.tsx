@@ -99,7 +99,12 @@ const AdminDashboard: React.FC = () => {
       setIsDataLoading(false);
     });
 
-    const staffQuery = query(collection(db, "users"), where("role", "in", ["staff", "secretary"]));
+    // ✅ NILAGYAN NG FILTER PARA HINDI LUMABAS ANG DEACTIVATED
+    const staffQuery = query(
+      collection(db, "users"), 
+      where("role", "in", ["staff", "secretary"]),
+      where("status", "!=", "Inactive") 
+    );
     const unsubscribeStaff = onSnapshot(staffQuery, (snapshot) => {
       const staffList: StaffMember[] = [];
       snapshot.forEach(doc => {
