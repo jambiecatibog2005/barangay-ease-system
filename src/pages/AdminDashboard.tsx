@@ -99,16 +99,16 @@ const AdminDashboard: React.FC = () => {
       setIsDataLoading(false);
     });
 
-    // ✅ NILAGYAN NG FILTER PARA HINDI LUMABAS ANG DEACTIVATED
-    const staffQuery = query(
-      collection(db, "users"), 
-      where("role", "in", ["staff", "secretary"]),
-      where("status", "!=", "Inactive") 
-    );
+    // ✅ FIX: Kinukuha lahat, tapos javascript filter ang gagawa
+    const staffQuery = query(collection(db, "users"), where("role", "in", ["staff", "secretary"]));
     const unsubscribeStaff = onSnapshot(staffQuery, (snapshot) => {
       const staffList: StaffMember[] = [];
       snapshot.forEach(doc => {
-        staffList.push({ id: doc.id, ...doc.data() } as StaffMember);
+        const data = doc.data();
+        // I-filter dito: kung ang status ay 'Inactive', wag isama. Kung 'Active' o wala, isama.
+        if (data.status !== 'Inactive') {
+          staffList.push({ id: doc.id, ...data } as StaffMember);
+        }
       });
       setStaffOnDuty(staffList);
     });
