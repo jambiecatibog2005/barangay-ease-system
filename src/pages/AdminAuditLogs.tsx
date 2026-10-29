@@ -29,7 +29,9 @@ const AdminAuditLogs: React.FC = () => {
   const [pageHistory, setPageHistory] = useState<any[]>([]); 
   const [totalLogs, setTotalLogs] = useState(0);
 
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
+  // ✅ FIX: Tinanggal ang setIsMobile dahil hindi naman ito ginagamit.
+  // Fixed na lang ang isMobile base sa unang window size (walang resize listener).
+  const [isMobile] = useState(window.innerWidth <= 1024);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // ✅ FETCH LOGS (May Server-Side Search na)
@@ -318,7 +320,7 @@ const AdminAuditLogs: React.FC = () => {
             <main style={{ padding: isMobile ? '16px' : '32px', flex: 1, backgroundColor: '#f8f9ff' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1200px', margin: '0 auto' }}>
                 
-                {/* ✅ HEADER DESIGN (Inayos para magkatabi palagi sa desktop) */}
+                {/* ✅ HEADER DESIGN */}
                 <section style={{
                   backgroundColor: '#ffffff',
                   borderLeft: '6px solid #1e3a8a',
@@ -326,7 +328,7 @@ const AdminAuditLogs: React.FC = () => {
                   padding: isMobile ? '20px 16px' : '24px 32px',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                   display: 'flex',
-                  flexDirection: isMobile ? 'column' : 'row', // Side-by-side sa desktop
+                  flexDirection: isMobile ? 'column' : 'row', 
                   alignItems: isMobile ? 'flex-start' : 'center',
                   gap: '20px'
                 }}>
