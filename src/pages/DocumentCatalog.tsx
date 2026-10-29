@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
 import { collection, addDoc, doc, getDoc, onSnapshot } from "firebase/firestore";
-import { auth, db, logAction } from '../firebase'; // ✅ IDINAGDAG ANG logAction
+import { auth, db, logAction } from '../firebase'; 
 import logoImage from '../assets/logo.png';
 
 interface DocumentType {
@@ -55,6 +55,28 @@ const masterDataEn: Record<string, { title: string, desc: string, reqs: string[]
     reqs: ['Signed Oath of Undertaking', 'Proof of Graduation', '1 Valid ID'],
     icon: 'work',
     color: 'text-secondary'
+  },
+  // ✅ MGA BAGONG DAGDAG
+  'BRGY-CTC-06': {
+    title: 'Cedula (Community Tax Certificate)',
+    desc: 'A basic tax document required for various legal and government transactions.',
+    reqs: ['1 Valid ID', 'Proof of Income (if applicable)'],
+    icon: 'receipt',
+    color: 'text-primary'
+  },
+  'BRGY-SOL-07': {
+    title: 'Certificate of Solo Parent',
+    desc: 'Certifies that the applicant is a solo parent eligible for benefits under RA 8972.',
+    reqs: ['1 Valid ID', 'Birth Certificate of Child/Children', 'Proof of Single Status (Death/Marriage Cert.)'],
+    icon: 'family_restroom',
+    color: 'text-tertiary'
+  },
+  'BRGY-SEN-08': {
+    title: 'Senior Citizen Certificate',
+    desc: 'Issued to residents aged 60 and above for availing senior citizen discounts and benefits.',
+    reqs: ['1 Valid ID (showing birthdate)', '2x2 Picture'],
+    icon: 'elderly',
+    color: 'text-secondary'
   }
 };
 
@@ -93,6 +115,28 @@ const masterDataFil: Record<string, { title: string, desc: string, reqs: string[
     desc: 'Libre ang bayad sa clearance para sa mga first-time na jobseeker ayon sa batas.',
     reqs: ['Pirmadong Oath of Undertaking', 'Patunay ng Pagtatapos (Proof of Graduation)', '1 Balidong ID'],
     icon: 'work',
+    color: 'text-secondary'
+  },
+  // ✅ MGA BAGONG DAGDAG
+  'BRGY-CTC-06': {
+    title: 'Cedula (Community Tax Certificate)',
+    desc: 'Isang pangunahing dokumento ng buwis na kailangan para sa iba\'t ibang legal at transaksyon sa gobyerno.',
+    reqs: ['1 Balidong ID', 'Patunay ng Kita (kung applicable)'],
+    icon: 'receipt',
+    color: 'text-primary'
+  },
+  'BRGY-SOL-07': {
+    title: 'Certificate of Solo Parent',
+    desc: 'Nagpapatunay na ang aplikante ay isang solo parent na kwalipikado sa mga benepisyo ng RA 8972.',
+    reqs: ['1 Balidong ID', 'Birth Certificate ng Anak/Anak', 'Patunay na Walang Asawa (Death/Marriage Cert.)'],
+    icon: 'family_restroom',
+    color: 'text-tertiary'
+  },
+  'BRGY-SEN-08': {
+    title: 'Senior Citizen Certificate',
+    desc: 'Ipinagkakaloob sa mga residenteng edad 60 pataas para sa pag-avail ng mga diskwento at benepisyo.',
+    reqs: ['1 Balidong ID (may petsa ng kapanganakan)', '2x2 Larawan (Picture)'],
+    icon: 'elderly',
     color: 'text-secondary'
   }
 };
@@ -244,7 +288,7 @@ const DocumentCatalog: React.FC = () => {
     });
 
     return () => unsubscribe();
-  }, [language]); // ✅ Idinagdag ang 'language' dito para mag-refresh ang translation
+  }, [language]); 
 
   const filteredDocs = documents.filter(doc => {
     const matchesSearch = doc.title.toLowerCase().includes(searchQuery.toLowerCase()) || doc.description.toLowerCase().includes(searchQuery.toLowerCase());
