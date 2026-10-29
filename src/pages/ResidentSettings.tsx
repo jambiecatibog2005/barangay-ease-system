@@ -24,7 +24,7 @@ const ResidentSettings: React.FC = () => {
     return (localStorage.getItem('appLanguage') as 'en' | 'fil') || 'en';
   });
 
-  // ✅ KUMPLETONG TRANSLATIONS PARA SA BUONG PAGE
+  // ✅ KUMPLETONG TRANSLATIONS
   const t = {
     en: { 
       dashboard: "Dashboard", 
