@@ -38,7 +38,6 @@ interface HolidayData {
 const translations = {
   en: {
     dashboard: "Dashboard", requestDocument: "Request Document", trackStatus: "Track Status", transactionHistory: "Transaction History",
-    settings: "Settings",
     logout: "Logout", cancel: "Cancel", yesLogout: "Yes, Log out", logoutTitle: "Are you sure you want to log out?",
     logoutMessage: "You will need to sign in again to view your requests and apply for new documents.",
     welcome: "Welcome", active: "Active", requestNewDoc: "Request New Document", trackMyRequests: "Track My Requests",
@@ -56,7 +55,6 @@ const translations = {
   },
   fil: {
     dashboard: "Panel ng Residente", requestDocument: "Humiling ng Dokumento", trackStatus: "Subaybayan ang Status", transactionHistory: "Kasaysayan ng Transaksyon",
-    settings: "Mga Setting",
     logout: "Mag-logout", cancel: "Kanselahin", yesLogout: "Oo, Mag-logout", logoutTitle: "Sigurado ka bang gusto mong mag-logout?",
     logoutMessage: "Kailangan mong mag-login muli para makita ang iyong mga request at makapag-apply ng bagong dokumento.",
     welcome: "Mabuhay", active: "Aktibo", requestNewDoc: "Humiling ng Bagong Dokumento", trackMyRequests: "Subaybayan ang Aking Request",
@@ -391,7 +389,6 @@ const ResidentDashboard: React.FC = () => {
                 <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/documents">{t.requestDocument}</a>
                 <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/track-status">{t.trackStatus}</a>
                 <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/history">{t.transactionHistory}</a>
-                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/settings">{t.settings}</a>
               </nav>
               
               <div className="flex items-center justify-end gap-2 shrink-0">
@@ -413,7 +410,6 @@ const ResidentDashboard: React.FC = () => {
                         <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/documents">{t.requestDocument}</a>
                         <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/track-status">{t.trackStatus}</a>
                         <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/history">{t.transactionHistory}</a>
-                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/settings">{t.settings}</a>
                         <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
                       </div>
                       
