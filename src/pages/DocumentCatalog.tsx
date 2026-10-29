@@ -56,31 +56,38 @@ const masterDataEn: Record<string, { title: string, desc: string, reqs: string[]
     icon: 'work',
     color: 'text-secondary'
   },
-  // ✅ MGA BAGONG DAGDAG
+  // ✅ MGA BAGONG DAGDAG (Eksaktong Description base sa request mo)
   'BRGY-CTC-06': {
     title: 'Cedula (Community Tax Certificate)',
-    desc: 'A basic tax document required for various legal and government transactions.',
+    desc: 'Serves as a basic proof of identity and tax payment required for various legal, government, and private transactions.',
     reqs: ['1 Valid ID', 'Proof of Income (if applicable)'],
     icon: 'receipt',
     color: 'text-primary'
   },
   'BRGY-SOL-07': {
     title: 'Certificate of Solo Parent',
-    desc: 'Certifies that the applicant is a solo parent eligible for benefits under RA 8972.',
+    desc: 'Issued to single parents to avail of benefits and privileges mandated by the Solo Parents\' Welfare Act (RA 8972).',
     reqs: ['1 Valid ID', 'Birth Certificate of Child/Children', 'Proof of Single Status (Death/Marriage Cert.)'],
     icon: 'family_restroom',
     color: 'text-tertiary'
   },
   'BRGY-SEN-08': {
     title: 'Senior Citizen Certificate',
-    desc: 'Issued to residents aged 60 and above for availing senior citizen discounts and benefits.',
+    desc: 'Certifies that the applicant is a senior citizen eligible for mandatory 20% discounts and other benefits under RA 9994.',
     reqs: ['1 Valid ID (showing birthdate)', '2x2 Picture'],
     icon: 'elderly',
     color: 'text-secondary'
+  },
+  'BRGY-BLT-09': {
+    title: 'Complaint / Blotter Report',
+    desc: 'Official recording of disputes, incidents, or complaints for legal documentation and barangay mediation.',
+    reqs: ['1 Valid ID', 'Incident Details / Narrative Report', 'Witnesses (if applicable)'],
+    icon: 'gavel',
+    color: 'text-error'
   }
 };
 
-// ✅ MASTER DATA (FILIPINO)
+// --- MASTER DATA (FILIPINO) ---
 const masterDataFil: Record<string, { title: string, desc: string, reqs: string[], icon: string, color: string }> = {
   'BRGY-CLR-01': { 
     title: 'Barangay Clearance', 
@@ -117,27 +124,34 @@ const masterDataFil: Record<string, { title: string, desc: string, reqs: string[
     icon: 'work',
     color: 'text-secondary'
   },
-  // ✅ MGA BAGONG DAGDAG
+  // ✅ MGA BAGONG DAGDAG (Eksaktong Description base sa request mo)
   'BRGY-CTC-06': {
     title: 'Cedula (Community Tax Certificate)',
-    desc: 'Isang pangunahing dokumento ng buwis na kailangan para sa iba\'t ibang legal at transaksyon sa gobyerno.',
+    desc: 'Nagsisilbing pangunahing patunay ng pagkakakilanlan at pagbabayad ng buwis na kailangan sa iba\'t ibang transaksyon sa gobyerno at pribadong sektor.',
     reqs: ['1 Balidong ID', 'Patunay ng Kita (kung applicable)'],
     icon: 'receipt',
     color: 'text-primary'
   },
   'BRGY-SOL-07': {
     title: 'Certificate of Solo Parent',
-    desc: 'Nagpapatunay na ang aplikante ay isang solo parent na kwalipikado sa mga benepisyo ng RA 8972.',
+    desc: 'Ipinagkakaloob sa mga nag-iisang magulang upang makuha ang mga benepisyo at pribilehiyo na nakasaad sa Solo Parents\' Welfare Act (RA 8972).',
     reqs: ['1 Balidong ID', 'Birth Certificate ng Anak/Anak', 'Patunay na Walang Asawa (Death/Marriage Cert.)'],
     icon: 'family_restroom',
     color: 'text-tertiary'
   },
   'BRGY-SEN-08': {
     title: 'Senior Citizen Certificate',
-    desc: 'Ipinagkakaloob sa mga residenteng edad 60 pataas para sa pag-avail ng mga diskwento at benepisyo.',
+    desc: 'Nagpapatunay na ang aplikante ay isang senior citizen na kwalipikado sa 20% diskwento at iba pang benepisyo ayon sa RA 9994.',
     reqs: ['1 Balidong ID (may petsa ng kapanganakan)', '2x2 Larawan (Picture)'],
     icon: 'elderly',
     color: 'text-secondary'
+  },
+  'BRGY-BLT-09': {
+    title: 'Complaint / Blotter Report',
+    desc: 'Opisyal na pag-tala ng mga hindi pagkakaunawaan, insidente, o reklamo para sa legal na dokumentasyon at medyasyon ng barangay.',
+    reqs: ['1 Balidong ID', 'Detalye ng Insidente / Paliwanag', 'Mga Saksi (kung meron)'],
+    icon: 'gavel',
+    color: 'text-error'
   }
 };
 
