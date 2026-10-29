@@ -12,12 +12,12 @@ interface RequestData {
   documentType: string;
   purpose: string;
   dateFiled: string;
-  dateReleased?: string; // ✅ IDINAGDAG
+  dateReleased?: string;
   estimatedRelease: string;
   fee: string;
   status: string;
-  residentName?: string; // ✅ IDINAGDAG
-  purok?: string;        // ✅ IDINAGDAG
+  residentName?: string;
+  purok?: string;
 }
 
 interface AnnouncementData {
@@ -89,6 +89,10 @@ const ResidentDashboard: React.FC = () => {
   const [announcement, setAnnouncement] = useState<AnnouncementData | null>(null);
   const [holidays, setHolidays] = useState<HolidayData[]>([]);
 
+  // ✅ STATES PARA SA AUTO-LOGOUT WARNING
+  const [isSuspendedModalOpen, setIsSuspendedModalOpen] = useState(false);
+  const [countdown, setCountdown] = useState(10);
+
   const [language, setLanguage] = useState<Language>(() => {
     return (localStorage.getItem('appLanguage') as Language) || 'en';
   });
@@ -100,8 +104,45 @@ const ResidentDashboard: React.FC = () => {
     localStorage.setItem('appLanguage', language);
   }, [language]);
 
+  // ✅ MONITOR USER STATUS (AUTO-LOGOUT KAPAG SUSPENDED)
   useEffect(() => {
     let unsubUser: any;
+    const currentUid = localStorage.getItem('residentUid');
+
+    if (currentUid) {
+      const userRef = doc(db, "users", currentUid);
+      unsubUser = onSnapshot(userRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const status = data.status?.toLowerCase();
+          
+          // Kung naging suspended o rejected habang naka-login
+          if (status === 'suspended' || status === 'rejected') {
+            setIsSuspendedModalOpen(true);
+          }
+        }
+      });
+    }
+
+    return () => {
+      if (unsubUser) unsubUser();
+    };
+  }, []);
+
+  // ✅ COUNTDOWN TIMER PARA SA AUTO-LOGOUT
+  useEffect(() => {
+    let timer: any;
+    if (isSuspendedModalOpen && countdown > 0) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    } else if (isSuspendedModalOpen && countdown === 0) {
+      // Kapag 0 na, i-logout
+      localStorage.removeItem('residentUid');
+      window.location.href = '/login';
+    }
+    return () => clearTimeout(timer);
+  }, [isSuspendedModalOpen, countdown]);
+
+  useEffect(() => {
     let unsubRequests: any;
 
     const fetchData = async () => {
@@ -137,7 +178,6 @@ const ResidentDashboard: React.FC = () => {
     fetchData();
 
     return () => {
-      if (unsubUser) unsubUser();
       if (unsubRequests) unsubRequests();
     };
   }, []);
@@ -693,7 +733,7 @@ const ResidentDashboard: React.FC = () => {
             </div>
           </footer>
 
-          {/* ✅ CLAIM SLIP MODAL (UPDATED) */}
+          {/* ✅ CLAIM SLIP MODAL */}
           {isClaimSlipOpen && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary/50 backdrop-blur-sm p-4 print:bg-white print:p-0 print:static">
               
@@ -701,7 +741,6 @@ const ResidentDashboard: React.FC = () => {
                 ref={claimSlipRef} 
                 className="w-full max-w-md bg-white p-5 sm:p-8 rounded-xl shadow-2xl border-t-8 border-primary print:shadow-none print:rounded-none print:max-w-none print:border-t-0 print:p-4 max-h-[90vh] overflow-y-auto"
               >
-                {/* ✅ ITO YUNG PAPEL NA MAKUKUHA SA PDF/PRINT */}
                 <div id="printable-claim-slip">
                   <div className="text-center border-b-2 border-gray-300 pb-4 mb-4">
                     <img src={logoImage} alt="Logo" style={{ width: '70px', height: '70px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', display: 'block' }} />
@@ -734,7 +773,6 @@ const ResidentDashboard: React.FC = () => {
                         <p className="font-semibold text-gray-900 text-xs">{userData?.purok || 'N/A'}</p>
                       </div>
                       
-                      {/* ✅ IDINAGDAG NA FEE */}
                       <div className="col-span-2 bg-blue-50/50 p-2.5 rounded-lg border border-blue-100 mt-1">
                         <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Amount to Pay / Fee</p>
                         <p className="font-bold text-blue-900 text-sm">{formatCurrency(selectedRequest.fee)}</p>
@@ -764,7 +802,6 @@ const ResidentDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                {/* ✅ MGA BUTTONS (Nasa loob para maganda, pero naka-ignore sa Print at PDF) */}
                 <div 
                   className="no-print mt-6 flex flex-wrap justify-end gap-2 bg-gray-50 p-3 rounded-xl border border-gray-200"
                   data-html2canvas-ignore="true"
@@ -800,6 +837,39 @@ const ResidentDashboard: React.FC = () => {
                     {t.yesLogout}
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* ✅ SUSPENDED ACCOUNT AUTO-LOGOUT MODAL */}
+          {isSuspendedModalOpen && (
+            <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(11, 28, 48, 0.85)', backdropFilter: 'blur(8px)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+              <div style={{ backgroundColor: '#ffffff', borderRadius: '24px', padding: '40px 32px', width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+                
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#ffdad6', color: '#ba1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px', animation: 'pop 0.4s ease-out' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '48px' }}>gpp_bad</span>
+                </div>
+                
+                <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#111827', margin: '0 0 12px 0' }}>Account Suspended</h2>
+                <p style={{ fontSize: '14px', color: '#4b5563', margin: '0 0 32px 0', lineHeight: 1.6 }}>
+                  Your account has been temporarily suspended by the Barangay Administration. You will be automatically logged out in <strong>{countdown}</strong> seconds.
+                </p>
+                
+                <button 
+                  onClick={() => {
+                    localStorage.removeItem('residentUid');
+                    window.location.href = '/login';
+                  }} 
+                  style={{ width: '100%', padding: '14px', borderRadius: '12px', backgroundColor: '#ba1a1a', color: '#ffffff', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px', transition: 'background-color 0.2s' }}
+                >
+                  Okay, I Understand
+                </button>
+                
+                <style>
+                  {`
+                    @keyframes pop { 0% { transform: scale(0.5); opacity: 0; } 80% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+                  `}
+                </style>
               </div>
             </div>
           )}

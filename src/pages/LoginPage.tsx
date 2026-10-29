@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { auth, db, logAction } from '../firebase'; 
 import logoImage from '../assets/logo.png';
 
@@ -120,7 +120,7 @@ const LoginPage: React.FC = () => {
                   <p className="text-gray-500 text-sm">Login to your BarangayEase account.</p>
                 </div>
 
-                {/* ✅ ERROR MESSAGE DISPLAY (Ito lang ang idinagdag) */}
+                {/* ✅ ERROR MESSAGE DISPLAY */}
                 {errorMessage && (
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-start gap-3">
                     <span className="material-symbols-outlined text-red-500 text-xl">error</span>
