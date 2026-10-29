@@ -59,95 +59,80 @@ const AdminLogin: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent className="bg-surface">
-        {/* ✅ Pinalitan ko ng bahagyang light blue ang background para maging moderno */}
-        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#f0f4f8', fontFamily: "'Public Sans', sans-serif", color: '#0b1c30' }}>
+      <IonContent className="bg-[#f0f4f8]">
+        <div className="min-h-screen flex flex-col font-sans text-gray-800">
           
-          {/* HEADER (Hindi ito ginagalaw, kung ano ang dati, yun pa rin) */}
-          <header style={{ width: '100%', backgroundColor: '#ffffff', borderBottom: '1px solid #e5eeff', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', zIndex: 10, flexWrap: 'wrap', gap: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ width: '56px', height: '56px', borderRadius: '50%', overflow: 'hidden', backgroundColor: '#ffffff' }}>
-                <img src={logoImage} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          {/* HEADER */}
+          <header className="w-full bg-white border-b border-gray-100 py-3 px-6 md:px-12 flex flex-col sm:flex-row items-center justify-between shadow-sm gap-4 z-10 relative">
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0">
+                <img src={logoImage} alt="BarangayEase Logo" className="w-full h-full object-contain rounded-full" />
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontWeight: 'bold', fontSize: '18px', color: '#00236f' }}>BarangayEase</span>
-                <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500' }}>Barangay Malinao Local Government Portal</span>
+              <div className="flex flex-col">
+                <span className="font-bold text-lg text-[#00236f] leading-tight">BarangayEase</span>
+                <span className="text-xs text-gray-500 font-medium">Barangay Malinao Local Government Portal</span>
               </div>
             </div>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {/* STAFF PORTAL BUTTON */}
-              <button 
-                onClick={() => window.location.href = '/staff-login'}
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#ffffff', color: '#00236f', border: '1px solid #e5eeff', padding: '8px 16px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s' }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f8f9ff'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#ffffff'}
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>badge</span>
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+              <button onClick={() => window.location.href = '/staff-login'} className="flex items-center gap-1.5 bg-white text-[#00236f] border border-gray-200 hover:bg-gray-50 active:bg-gray-200 active:scale-95 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all shadow-sm">
+                <span className="material-symbols-outlined text-[18px]">badge</span>
                 <span>Staff Portal</span>
               </button>
-
-              {/* HOME BUTTON */}
-              <button 
-                onClick={() => window.location.href = '/'}
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#00236f', color: '#ffffff', border: 'none', padding: '8px 16px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 6px rgba(0,35,111,0.2)' }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#00174d'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#00236f'}
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>home</span>
+              <button onClick={() => window.location.href = '/'} className="flex items-center gap-1.5 bg-[#00236f] text-white border border-[#00236f] hover:bg-[#00174d] active:bg-[#000d29] active:scale-95 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all shadow-md hover:shadow-lg">
+                <span className="material-symbols-outlined text-[18px]">home</span>
                 <span>Home</span>
               </button>
             </div>
           </header>
 
           {/* MAIN CONTENT */}
-          <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 16px' }}>
-            <div style={{ width: '100%', maxWidth: '450px', backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: '0 10px 40px rgba(0,0,0,0.08)', overflow: 'hidden', border: '1px solid #eff4ff' }}>
+          <main className="flex-1 flex items-center justify-center p-4 md:p-8">
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] w-full max-w-[500px] overflow-hidden relative z-10">
               
-              {/* Tricolor Top Bar */}
-              <div style={{ height: '6px', width: '100%', display: 'flex' }}>
-                <div style={{ width: '33.33%', backgroundColor: '#b32424' }}></div>
-                <div style={{ width: '33.33%', backgroundColor: '#00236f' }}></div>
-                <div style={{ width: '33.33%', backgroundColor: '#fe932c' }}></div>
+              {/* TOP TRICOLOR BAR */}
+              <div className="h-2 w-full flex">
+                <div className="w-1/3 bg-[#00236f]"></div>
+                <div className="w-1/3 bg-[#b32424]"></div>
+                <div className="w-1/3 bg-[#fe932c]"></div>
               </div>
 
-              <div style={{ padding: '40px 32px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '32px' }}>
-                  <div style={{ width: '100px', height: '100px', marginBottom: '16px', borderRadius: '50%', backgroundColor: '#f8f9ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <img src={logoImage} alt="Logo" style={{ width: '80%', height: '80%', objectFit: 'contain', borderRadius: '50%' }} />
+              <div className="p-8 md:p-10">
+                <div className="flex flex-col items-center text-center mb-8">
+                  <div className="w-32 h-32 flex items-center justify-center mb-4">
+                    <img src={logoImage} alt="BarangayEase Logo" className="w-full h-full object-contain rounded-full" />
                   </div>
                   
-                  <span style={{ color: '#b32424', fontSize: '10px', fontWeight: 'bold', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '4px' }}>Restricted Access</span>
-                  <span style={{ color: '#6b7280', fontSize: '12px', fontWeight: '500', marginBottom: '8px' }}>Municipality of Naujan • Barangay Malinao</span>
-                  <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#00236f', margin: '0 0 4px 0' }}>Admin Portal</h1>
-                  <p style={{ color: '#9ca3af', fontSize: '13px', margin: 0 }}>Authorized Punong Barangay Login</p>
+                  <span className="text-[#b32424] text-[10px] font-bold tracking-[0.2em] uppercase mb-1">Restricted Access</span>
+                  <span className="text-gray-600 text-xs font-medium mb-2">Municipality of Naujan • Barangay Malinao</span>
+                  <h1 className="text-2xl font-bold text-[#00236f] mb-1">Admin Portal Access</h1>
+                  <p className="text-gray-500 text-sm">Authorized Punong Barangay Login</p>
                 </div>
 
-                <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fee2e2', borderRadius: '12px', padding: '16px', marginBottom: '32px', display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                  <span className="material-symbols-outlined" style={{ color: '#dc2626', fontSize: '24px' }}>gpp_maybe</span>
+                {/* WARNING BOX */}
+                <div className="bg-red-50 border border-red-100 rounded-xl p-4 mb-8 flex items-start gap-3">
+                  <span className="material-symbols-outlined text-red-600 text-xl">gpp_maybe</span>
                   <div>
-                    <span style={{ color: '#991b1b', fontSize: '12px', fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>SECURITY WARNING</span>
-                    <p style={{ fontSize: '12px', color: '#b91c1c', lineHeight: 1.5, margin: 0 }}>
+                    <span className="text-red-700 text-xs font-bold block mb-1">SECURITY WARNING</span>
+                    <p className="text-xs text-red-600 leading-relaxed">
                       This area is for the Punong Barangay only. Unauthorized access attempts are logged and reported.
                     </p>
                   </div>
                 </div>
 
-                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <form onSubmit={handleLogin} className="flex flex-col gap-5">
                   <div>
-                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
-                      Admin Email <span style={{ color: '#b32424' }}>*</span>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Admin Email <span className="text-[#b32424]">*</span>
                     </label>
-                    <div style={{ position: 'relative' }}>
-                      <span className="material-symbols-outlined" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', fontSize: '20px' }}>admin_panel_settings</span>
+                    <div className="relative">
+                      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">admin_panel_settings</span>
                       <input 
                         type="email" 
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="e.g. captain@malinao.gov.ph"
-                        style={{ width: '100%', padding: '12px 16px 12px 40px', backgroundColor: '#f8f9ff', border: '1px solid #e5eeff', borderRadius: '10px', fontSize: '14px', color: '#0b1c30', outline: 'none', transition: 'border 0.2s' }}
-                        onFocus={(e) => e.target.style.border = '1px solid #00236f'}
-                        onBlur={(e) => e.target.style.border = '1px solid #e5eeff'}
+                        className="w-full pl-10 pr-4 py-3 bg-[#eff4ff] border border-transparent rounded-xl text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#00236f] focus:bg-white transition-all placeholder:text-gray-400"
                         required
                         disabled={isLoading}
                       />
@@ -155,28 +140,26 @@ const AdminLogin: React.FC = () => {
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
-                      Admin Password <span style={{ color: '#b32424' }}>*</span>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Admin Password <span className="text-[#b32424]">*</span>
                     </label>
-                    <div style={{ position: 'relative' }}>
-                      <span className="material-symbols-outlined" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', fontSize: '20px' }}>lock</span>
+                    <div className="relative">
+                      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">lock</span>
                       <input 
                         type={showPassword ? 'text' : 'password'}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••••"
-                        style={{ width: '100%', padding: '12px 40px 12px 40px', backgroundColor: '#f8f9ff', border: '1px solid #e5eeff', borderRadius: '10px', fontSize: '14px', color: '#0b1c30', outline: 'none', transition: 'border 0.2s', fontFamily: 'monospace' }}
-                        onFocus={(e) => e.target.style.border = '1px solid #00236f'}
-                        onBlur={(e) => e.target.style.border = '1px solid #e5eeff'}
+                        className="w-full pl-10 pr-12 py-3 bg-[#eff4ff] border border-transparent rounded-xl text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#00236f] focus:bg-white transition-all placeholder:text-gray-500 font-mono"
                         required
                         disabled={isLoading}
                       />
                       <button 
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>{showPassword ? 'visibility_off' : 'visibility'}</span>
+                        <span className="material-symbols-outlined">{showPassword ? 'visibility_off' : 'visibility'}</span>
                       </button>
                     </div>
                   </div>
@@ -184,21 +167,19 @@ const AdminLogin: React.FC = () => {
                   <button 
                     type="submit" 
                     disabled={isLoading}
-                    style={{ width: '100%', backgroundColor: isLoading ? '#9ca3af' : '#00236f', color: '#ffffff', fontWeight: 'bold', padding: '14px', borderRadius: '10px', border: 'none', cursor: isLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '12px', fontSize: '15px', transition: 'background 0.2s', boxShadow: isLoading ? 'none' : '0 4px 12px rgba(0,35,111,0.2)' }}
-                    onMouseOver={(e) => { if(!isLoading) e.currentTarget.style.backgroundColor = '#00174d' }}
-                    onMouseOut={(e) => { if(!isLoading) e.currentTarget.style.backgroundColor = '#00236f' }}
+                    className={`w-full ${isLoading ? 'bg-gray-400' : 'bg-[#00236f] hover:bg-[#00174d] active:bg-[#000d29] active:scale-[0.98]'} text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md mt-4`}
                   >
-                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+                    <span className="material-symbols-outlined text-xl">
                       {isLoading ? 'sync' : 'login'}
                     </span>
                     {isLoading ? 'Signing In...' : 'Sign In as Admin'}
                   </button>
                 </form>
 
-                <div style={{ marginTop: '32px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '11px', color: '#9ca3af', fontWeight: '500' }}>
-                  <p style={{ margin: 0 }}>Authorized Personnel Only • Barangay Malinao Administrative District</p>
-                  <p style={{ margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>lock</span>
+                <div className="mt-8 text-center flex flex-col gap-1 text-[11px] text-gray-500 font-medium">
+                  <p>Authorized Personnel Only • Barangay Malinao Administrative District</p>
+                  <p className="flex items-center justify-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">lock</span>
                     System Secured via 256-Bit Encryption
                   </p>
                 </div>
@@ -206,6 +187,22 @@ const AdminLogin: React.FC = () => {
               </div>
             </div>
           </main>
+
+          {/* FOOTER */}
+          <footer className="w-full bg-white border-t border-gray-100 py-4 px-6 md:px-12 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500 gap-2">
+            <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
+              <span>Republic of the Philippines</span>
+              <span>•</span>
+              <span>City Government of Oriental Mindoro</span>
+              <span>•</span>
+              <span>Barangay Malinao Administrative District</span>
+            </div>
+            <div className="flex items-center gap-1.5 font-medium">
+              <span className="material-symbols-outlined text-[16px]">lock</span>
+              256-Bit Encrypted Municipal Records System
+            </div>
+          </footer>
+
         </div>
       </IonContent>
     </IonPage>
