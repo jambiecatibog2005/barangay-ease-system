@@ -28,6 +28,7 @@ const translations = {
     navRequest: "Request Document",
     navTrack: "Track Status",
     navHistory: "Transaction History",
+    navSettings: "Settings",
     logout: "Logout",
     langLabel: "Language",
     officeHours: "Office Hours: Monday-Sunday 8:00 AM – 5:00 PM",
@@ -80,6 +81,7 @@ const translations = {
     navRequest: "Humiling ng Dokumento",
     navTrack: "Subaybayan ang Status",
     navHistory: "Kasaysayan ng Transaksyon",
+    navSettings: "Mga Setting",
     logout: "Mag-logout",
     langLabel: "Wika",
     officeHours: "Oras ng Opisina: Lunes-Linggo 8:00 AM – 5:00 PM",
@@ -231,7 +233,7 @@ const TransactionHistory: React.FC = () => {
   const formatFee = (feeStr: string) => {
     if (!feeStr) return '₱0.00';
     if (feeStr.toLowerCase().includes('libre') || feeStr === '₱0.00' || feeStr === '0') {
-      return 'Libre (₱0.00)'; // O kaya gawin mong '₱0.00' kung ayaw mo ng "Libre"
+      return 'Libre (₱0.00)'; 
     }
     return feeStr;
   };
@@ -281,6 +283,7 @@ const TransactionHistory: React.FC = () => {
                 <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/documents">{t.navRequest}</a>
                 <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/track-status">{t.navTrack}</a>
                 <a className="px-3 py-2 transition-colors bg-primary text-on-primary font-bold rounded-lg shadow-sm text-sm whitespace-nowrap" href="/history">{t.navHistory}</a>
+                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/settings">{t.navSettings}</a>
               </nav>
 
               <div className="flex items-center justify-end gap-2 shrink-0">
@@ -298,6 +301,7 @@ const TransactionHistory: React.FC = () => {
                         <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/documents">{t.navRequest}</a>
                         <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/track-status">{t.navTrack}</a>
                         <a className="px-4 py-2.5 text-sm font-semibold text-primary bg-primary/10 rounded-lg" href="/history">{t.navHistory}</a>
+                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/settings">{t.navSettings}</a>
                         <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
                       </div>
                       
