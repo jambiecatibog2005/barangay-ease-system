@@ -24,7 +24,7 @@ const ResidentSettings: React.FC = () => {
     return (localStorage.getItem('appLanguage') as 'en' | 'fil') || 'en';
   });
 
-  // ✅ KUMPLETONG TRANSLATIONS
+  // ✅ KUMPLETONG TRANSLATIONS (Menu + Settings Content)
   const t = {
     en: { 
       dashboard: "Dashboard", 
@@ -196,7 +196,7 @@ const ResidentSettings: React.FC = () => {
       <IonContent className="bg-surface">
         <div className="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col">
           
-          {/* HEADER */}
+          {/* HEADER (Gaya sa Dashboard) */}
           <header className="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
             <div className="bg-primary text-on-primary text-label-sm font-label-sm">
               <div className="max-w-7xl mx-auto px-4 md:px-margin flex flex-col md:flex-row items-center justify-between py-2 md:py-0 md:h-8 gap-1.5 md:gap-0">
