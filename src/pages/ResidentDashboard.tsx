@@ -50,7 +50,27 @@ const translations = {
     document: "Document", download: "Download PDF", print: "Print", close: "Close", language: "Language",
     publicAnnouncement: "Public Announcement", for: "For",
     upcomingHolidays: "Upcoming Holidays", noUpcomingHolidays: "No upcoming holidays.",
-    slaNote: "Note: SLA deadlines for document requests are paused on these dates."
+    slaNote: "Note: SLA deadlines for document requests are paused on these dates.",
+    
+    // ✅ PROFILE MODAL TRANSLATIONS
+    myAccount: "My Account",
+    fullName: "Full Name",
+    email: "Email",
+    updatePurok: "Update Purok",
+    saveProfile: "Save Profile Changes",
+    changePassword: "Change Password",
+    currentPassword: "Current Password",
+    newPassword: "New Password (min 6 chars)",
+    updatePassword: "Update Password",
+    profileUpdated: "Profile updated successfully!",
+    failedProfile: "Failed to update profile.",
+    namePurokEmpty: "Name and Purok cannot be empty.",
+    passwordChanged: "Password changed successfully! Logging you out...",
+    incorrectPassword: "Incorrect current password. Please try again.",
+    securityCheck: "Security check failed. Please logout and login again.",
+    failedPassword: "Failed to change password.",
+    enterCurrentPassword: "Please enter your current password.",
+    newPasswordLength: "New password must be at least 6 characters."
   },
   fil: {
     dashboard: "Panel ng Residente", requestDocument: "Humiling ng Dokumento", trackStatus: "Subaybayan ang Status", transactionHistory: "Kasaysayan ng Transaksyon",
@@ -67,7 +87,27 @@ const translations = {
     document: "Dokumento", download: "I-download", print: "I-print", close: "Isara", language: "Wika",
     publicAnnouncement: "Pampublikong Abiso", for: "Para sa",
     upcomingHolidays: "Mga Paparating na Holiday", noUpcomingHolidays: "Walang paparating na holiday.",
-    slaNote: "Paalala: Pansamantalang naka-pause ang oras ng SLA tuwing may holiday."
+    slaNote: "Paalala: Pansamantalang naka-pause ang oras ng SLA tuwing may holiday.",
+    
+    // ✅ PROFILE MODAL TRANSLATIONS
+    myAccount: "Aking Account",
+    fullName: "Buong Pangalan",
+    email: "Email",
+    updatePurok: "Palitan ang Purok",
+    saveProfile: "I-save ang Profile",
+    changePassword: "Palitan ang Password",
+    currentPassword: "Kasalukuyang Password",
+    newPassword: "Bagong Password (min 6 characters)",
+    updatePassword: "I-update ang Password",
+    profileUpdated: "Matagumpay na na-update ang profile!",
+    failedProfile: "Bigo ang pag-update ng profile.",
+    namePurokEmpty: "Hindi pwedeng walang laman ang Pangalan at Purok.",
+    passwordChanged: "Matagumpay na napalitan ang password! Maglo-logout ka...",
+    incorrectPassword: "Mali ang kasalukuyang password. Subukan muli.",
+    securityCheck: "Bigo ang security check. Mag-logout at mag-login muli.",
+    failedPassword: "Bigo ang pagpalit ng password.",
+    enterCurrentPassword: "Ilagay ang iyong kasalukuyang password.",
+    newPasswordLength: "Ang bagong password ay dapat hindi bababa sa 6 na characters."
   }
 };
 
@@ -88,7 +128,7 @@ const ResidentDashboard: React.FC = () => {
   // ✅ MGA STATES PARA SA PROFILE / SETTINGS
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [editFullName, setEditFullName] = useState('');
-  const [currentPassword, setCurrentPassword] = useState(''); // ✅ BAGONG STATE
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newPurok, setNewPurok] = useState('');
   const [profileMsg, setProfileMsg] = useState({ text: '', type: '' });
@@ -280,7 +320,7 @@ const ResidentDashboard: React.FC = () => {
   // ✅ FUNCTIONS PARA SA PROFILE MODAL
   const handleUpdateProfile = async () => {
     if (!editFullName || !newPurok) {
-      setProfileMsg({ text: 'Name and Purok cannot be empty.', type: 'error' });
+      setProfileMsg({ text: t.namePurokEmpty, type: 'error' });
       return;
     }
     setIsUpdating(true);
@@ -294,22 +334,21 @@ const ResidentDashboard: React.FC = () => {
         purok: newPurok 
       });
       setUserData((prev: any) => ({ ...prev, fullName: editFullName, purok: newPurok }));
-      setProfileMsg({ text: 'Profile updated successfully!', type: 'success' });
+      setProfileMsg({ text: t.profileUpdated, type: 'success' });
     } catch (error) {
-      setProfileMsg({ text: 'Failed to update profile.', type: 'error' });
+      setProfileMsg({ text: t.failedProfile, type: 'error' });
     } finally {
       setIsUpdating(false);
     }
   };
 
-  // ✅ FIXED: Change Password with Reauthentication
   const handleChangePassword = async () => {
     if (!currentPassword) {
-      setProfileMsg({ text: 'Please enter your current password.', type: 'error' });
+      setProfileMsg({ text: t.enterCurrentPassword, type: 'error' });
       return;
     }
     if (newPassword.length < 6) {
-      setProfileMsg({ text: 'New password must be at least 6 characters.', type: 'error' });
+      setProfileMsg({ text: t.newPasswordLength, type: 'error' });
       return;
     }
     
@@ -320,18 +359,15 @@ const ResidentDashboard: React.FC = () => {
       const user = auth.currentUser;
       if (!user || !user.email) throw new Error("Session expired. Please logout and login again.");
 
-      // 1. REAUTHENTICATE GAMIT ANG LUMANG PASSWORD
       const credential = EmailAuthProvider.credential(user.email, currentPassword);
       await reauthenticateWithCredential(user, credential);
 
-      // 2. KAPAG OKAY ANG LUMANG PASSWORD, PALITAN NA ANG BAGO
       await updatePassword(user, newPassword);
       
-      setProfileMsg({ text: 'Password changed successfully! Logging you out...', type: 'success' });
+      setProfileMsg({ text: t.passwordChanged, type: 'success' });
       setCurrentPassword('');
       setNewPassword('');
       
-      // 3. AUTOMATIC LOGOUT PAGKATAPOS NG 2 SEGUNDO
       setTimeout(async () => {
         localStorage.removeItem('residentUid');
         await signOut(auth);
@@ -340,11 +376,11 @@ const ResidentDashboard: React.FC = () => {
 
     } catch (error: any) {
       if (error.code === 'auth/wrong-password') {
-        setProfileMsg({ text: 'Incorrect current password. Please try again.', type: 'error' });
+        setProfileMsg({ text: t.incorrectPassword, type: 'error' });
       } else if (error.code === 'auth/requires-recent-login') {
-        setProfileMsg({ text: 'Security check failed. Please logout and login again.', type: 'error' });
+        setProfileMsg({ text: t.securityCheck, type: 'error' });
       } else {
-        setProfileMsg({ text: error.message || 'Failed to change password.', type: 'error' });
+        setProfileMsg({ text: error.message || t.failedPassword, type: 'error' });
       }
     } finally {
       setIsUpdating(false);
@@ -944,7 +980,7 @@ const ResidentDashboard: React.FC = () => {
             <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-primary/50 backdrop-blur-sm p-4">
               <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-4 border-b pb-3">
-                  <h2 className="text-xl font-bold text-primary">My Account</h2>
+                  <h2 className="text-xl font-bold text-primary">{t.myAccount}</h2>
                   <button onClick={() => setIsProfileModalOpen(false)} className="text-gray-500 hover:bg-gray-100 rounded-full p-1">
                     <span className="material-symbols-outlined">close</span>
                   </button>
@@ -957,19 +993,19 @@ const ResidentDashboard: React.FC = () => {
                 )}
 
                 <div className="mb-4">
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Full Name</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{t.fullName}</label>
                   <input 
                     type="text" 
                     value={editFullName}
                     onChange={(e) => setEditFullName(e.target.value)}
                     className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2"
                   />
-                  <p className="text-xs text-gray-500 font-bold uppercase mt-2">Email</p>
+                  <p className="text-xs text-gray-500 font-bold uppercase mt-2">{t.email}</p>
                   <p className="font-semibold text-gray-800 text-sm">{userData?.email}</p>
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Update Purok</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{t.updatePurok}</label>
                   <select 
                     value={newPurok} 
                     onChange={(e) => setNewPurok(e.target.value)}
@@ -984,17 +1020,16 @@ const ResidentDashboard: React.FC = () => {
                     <option value="Purok 7 Silangan">Purok 7 Silangan</option>
                   </select>
                   <button onClick={handleUpdateProfile} disabled={isUpdating} className="w-full bg-secondary text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-800 transition-colors">
-                    Save Profile Changes
+                    {t.saveProfile}
                   </button>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Change Password</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{t.changePassword}</label>
                   
-                  {/* ✅ CURRENT PASSWORD INPUT */}
                   <input 
                     type="password" 
-                    placeholder="Current Password" 
+                    placeholder={t.currentPassword} 
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2"
@@ -1002,14 +1037,14 @@ const ResidentDashboard: React.FC = () => {
                   
                   <input 
                     type="password" 
-                    placeholder="New Password (min 6 chars)" 
+                    placeholder={t.newPassword} 
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2"
                   />
                   
                   <button onClick={handleChangePassword} disabled={isUpdating || !currentPassword || !newPassword} className="w-full bg-primary text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-900 disabled:bg-gray-400 transition-colors">
-                    Update Password
+                    {t.updatePassword}
                   </button>
                 </div>
 

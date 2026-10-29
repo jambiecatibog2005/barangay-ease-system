@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { collection, onSnapshot, query, where, doc, getDoc, updateDoc } from "firebase/firestore";
+import { updatePassword, signOut, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 import { auth, db } from '../firebase';
 import logoImage from '../assets/logo.png';
 
@@ -73,7 +74,27 @@ const translations = {
     logoutTitle: "Are you sure you want to log out?",
     logoutMsg: "You will need to sign in again to view your requests and apply for new documents.",
     logoutConfirm: "Yes, Log out",
-    cancel: "Cancel"
+    cancel: "Cancel",
+
+    // ✅ PROFILE MODAL TRANSLATIONS
+    myAccount: "My Account",
+    fullName: "Full Name",
+    emailProfile: "Email",
+    updatePurok: "Update Purok",
+    saveProfile: "Save Profile Changes",
+    changePassword: "Change Password",
+    currentPassword: "Current Password",
+    newPassword: "New Password (min 6 chars)",
+    updatePassword: "Update Password",
+    profileUpdated: "Profile updated successfully!",
+    failedProfile: "Failed to update profile.",
+    namePurokEmpty: "Name and Purok cannot be empty.",
+    passwordChanged: "Password changed successfully! Logging you out...",
+    incorrectPassword: "Incorrect current password. Please try again.",
+    securityCheck: "Security check failed. Please logout and login again.",
+    failedPassword: "Failed to change password.",
+    enterCurrentPassword: "Please enter your current password.",
+    newPasswordLength: "New password must be at least 6 characters."
   },
   fil: {
     navDashboard: "Panel ng Residente",
@@ -125,7 +146,27 @@ const translations = {
     logoutTitle: "Sigurado ka bang gusto mong mag-logout?",
     logoutMsg: "Kailangan mong mag-login muli para makita ang iyong mga request at makapag-apply ng bagong dokumento.",
     logoutConfirm: "Oo, Mag-logout",
-    cancel: "Kanselahin"
+    cancel: "Kanselahin",
+
+    // ✅ PROFILE MODAL TRANSLATIONS
+    myAccount: "Aking Account",
+    fullName: "Buong Pangalan",
+    emailProfile: "Email",
+    updatePurok: "Palitan ang Purok",
+    saveProfile: "I-save ang Profile",
+    changePassword: "Palitan ang Password",
+    currentPassword: "Kasalukuyang Password",
+    newPassword: "Bagong Password (min 6 characters)",
+    updatePassword: "I-update ang Password",
+    profileUpdated: "Matagumpay na na-update ang profile!",
+    failedProfile: "Bigo ang pag-update ng profile.",
+    namePurokEmpty: "Hindi pwedeng walang laman ang Pangalan at Purok.",
+    passwordChanged: "Matagumpay na napalitan ang password! Maglo-logout ka...",
+    incorrectPassword: "Mali ang kasalukuyang password. Subukan muli.",
+    securityCheck: "Bigo ang security check. Mag-logout at mag-login muli.",
+    failedPassword: "Bigo ang pagpalit ng password.",
+    enterCurrentPassword: "Ilagay ang iyong kasalukuyang password.",
+    newPasswordLength: "Ang bagong password ay dapat hindi bababa sa 6 na characters."
   }
 };
 
@@ -138,6 +179,16 @@ const TransactionHistory: React.FC = () => {
 
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
+  // ✅ MGA STATES PARA SA PROFILE / SETTINGS
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
+  const [editFullName, setEditFullName] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newPurok, setNewPurok] = useState('');
+  const [profileMsg, setProfileMsg] = useState({ text: '', type: '' });
+  const [isUpdating, setIsUpdating] = useState(false);
+
   const [language, setLanguage] = useState<Language>(() => {
     return (localStorage.getItem('appLanguage') as Language) || 'en';
   });
@@ -147,6 +198,21 @@ const TransactionHistory: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('appLanguage', language);
   }, [language]);
+
+  // ✅ FETCH USER DATA PARA SA PROFILE
+  useEffect(() => {
+    const fetchUser = async () => {
+      const uid = localStorage.getItem('residentUid') || auth.currentUser?.uid;
+      if (uid) {
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          setUserData(userSnap.data());
+        }
+      }
+    };
+    fetchUser();
+  }, []);
 
   // --- FETCH HISTORY (Released + Rejected only) ---
   useEffect(() => {
@@ -204,6 +270,76 @@ const TransactionHistory: React.FC = () => {
   const confirmLogout = () => {
     localStorage.removeItem('residentUid');
     window.location.href = '/login';
+  };
+
+  // ✅ FUNCTIONS PARA SA PROFILE MODAL
+  const handleUpdateProfile = async () => {
+    if (!editFullName || !newPurok) {
+      setProfileMsg({ text: t.namePurokEmpty, type: 'error' });
+      return;
+    }
+    setIsUpdating(true);
+    setProfileMsg({ text: '', type: '' });
+    try {
+      const currentUid = localStorage.getItem('residentUid');
+      if (!currentUid) throw new Error("No UID");
+      
+      await updateDoc(doc(db, "users", currentUid), { 
+        fullName: editFullName,
+        purok: newPurok 
+      });
+      setUserData((prev: any) => ({ ...prev, fullName: editFullName, purok: newPurok }));
+      setProfileMsg({ text: t.profileUpdated, type: 'success' });
+    } catch (error) {
+      setProfileMsg({ text: t.failedProfile, type: 'error' });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!currentPassword) {
+      setProfileMsg({ text: t.enterCurrentPassword, type: 'error' });
+      return;
+    }
+    if (newPassword.length < 6) {
+      setProfileMsg({ text: t.newPasswordLength, type: 'error' });
+      return;
+    }
+    
+    setIsUpdating(true);
+    setProfileMsg({ text: '', type: '' });
+    
+    try {
+      const user = auth.currentUser;
+      if (!user || !user.email) throw new Error("Session expired. Please logout and login again.");
+
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+
+      await updatePassword(user, newPassword);
+      
+      setProfileMsg({ text: t.passwordChanged, type: 'success' });
+      setCurrentPassword('');
+      setNewPassword('');
+      
+      setTimeout(async () => {
+        localStorage.removeItem('residentUid');
+        await signOut(auth);
+        window.location.href = '/login';
+      }, 2000);
+
+    } catch (error: any) {
+      if (error.code === 'auth/wrong-password') {
+        setProfileMsg({ text: t.incorrectPassword, type: 'error' });
+      } else if (error.code === 'auth/requires-recent-login') {
+        setProfileMsg({ text: t.securityCheck, type: 'error' });
+      } else {
+        setProfileMsg({ text: error.message || t.failedPassword, type: 'error' });
+      }
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   // --- DERIVED DATA PARA SA SUMMARY ---
@@ -284,6 +420,23 @@ const TransactionHistory: React.FC = () => {
               </nav>
 
               <div className="flex items-center justify-end gap-2 shrink-0">
+                
+                {/* ✅ USER PROFILE ICON */}
+                <button 
+                  onClick={() => {
+                    setEditFullName(userData?.fullName || '');
+                    setNewPurok(userData?.purok || 'Purok 1 Centro');
+                    setCurrentPassword('');
+                    setNewPassword('');
+                    setProfileMsg({ text: '', type: '' });
+                    setIsProfileModalOpen(true);
+                  }}
+                  className="p-2 text-primary cursor-pointer hover:bg-surface-container rounded-lg focus:outline-none transition-colors"
+                  title="My Account"
+                >
+                  <span className="material-symbols-outlined text-[28px]">account_circle</span>
+                </button>
+
                 <div className="relative">
                   <details className="group [&_summary::-webkit-details-marker]:hidden">
                     <summary className="list-none outline-none p-2 text-primary cursor-pointer hover:bg-surface-container rounded-lg focus:outline-none transition-colors">
@@ -608,6 +761,83 @@ const TransactionHistory: React.FC = () => {
                     {t.logoutConfirm}
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* ✅ PROFILE / CHANGE PASSWORD MODAL */}
+          {isProfileModalOpen && (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-primary/50 backdrop-blur-sm p-4">
+              <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-4 border-b pb-3">
+                  <h2 className="text-xl font-bold text-primary">{t.myAccount}</h2>
+                  <button onClick={() => setIsProfileModalOpen(false)} className="text-gray-500 hover:bg-gray-100 rounded-full p-1">
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+
+                {profileMsg.text && (
+                  <div className={`p-2 mb-4 text-xs font-bold rounded-lg ${profileMsg.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    {profileMsg.text}
+                  </div>
+                )}
+
+                <div className="mb-4">
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{t.fullName}</label>
+                  <input 
+                    type="text" 
+                    value={editFullName}
+                    onChange={(e) => setEditFullName(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2"
+                  />
+                  <p className="text-xs text-gray-500 font-bold uppercase mt-2">{t.emailProfile}</p>
+                  <p className="font-semibold text-gray-800 text-sm">{userData?.email}</p>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{t.updatePurok}</label>
+                  <select 
+                    value={newPurok} 
+                    onChange={(e) => setNewPurok(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2 cursor-pointer"
+                  >
+                    <option value="Purok 1 Centro">Purok 1 Centro</option>
+                    <option value="Purok 2 Riverside">Purok 2 Riverside</option>
+                    <option value="Purok 3 Ilaya">Purok 3 Ilaya</option>
+                    <option value="Purok 4 Pag-asa">Purok 4 Pag-asa</option>
+                    <option value="Purok 5 Maharlika">Purok 5 Maharlika</option>
+                    <option value="Purok 6 Bukid">Purok 6 Bukid</option>
+                    <option value="Purok 7 Silangan">Purok 7 Silangan</option>
+                  </select>
+                  <button onClick={handleUpdateProfile} disabled={isUpdating} className="w-full bg-secondary text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-800 transition-colors">
+                    {t.saveProfile}
+                  </button>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{t.changePassword}</label>
+                  
+                  <input 
+                    type="password" 
+                    placeholder={t.currentPassword} 
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2"
+                  />
+                  
+                  <input 
+                    type="password" 
+                    placeholder={t.newPassword} 
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2"
+                  />
+                  
+                  <button onClick={handleChangePassword} disabled={isUpdating || !currentPassword || !newPassword} className="w-full bg-primary text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-900 disabled:bg-gray-400 transition-colors">
+                    {t.updatePassword}
+                  </button>
+                </div>
+
               </div>
             </div>
           )}

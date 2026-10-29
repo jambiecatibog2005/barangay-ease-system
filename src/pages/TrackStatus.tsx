@@ -4,8 +4,6 @@ import { collection, onSnapshot, query, where, doc, getDoc, updateDoc } from "fi
 import { updatePassword, signOut, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 import { auth, db } from '../firebase'; 
 import logoImage from '../assets/logo.png';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 
 // --- TYPES ---
 interface RequestData {
@@ -119,7 +117,27 @@ const translations = {
     logoutTitle: "Are you sure you want to log out?",
     logoutMsg: "You will need to sign in again to view your requests and apply for new documents.",
     logoutConfirm: "Yes, Log out",
-    cancel: "Cancel"
+    cancel: "Cancel",
+
+    // ✅ PROFILE MODAL TRANSLATIONS
+    myAccount: "My Account",
+    fullName: "Full Name",
+    email: "Email",
+    updatePurok: "Update Purok",
+    saveProfile: "Save Profile Changes",
+    changePassword: "Change Password",
+    currentPassword: "Current Password",
+    newPassword: "New Password (min 6 chars)",
+    updatePassword: "Update Password",
+    profileUpdated: "Profile updated successfully!",
+    failedProfile: "Failed to update profile.",
+    namePurokEmpty: "Name and Purok cannot be empty.",
+    passwordChanged: "Password changed successfully! Logging you out...",
+    incorrectPassword: "Incorrect current password. Please try again.",
+    securityCheck: "Security check failed. Please logout and login again.",
+    failedPassword: "Failed to change password.",
+    enterCurrentPassword: "Please enter your current password.",
+    newPasswordLength: "New password must be at least 6 characters."
   },
   fil: {
     navDashboard: "Panel ng Residente",
@@ -214,7 +232,27 @@ const translations = {
     logoutTitle: "Sigurado ka bang gusto mong mag-logout?",
     logoutMsg: "Kailangan mong mag-login muli para makita ang iyong mga request at makapag-apply ng bagong dokumento.",
     logoutConfirm: "Oo, Mag-logout",
-    cancel: "Kanselahin"
+    cancel: "Kanselahin",
+
+    // ✅ PROFILE MODAL TRANSLATIONS
+    myAccount: "Aking Account",
+    fullName: "Buong Pangalan",
+    email: "Email",
+    updatePurok: "Palitan ang Purok",
+    saveProfile: "I-save ang Profile",
+    changePassword: "Palitan ang Password",
+    currentPassword: "Kasalukuyang Password",
+    newPassword: "Bagong Password (min 6 characters)",
+    updatePassword: "I-update ang Password",
+    profileUpdated: "Matagumpay na na-update ang profile!",
+    failedProfile: "Bigo ang pag-update ng profile.",
+    namePurokEmpty: "Hindi pwedeng walang laman ang Pangalan at Purok.",
+    passwordChanged: "Matagumpay na napalitan ang password! Maglo-logout ka...",
+    incorrectPassword: "Mali ang kasalukuyang password. Subukan muli.",
+    securityCheck: "Bigo ang security check. Mag-logout at mag-login muli.",
+    failedPassword: "Bigo ang pagpalit ng password.",
+    enterCurrentPassword: "Ilagay ang iyong kasalukuyang password.",
+    newPasswordLength: "Ang bagong password ay dapat hindi bababa sa 6 na characters."
   }
 };
 
@@ -343,7 +381,7 @@ const TrackStatus: React.FC = () => {
   // ✅ FUNCTIONS PARA SA PROFILE MODAL
   const handleUpdateProfile = async () => {
     if (!editFullName || !newPurok) {
-      setProfileMsg({ text: 'Name and Purok cannot be empty.', type: 'error' });
+      setProfileMsg({ text: t.namePurokEmpty, type: 'error' });
       return;
     }
     setIsUpdating(true);
@@ -357,9 +395,9 @@ const TrackStatus: React.FC = () => {
         purok: newPurok 
       });
       setUserData((prev: any) => ({ ...prev, fullName: editFullName, purok: newPurok }));
-      setProfileMsg({ text: 'Profile updated successfully!', type: 'success' });
+      setProfileMsg({ text: t.profileUpdated, type: 'success' });
     } catch (error) {
-      setProfileMsg({ text: 'Failed to update profile.', type: 'error' });
+      setProfileMsg({ text: t.failedProfile, type: 'error' });
     } finally {
       setIsUpdating(false);
     }
@@ -367,11 +405,11 @@ const TrackStatus: React.FC = () => {
 
   const handleChangePassword = async () => {
     if (!currentPassword) {
-      setProfileMsg({ text: 'Please enter your current password.', type: 'error' });
+      setProfileMsg({ text: t.enterCurrentPassword, type: 'error' });
       return;
     }
     if (newPassword.length < 6) {
-      setProfileMsg({ text: 'New password must be at least 6 characters.', type: 'error' });
+      setProfileMsg({ text: t.newPasswordLength, type: 'error' });
       return;
     }
     
@@ -387,7 +425,7 @@ const TrackStatus: React.FC = () => {
 
       await updatePassword(user, newPassword);
       
-      setProfileMsg({ text: 'Password changed successfully! Logging you out...', type: 'success' });
+      setProfileMsg({ text: t.passwordChanged, type: 'success' });
       setCurrentPassword('');
       setNewPassword('');
       
@@ -399,11 +437,11 @@ const TrackStatus: React.FC = () => {
 
     } catch (error: any) {
       if (error.code === 'auth/wrong-password') {
-        setProfileMsg({ text: 'Incorrect current password. Please try again.', type: 'error' });
+        setProfileMsg({ text: t.incorrectPassword, type: 'error' });
       } else if (error.code === 'auth/requires-recent-login') {
-        setProfileMsg({ text: 'Security check failed. Please logout and login again.', type: 'error' });
+        setProfileMsg({ text: t.securityCheck, type: 'error' });
       } else {
-        setProfileMsg({ text: error.message || 'Failed to change password.', type: 'error' });
+        setProfileMsg({ text: error.message || t.failedPassword, type: 'error' });
       }
     } finally {
       setIsUpdating(false);
@@ -1096,7 +1134,7 @@ const TrackStatus: React.FC = () => {
             <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-primary/50 backdrop-blur-sm p-4">
               <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-4 border-b pb-3">
-                  <h2 className="text-xl font-bold text-primary">My Account</h2>
+                  <h2 className="text-xl font-bold text-primary">{t.myAccount}</h2>
                   <button onClick={() => setIsProfileModalOpen(false)} className="text-gray-500 hover:bg-gray-100 rounded-full p-1">
                     <span className="material-symbols-outlined">close</span>
                   </button>
@@ -1109,19 +1147,19 @@ const TrackStatus: React.FC = () => {
                 )}
 
                 <div className="mb-4">
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Full Name</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{t.fullName}</label>
                   <input 
                     type="text" 
                     value={editFullName}
                     onChange={(e) => setEditFullName(e.target.value)}
                     className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2"
                   />
-                  <p className="text-xs text-gray-500 font-bold uppercase mt-2">Email</p>
+                  <p className="text-xs text-gray-500 font-bold uppercase mt-2">{t.email}</p>
                   <p className="font-semibold text-gray-800 text-sm">{userData?.email}</p>
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Update Purok</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{t.updatePurok}</label>
                   <select 
                     value={newPurok} 
                     onChange={(e) => setNewPurok(e.target.value)}
@@ -1136,16 +1174,16 @@ const TrackStatus: React.FC = () => {
                     <option value="Purok 7 Silangan">Purok 7 Silangan</option>
                   </select>
                   <button onClick={handleUpdateProfile} disabled={isUpdating} className="w-full bg-secondary text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-800 transition-colors">
-                    Save Profile Changes
+                    {t.saveProfile}
                   </button>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Change Password</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{t.changePassword}</label>
                   
                   <input 
                     type="password" 
-                    placeholder="Current Password" 
+                    placeholder={t.currentPassword} 
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2"
@@ -1153,14 +1191,14 @@ const TrackStatus: React.FC = () => {
                   
                   <input 
                     type="password" 
-                    placeholder="New Password (min 6 chars)" 
+                    placeholder={t.newPassword} 
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2"
                   />
                   
                   <button onClick={handleChangePassword} disabled={isUpdating || !currentPassword || !newPassword} className="w-full bg-primary text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-900 disabled:bg-gray-400 transition-colors">
-                    Update Password
+                    {t.updatePassword}
                   </button>
                 </div>
 
