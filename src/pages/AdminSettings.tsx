@@ -365,17 +365,14 @@ const AdminSettings: React.FC = () => {
             <main style={{ padding: isMobile ? '16px' : '32px', flex: 1, backgroundColor: '#f8f9ff' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '900px', margin: '0 auto' }}>
                 
-                {/* ✅ BAGONG DESIGN: HEADER CARD */}
+                {/* ✅ HEADER CARD */}
                 <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: isMobile ? '20px' : '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', border: '1px solid #eff4ff', display: 'flex', alignItems: 'center', gap: isMobile ? '16px' : '24px', position: 'relative', overflow: 'hidden' }}>
-                  {/* Blue accent border sa kaliwa */}
                   <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '6px', backgroundColor: '#00236f' }}></div>
                   
-                  {/* Icon Circle */}
                   <div style={{ width: isMobile ? '56px' : '72px', height: isMobile ? '56px' : '72px', borderRadius: '50%', backgroundColor: '#eff4ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginLeft: '8px' }}>
                     <span className="material-symbols-outlined" style={{ fontSize: isMobile ? '28px' : '36px', color: '#00236f' }}>settings_suggest</span>
                   </div>
 
-                  {/* Text Content */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', fontWeight: 700, color: '#757682', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       <span>Barangay Captain</span>
@@ -387,7 +384,7 @@ const AdminSettings: React.FC = () => {
                   </div>
                 </div>
 
-                {/* ✅ BAGONG ANNOUNCEMENT SECTION (5 Ws Format) */}
+                {/* ✅ ANNOUNCEMENT SECTION */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 flex flex-col gap-4">
                   <div style={{ borderBottom: '1px solid #eff4ff', paddingBottom: '12px' }}>
                     <h2 className="text-base md:text-lg font-bold text-gray-900">Public Announcement Banner</h2>
@@ -395,7 +392,6 @@ const AdminSettings: React.FC = () => {
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* WHAT (Title) */}
                     <div className="flex flex-col gap-1 col-span-1 md:col-span-2">
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#444651' }}>Announcement Title (What)</label>
                       <input 
@@ -407,7 +403,6 @@ const AdminSettings: React.FC = () => {
                       />
                     </div>
 
-                    {/* WHO (Audience) */}
                     <div className="flex flex-col gap-1">
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#444651' }}>Target Audience (Who)</label>
                       <select 
@@ -423,7 +418,6 @@ const AdminSettings: React.FC = () => {
                       </select>
                     </div>
 
-                    {/* WHEN (Date) */}
                     <div className="flex flex-col gap-1">
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#444651' }}>Date / Deadline (When)</label>
                       <input 
@@ -434,7 +428,6 @@ const AdminSettings: React.FC = () => {
                       />
                     </div>
 
-                    {/* WHERE (Location) */}
                     <div className="flex flex-col gap-1 col-span-1 md:col-span-2">
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#444651' }}>Location (Where - Optional)</label>
                       <input 
@@ -446,7 +439,6 @@ const AdminSettings: React.FC = () => {
                       />
                     </div>
 
-                    {/* WHY/HOW (Details) */}
                     <div className="flex flex-col gap-1 col-span-1 md:col-span-2">
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#444651' }}>Full Details (Why & How)</label>
                       <textarea 
@@ -471,14 +463,13 @@ const AdminSettings: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Holidays */}
+                {/* ✅ HOLIDAYS SECTION */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 flex flex-col gap-4">
                   <div>
                     <h2 className="text-base md:text-lg font-bold text-gray-900">Holidays & Non-Working Days</h2>
                     <p className="text-xs md:text-sm text-gray-500 mt-1">Adding a date here will pause SLA deadlines for pending requests.</p>
                   </div>
 
-                  {/* ✅ FIXED FLEX LAYOUT PARA SA ADD HOLIDAY */}
                   <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center w-full">
                     <input 
                       type="text"
@@ -507,7 +498,6 @@ const AdminSettings: React.FC = () => {
                     </button>
                   </div>
 
-                  {/* LIST OF HOLIDAYS */}
                   <ul className="flex flex-col gap-2 mt-2">
                     {isLoading ? (
                       <li className="text-center text-gray-500 text-sm py-4">Loading holidays...</li>
@@ -521,7 +511,6 @@ const AdminSettings: React.FC = () => {
                       holidaysList.map((h: any) => (
                         <li key={h.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-100 gap-2">
                           {editingHoliday?.id === h.id ? (
-                            // ✅ INLINE EDIT MODE
                             <div className="flex flex-col md:flex-row gap-2 flex-1 w-full">
                               <input
                                 type="text"
@@ -558,7 +547,6 @@ const AdminSettings: React.FC = () => {
                               </div>
                             </div>
                           ) : (
-                            // ✅ DISPLAY MODE
                             <>
                               <div className="flex flex-col">
                                 <span className="text-xs md:text-sm font-semibold">
@@ -625,20 +613,20 @@ const AdminSettings: React.FC = () => {
               </div>
               <h2 style={{ fontSize: '18px', fontWeight: 'bold', color: '#0b1c30', margin: '0 0 8px 0' }}>Delete Holiday?</h2>
               <p style={{ fontSize: '13px', color: '#444651', margin: '0 0 24px 0', lineHeight: 1.5 }}>
-                Sigurado ka bang gusto mong i-delete ang <strong>"{deleteTarget.name || 'Unnamed Holiday'}"</strong> ({formatDateDisplay(deleteTarget.date)})? Hindi na ito maibabalik.
+                Are you sure you want to delete <strong>"{deleteTarget.name || 'Unnamed Holiday'}"</strong> ({formatDateDisplay(deleteTarget.date)})? This action cannot be undone.
               </p>
               <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
                 <button 
                   onClick={() => setDeleteTarget(null)}
                   disabled={deletingId !== null}
-                  style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: '#eff4ff', color: '#00236f', border: 'none', cursor: deletingId ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '13px' }}
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: '#f1f5f9', color: '#334155', border: 'none', cursor: deletingId ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '13px' }}
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={deleteHoliday}
                   disabled={deletingId !== null}
-                  style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: deletingId ? '#9ca3af' : '#ba1a1a', color: '#ffffff', border: 'none', cursor: deletingId ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '13px' }}
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: deletingId ? '#9ca3af' : '#dc2626', color: '#ffffff', border: 'none', cursor: deletingId ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '13px' }}
                 >
                   {deletingId ? 'Deleting...' : 'Yes, Delete'}
                 </button>
@@ -650,31 +638,34 @@ const AdminSettings: React.FC = () => {
         {/* ================= LOGOUT MODAL ================= */}
         {showLogoutModal && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(11, 28, 48, 0.6)', backdropFilter: 'blur(4px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-            <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
+            <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '32px 24px', width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
               
-              <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#ffdad6', color: '#ba1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+              <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#ffe4e6', color: '#e11d48', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
                 <span className="material-symbols-outlined" style={{ fontSize: '32px' }}>logout</span>
               </div>
 
-              <h2 style={{ fontSize: '18px', fontWeight: 'bold', color: '#0b1c30', margin: '0 0 8px 0' }}>End Admin Session?</h2>
-              <p style={{ fontSize: '13px', color: '#444651', margin: '0 0 24px 0', lineHeight: 1.5 }}>
-                Sigurado ka bang gusto mong mag-log out? Kailangan mong mag-login muli para ma-access ang admin controls.
+              <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#0f172a', margin: '0 0 8px 0' }}>
+                End Admin Session?
+              </h2>
+              
+              <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 24px 0', lineHeight: 1.5 }}>
+                Are you sure you want to log out? You will need to log in again to access the admin portal.
               </p>
 
               <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
                 <button 
                   onClick={() => setShowLogoutModal(false)}
-                  style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: '#eff4ff', color: '#00236f', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', transition: 'background 0.2s' }}
-                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#dce9ff'}
-                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#eff4ff'}
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: '#f1f5f9', color: '#334155', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', transition: 'background 0.2s' }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={handleLogout}
-                  style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: '#ba1a1a', color: '#ffffff', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', transition: 'background 0.2s' }}
-                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#93000a'}
-                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#ba1a1a'}
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: '#dc2626', color: '#ffffff', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', transition: 'background 0.2s' }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#b91c1c'}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
                 >
                   Yes, Log Out
                 </button>
