@@ -38,7 +38,7 @@ interface HolidayData {
 const translations = {
   en: {
     dashboard: "Dashboard", requestDocument: "Request Document", trackStatus: "Track Status", transactionHistory: "Transaction History",
-    settings: "Settings", // ✅ IDINAGDAG
+    settings: "Settings",
     logout: "Logout", cancel: "Cancel", yesLogout: "Yes, Log out", logoutTitle: "Are you sure you want to log out?",
     logoutMessage: "You will need to sign in again to view your requests and apply for new documents.",
     welcome: "Welcome", active: "Active", requestNewDoc: "Request New Document", trackMyRequests: "Track My Requests",
@@ -56,7 +56,7 @@ const translations = {
   },
   fil: {
     dashboard: "Panel ng Residente", requestDocument: "Humiling ng Dokumento", trackStatus: "Subaybayan ang Status", transactionHistory: "Kasaysayan ng Transaksyon",
-    settings: "Mga Setting", // ✅ IDINAGDAG
+    settings: "Mga Setting",
     logout: "Mag-logout", cancel: "Kanselahin", yesLogout: "Oo, Mag-logout", logoutTitle: "Sigurado ka bang gusto mong mag-logout?",
     logoutMessage: "Kailangan mong mag-login muli para makita ang iyong mga request at makapag-apply ng bagong dokumento.",
     welcome: "Mabuhay", active: "Aktibo", requestNewDoc: "Humiling ng Bagong Dokumento", trackMyRequests: "Subaybayan ang Aking Request",
@@ -91,7 +91,6 @@ const ResidentDashboard: React.FC = () => {
   const [announcement, setAnnouncement] = useState<AnnouncementData | null>(null);
   const [holidays, setHolidays] = useState<HolidayData[]>([]);
 
-  // ✅ STATES PARA SA AUTO-LOGOUT WARNING
   const [isSuspendedModalOpen, setIsSuspendedModalOpen] = useState(false);
   const [countdown, setCountdown] = useState(10);
 
@@ -106,7 +105,7 @@ const ResidentDashboard: React.FC = () => {
     localStorage.setItem('appLanguage', language);
   }, [language]);
 
-  // ✅ MONITOR USER STATUS (AUTO-LOGOUT KAPAG SUSPENDED)
+  // ✅ MONITOR USER STATUS
   useEffect(() => {
     let unsubUser: any;
     const currentUid = localStorage.getItem('residentUid');
@@ -118,7 +117,6 @@ const ResidentDashboard: React.FC = () => {
           const data = docSnap.data();
           const status = data.status?.toLowerCase();
           
-          // Kung naging suspended o rejected habang naka-login
           if (status === 'suspended' || status === 'rejected') {
             setIsSuspendedModalOpen(true);
           }
@@ -131,13 +129,12 @@ const ResidentDashboard: React.FC = () => {
     };
   }, []);
 
-  // ✅ COUNTDOWN TIMER PARA SA AUTO-LOGOUT
+  // ✅ COUNTDOWN TIMER
   useEffect(() => {
     let timer: any;
     if (isSuspendedModalOpen && countdown > 0) {
       timer = setTimeout(() => setCountdown(countdown - 1), 1000);
     } else if (isSuspendedModalOpen && countdown === 0) {
-      // Kapag 0 na, i-logout
       localStorage.removeItem('residentUid');
       window.location.href = '/login';
     }
@@ -554,6 +551,15 @@ const ResidentDashboard: React.FC = () => {
                     <span className="material-symbols-outlined text-[20px]">track_changes</span><span>{t.trackMyRequests}</span>
                   </button>
                 </div>
+
+                {/* ✅ BAGONG SETTINGS BUTTON */}
+                <button 
+                  onClick={() => window.location.href = '/settings'} 
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-surface-container-lowest text-gray-700 font-bold text-sm shadow-sm border border-outline-variant/50 hover:bg-surface-container transition-colors mt-2"
+                >
+                  <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
+                  <span>{t.settings}</span>
+                </button>
 
                 {/* ✅ UPCOMING HOLIDAYS SECTION */}
                 {holidays.length > 0 && (
