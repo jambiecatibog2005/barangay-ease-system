@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { auth, db, logAction } from '../firebase'; // ✅ IDINAGDAG ANG logAction
+import { auth, db, logAction } from '../firebase'; 
 import logoImage from '../assets/logo.png';
 
 const LoginPage: React.FC = () => {
@@ -31,15 +31,15 @@ const LoginPage: React.FC = () => {
         const userData = userDocSnap.data();
         const userStatus = userData.status?.toLowerCase();
 
-        // 3. CHECK KUNG ACTIVE ANG STATUS
+        // ✅ 3. CHECK KUNG ACTIVE ANG STATUS
         if (userStatus === "active") {
-          // 👇 MAHALAGA: I-save ang UID para mabasa ng Dashboard
+          // I-save sa localStorage
           localStorage.setItem('residentUid', user.uid); 
-          localStorage.setItem('residentName', userData.fullName || 'Resident'); // ✅ Sinigurado na may Name
+          localStorage.setItem('residentName', userData.fullName || 'Resident'); 
           localStorage.setItem('isResidentLoggedIn', 'true');
-          localStorage.setItem('userRole', 'Resident'); // ✅ Sinigurado na may Role
+          localStorage.setItem('userRole', 'Resident'); 
 
-          // ✅ IDINAGDAG: I-LOG ANG RESIDENT LOGIN SA AUDIT LOGS
+          // I-log ang successful login
           await logAction(
             "Resident Login", 
             `Resident logged in to the portal.`, 
@@ -50,15 +50,20 @@ const LoginPage: React.FC = () => {
           
           window.location.href = '/dashboard';
         } else if (userStatus === "pending") {
+          await signOut(auth); // ✅ I-logout agad
           setErrorMessage("Your account is still pending. Please wait for the Barangay Staff to verify your residency before you can login.");
         } else if (userStatus === "rejected") {
+          await signOut(auth);
           setErrorMessage("Your registration was rejected. You are not recognized as a resident of Brgy. Malinao.");
         } else if (userStatus === "suspended") {
+          await signOut(auth);
           setErrorMessage("Your account has been suspended. Please visit the Barangay Hall for assistance.");
         } else {
+          await signOut(auth);
           setErrorMessage("Account status unknown. Please contact the Barangay Staff.");
         }
       } else {
+        await signOut(auth);
         setErrorMessage("User record not found in the database.");
       }
     } catch (error: any) {
@@ -115,7 +120,7 @@ const LoginPage: React.FC = () => {
                   <p className="text-gray-500 text-sm">Login to your BarangayEase account.</p>
                 </div>
 
-                {/* ERROR MESSAGE DISPLAY */}
+                {/* ✅ ERROR MESSAGE DISPLAY (Ito lang ang idinagdag) */}
                 {errorMessage && (
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-start gap-3">
                     <span className="material-symbols-outlined text-red-500 text-xl">error</span>
