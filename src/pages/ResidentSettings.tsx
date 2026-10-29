@@ -16,9 +16,8 @@ const ResidentSettings: React.FC = () => {
   
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
   
-  // ✅ BAGONG STATES PARA SA MENU
+  // ✅ Tinanggal ang isMobile state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   
@@ -53,13 +52,6 @@ const ResidentSettings: React.FC = () => {
   }, [language]);
 
   useEffect(() => {
-    const handleResize = () => {
-      const mobile = window.innerWidth <= 1024;
-      setIsMobile(mobile);
-      if (!mobile) setIsMobileMenuOpen(false);
-    };
-    window.addEventListener('resize', handleResize);
-
     // Fetch current user data
     const fetchUserData = async () => {
       const uid = localStorage.getItem('residentUid');
@@ -75,12 +67,9 @@ const ResidentSettings: React.FC = () => {
     };
 
     fetchUserData();
-    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const navigateTo = (path: string) => {
-    window.location.href = path;
-  };
+  // ✅ Tinanggal ang navigateTo function dahil direkta nang naka-href
 
   const handleLogoutClick = () => {
     setIsMobileMenuOpen(false);
