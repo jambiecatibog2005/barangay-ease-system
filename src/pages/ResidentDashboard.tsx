@@ -87,7 +87,7 @@ const ResidentDashboard: React.FC = () => {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // ✅ BAGONG STATES PARA SA PROFILE / SETTINGS
+  // ✅ MGA STATES PARA SA PROFILE / SETTINGS
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [newPurok, setNewPurok] = useState('');
