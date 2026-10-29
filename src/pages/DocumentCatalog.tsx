@@ -56,7 +56,6 @@ const masterDataEn: Record<string, { title: string, desc: string, reqs: string[]
     icon: 'work',
     color: 'text-secondary'
   },
-  // ✅ MGA BAGONG DAGDAG (Eksaktong Description base sa request mo)
   'BRGY-CTC-06': {
     title: 'Cedula (Community Tax Certificate)',
     desc: 'Serves as a basic proof of identity and tax payment required for various legal, government, and private transactions.',
@@ -124,7 +123,6 @@ const masterDataFil: Record<string, { title: string, desc: string, reqs: string[
     icon: 'work',
     color: 'text-secondary'
   },
-  // ✅ MGA BAGONG DAGDAG (Eksaktong Description base sa request mo)
   'BRGY-CTC-06': {
     title: 'Cedula (Community Tax Certificate)',
     desc: 'Nagsisilbing pangunahing patunay ng pagkakakilanlan at pagbabayad ng buwis na kailangan sa iba\'t ibang transaksyon sa gobyerno at pribadong sektor.',
@@ -268,6 +266,7 @@ const DocumentCatalog: React.FC = () => {
         // ✅ PINIPILI KUNG ENGLISH O FILIPINO ANG GAGAMITIN BASE SA WIKA
         const activeMasterData = language === 'en' ? masterDataEn : masterDataFil;
         
+        // ✅ FORCE NA KUNIN SA MASTER DATA KUNG MAY CODE, PARA MAIWASAN ANG DATABASE OVERRIDE
         const localInfo = activeMasterData[code] || {
           title: data.title || 'Unknown Document',
           desc: language === 'en' ? 'Official Barangay Document. Please prepare a valid ID.' : 'Opisyal na Dokumento ng Barangay. Mangyaring maghanda ng valid ID.',
@@ -287,8 +286,9 @@ const DocumentCatalog: React.FC = () => {
           numericFee: numericFee,
           isFree: isFree,
           processingTime: data.processingTime || 'N/A',
-          description: localInfo.desc,
-          requirements: localInfo.reqs,
+          // ✅ DITO ANG FIX: Kung may match sa code, gamitin ang desc mula sa masterData
+          description: activeMasterData[code] ? activeMasterData[code].desc : (data.description || localInfo.desc),
+          requirements: activeMasterData[code] ? activeMasterData[code].reqs : (data.requirements || localInfo.reqs),
           icon: localInfo.icon,
           colorClass: localInfo.color,
           btnClass: 'bg-primary hover:bg-primary-container text-on-primary'
