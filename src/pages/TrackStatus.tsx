@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { collection, onSnapshot, query, where, doc, getDoc, updateDoc } from "firebase/firestore";
+import { updatePassword, signOut, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 import { auth, db } from '../firebase'; 
 import logoImage from '../assets/logo.png';
 import html2canvas from 'html2canvas';
@@ -234,6 +235,16 @@ const TrackStatus: React.FC = () => {
   const [claimRequestData, setClaimRequestData] = useState<RequestData | null>(null);
   const claimSlipRef = useRef<HTMLDivElement>(null);
 
+  // ✅ MGA STATES PARA SA PROFILE / SETTINGS
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
+  const [editFullName, setEditFullName] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newPurok, setNewPurok] = useState('');
+  const [profileMsg, setProfileMsg] = useState({ text: '', type: '' });
+  const [isUpdating, setIsUpdating] = useState(false);
+
   const [language, setLanguage] = useState<Language>(() => {
     return (localStorage.getItem('appLanguage') as Language) || 'en';
   });
@@ -243,6 +254,21 @@ const TrackStatus: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('appLanguage', language);
   }, [language]);
+
+  // ✅ FETCH USER DATA PARA SA PROFILE
+  useEffect(() => {
+    const fetchUser = async () => {
+      const uid = localStorage.getItem('residentUid') || auth.currentUser?.uid;
+      if (uid) {
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          setUserData(userSnap.data());
+        }
+      }
+    };
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     const uid = localStorage.getItem('residentUid') || auth.currentUser?.uid;
@@ -314,11 +340,84 @@ const TrackStatus: React.FC = () => {
     window.location.href = '/login';
   };
 
+  // ✅ FUNCTIONS PARA SA PROFILE MODAL
+  const handleUpdateProfile = async () => {
+    if (!editFullName || !newPurok) {
+      setProfileMsg({ text: 'Name and Purok cannot be empty.', type: 'error' });
+      return;
+    }
+    setIsUpdating(true);
+    setProfileMsg({ text: '', type: '' });
+    try {
+      const currentUid = localStorage.getItem('residentUid');
+      if (!currentUid) throw new Error("No UID");
+      
+      await updateDoc(doc(db, "users", currentUid), { 
+        fullName: editFullName,
+        purok: newPurok 
+      });
+      setUserData((prev: any) => ({ ...prev, fullName: editFullName, purok: newPurok }));
+      setProfileMsg({ text: 'Profile updated successfully!', type: 'success' });
+    } catch (error) {
+      setProfileMsg({ text: 'Failed to update profile.', type: 'error' });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!currentPassword) {
+      setProfileMsg({ text: 'Please enter your current password.', type: 'error' });
+      return;
+    }
+    if (newPassword.length < 6) {
+      setProfileMsg({ text: 'New password must be at least 6 characters.', type: 'error' });
+      return;
+    }
+    
+    setIsUpdating(true);
+    setProfileMsg({ text: '', type: '' });
+    
+    try {
+      const user = auth.currentUser;
+      if (!user || !user.email) throw new Error("Session expired. Please logout and login again.");
+
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+
+      await updatePassword(user, newPassword);
+      
+      setProfileMsg({ text: 'Password changed successfully! Logging you out...', type: 'success' });
+      setCurrentPassword('');
+      setNewPassword('');
+      
+      setTimeout(async () => {
+        localStorage.removeItem('residentUid');
+        await signOut(auth);
+        window.location.href = '/login';
+      }, 2000);
+
+    } catch (error: any) {
+      if (error.code === 'auth/wrong-password') {
+        setProfileMsg({ text: 'Incorrect current password. Please try again.', type: 'error' });
+      } else if (error.code === 'auth/requires-recent-login') {
+        setProfileMsg({ text: 'Security check failed. Please logout and login again.', type: 'error' });
+      } else {
+        setProfileMsg({ text: error.message || 'Failed to change password.', type: 'error' });
+      }
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   // ✅ DOWNLOAD AT PRINT FUNCTIONS
   const handleDownloadClaimSlip = async () => {
     if (!claimSlipRef.current) return;
     
     try {
+      const html2canvas = (await import('html2canvas')).default;
+      const { jsPDF } = await import('jspdf');
+
       const canvas = await html2canvas(claimSlipRef.current, {
         scale: 3,
         backgroundColor: '#ffffff',
@@ -504,6 +603,23 @@ const TrackStatus: React.FC = () => {
               </nav>
 
               <div className="flex items-center justify-end gap-2 shrink-0">
+                
+                {/* ✅ USER PROFILE ICON */}
+                <button 
+                  onClick={() => {
+                    setEditFullName(userData?.fullName || '');
+                    setNewPurok(userData?.purok || 'Purok 1 Centro');
+                    setCurrentPassword('');
+                    setNewPassword('');
+                    setProfileMsg({ text: '', type: '' });
+                    setIsProfileModalOpen(true);
+                  }}
+                  className="p-2 text-primary cursor-pointer hover:bg-surface-container rounded-lg focus:outline-none transition-colors"
+                  title="My Account"
+                >
+                  <span className="material-symbols-outlined text-[28px]">account_circle</span>
+                </button>
+
                 <div className="relative">
                   <details className="group [&_summary::-webkit-details-marker]:hidden">
                     <summary className="list-none outline-none p-2 text-primary cursor-pointer hover:bg-surface-container rounded-lg focus:outline-none transition-colors">
@@ -971,6 +1087,83 @@ const TrackStatus: React.FC = () => {
                     {t.logoutConfirm}
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* ✅ PROFILE / CHANGE PASSWORD MODAL */}
+          {isProfileModalOpen && (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-primary/50 backdrop-blur-sm p-4">
+              <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-4 border-b pb-3">
+                  <h2 className="text-xl font-bold text-primary">My Account</h2>
+                  <button onClick={() => setIsProfileModalOpen(false)} className="text-gray-500 hover:bg-gray-100 rounded-full p-1">
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+
+                {profileMsg.text && (
+                  <div className={`p-2 mb-4 text-xs font-bold rounded-lg ${profileMsg.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    {profileMsg.text}
+                  </div>
+                )}
+
+                <div className="mb-4">
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Full Name</label>
+                  <input 
+                    type="text" 
+                    value={editFullName}
+                    onChange={(e) => setEditFullName(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2"
+                  />
+                  <p className="text-xs text-gray-500 font-bold uppercase mt-2">Email</p>
+                  <p className="font-semibold text-gray-800 text-sm">{userData?.email}</p>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Update Purok</label>
+                  <select 
+                    value={newPurok} 
+                    onChange={(e) => setNewPurok(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2 cursor-pointer"
+                  >
+                    <option value="Purok 1 Centro">Purok 1 Centro</option>
+                    <option value="Purok 2 Riverside">Purok 2 Riverside</option>
+                    <option value="Purok 3 Ilaya">Purok 3 Ilaya</option>
+                    <option value="Purok 4 Pag-asa">Purok 4 Pag-asa</option>
+                    <option value="Purok 5 Maharlika">Purok 5 Maharlika</option>
+                    <option value="Purok 6 Bukid">Purok 6 Bukid</option>
+                    <option value="Purok 7 Silangan">Purok 7 Silangan</option>
+                  </select>
+                  <button onClick={handleUpdateProfile} disabled={isUpdating} className="w-full bg-secondary text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-800 transition-colors">
+                    Save Profile Changes
+                  </button>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Change Password</label>
+                  
+                  <input 
+                    type="password" 
+                    placeholder="Current Password" 
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2"
+                  />
+                  
+                  <input 
+                    type="password" 
+                    placeholder="New Password (min 6 chars)" 
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2"
+                  />
+                  
+                  <button onClick={handleChangePassword} disabled={isUpdating || !currentPassword || !newPassword} className="w-full bg-primary text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-900 disabled:bg-gray-400 transition-colors">
+                    Update Password
+                  </button>
+                </div>
+
               </div>
             </div>
           )}
