@@ -87,6 +87,7 @@ const ResidentDashboard: React.FC = () => {
 
   // ✅ MGA STATES PARA SA PROFILE / SETTINGS
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [editFullName, setEditFullName] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newPurok, setNewPurok] = useState('');
   const [profileMsg, setProfileMsg] = useState({ text: '', type: '' });
@@ -276,19 +277,25 @@ const ResidentDashboard: React.FC = () => {
   };
 
   // ✅ FUNCTIONS PARA SA PROFILE MODAL
-  const handleUpdatePurok = async () => {
-    if (!newPurok) return;
+  const handleUpdateProfile = async () => {
+    if (!editFullName || !newPurok) {
+      setProfileMsg({ text: 'Name and Purok cannot be empty.', type: 'error' });
+      return;
+    }
     setIsUpdating(true);
     setProfileMsg({ text: '', type: '' });
     try {
       const currentUid = localStorage.getItem('residentUid');
       if (!currentUid) throw new Error("No UID");
       
-      await updateDoc(doc(db, "users", currentUid), { purok: newPurok });
-      setUserData((prev: any) => ({ ...prev, purok: newPurok }));
-      setProfileMsg({ text: 'Purok updated successfully!', type: 'success' });
+      await updateDoc(doc(db, "users", currentUid), { 
+        fullName: editFullName,
+        purok: newPurok 
+      });
+      setUserData((prev: any) => ({ ...prev, fullName: editFullName, purok: newPurok }));
+      setProfileMsg({ text: 'Profile updated successfully!', type: 'success' });
     } catch (error) {
-      setProfileMsg({ text: 'Failed to update Purok.', type: 'error' });
+      setProfileMsg({ text: 'Failed to update profile.', type: 'error' });
     } finally {
       setIsUpdating(false);
     }
@@ -320,7 +327,6 @@ const ResidentDashboard: React.FC = () => {
     if (!claimSlipRef.current) return;
     
     try {
-      // ✅ Dito natin inilagay ang dynamic import para hindi mag-crash ang Vercel
       const html2canvas = (await import('html2canvas')).default;
       const { jsPDF } = await import('jspdf');
 
@@ -446,7 +452,8 @@ const ResidentDashboard: React.FC = () => {
                 {/* ✅ USER PROFILE ICON */}
                 <button 
                   onClick={() => {
-                    setNewPurok(userData?.purok || '');
+                    setEditFullName(userData?.fullName || '');
+                    setNewPurok(userData?.purok || 'Purok 1 Centro');
                     setProfileMsg({ text: '', type: '' });
                     setIsProfileModalOpen(true);
                   }}
@@ -920,8 +927,13 @@ const ResidentDashboard: React.FC = () => {
                 )}
 
                 <div className="mb-4">
-                  <p className="text-xs text-gray-500 font-bold uppercase">Full Name</p>
-                  <p className="font-semibold text-gray-800">{userData?.fullName || 'Loading...'}</p>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Full Name</label>
+                  <input 
+                    type="text" 
+                    value={editFullName}
+                    onChange={(e) => setEditFullName(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2"
+                  />
                   <p className="text-xs text-gray-500 font-bold uppercase mt-2">Email</p>
                   <p className="font-semibold text-gray-800 text-sm">{userData?.email}</p>
                 </div>
@@ -941,8 +953,8 @@ const ResidentDashboard: React.FC = () => {
                     <option value="Purok 6 Bukid">Purok 6 Bukid</option>
                     <option value="Purok 7 Silangan">Purok 7 Silangan</option>
                   </select>
-                  <button onClick={handleUpdatePurok} disabled={isUpdating} className="w-full bg-secondary text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-800 transition-colors">
-                    Save Purok
+                  <button onClick={handleUpdateProfile} disabled={isUpdating} className="w-full bg-secondary text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-800 transition-colors">
+                    Save Profile Changes
                   </button>
                 </div>
 
