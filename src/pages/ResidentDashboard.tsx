@@ -12,9 +12,12 @@ interface RequestData {
   documentType: string;
   purpose: string;
   dateFiled: string;
+  dateReleased?: string; // ✅ IDINAGDAG
   estimatedRelease: string;
   fee: string;
   status: string;
+  residentName?: string; // ✅ IDINAGDAG
+  purok?: string;        // ✅ IDINAGDAG
 }
 
 interface AnnouncementData {
@@ -74,7 +77,7 @@ type Language = 'en' | 'fil';
 const ResidentDashboard: React.FC = () => {
   const [filter, setFilter] = useState('all');
   const [isClaimSlipOpen, setIsClaimSlipOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState({ ref: '', doc: '', fee: '' });
+  const [selectedRequest, setSelectedRequest] = useState({ ref: '', doc: '', fee: '', dateReleased: '' });
   
   const [requests, setRequests] = useState<RequestData[]>([]);
   const [userData, setUserData] = useState<any>(null);
@@ -214,8 +217,8 @@ const ResidentDashboard: React.FC = () => {
         return true;
       });
 
-  const handleOpenClaimSlip = (ref: string, doc: string, fee: string) => { 
-    setSelectedRequest({ ref, doc, fee }); 
+  const handleOpenClaimSlip = (ref: string, doc: string, fee: string, dateReleased?: string) => { 
+    setSelectedRequest({ ref, doc, fee, dateReleased: dateReleased || '' }); 
     setIsClaimSlipOpen(true); 
   };
 
@@ -468,7 +471,7 @@ const ResidentDashboard: React.FC = () => {
                           <p className="font-body-md text-xs md:text-sm text-on-secondary-fixed-variant leading-relaxed">Your {req.documentType} (Ref: {req.refNo}) {t.readyBannerMsg}</p>
                         </div>
                       </div>
-                      <button onClick={() => handleOpenClaimSlip(req.refNo, req.documentType, req.fee)} className="w-full md:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg bg-secondary text-on-secondary font-bold shadow-sm hover:bg-secondary-container text-xs md:text-sm" type="button">
+                      <button onClick={() => handleOpenClaimSlip(req.refNo, req.documentType, req.fee, req.dateReleased)} className="w-full md:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg bg-secondary text-on-secondary font-bold shadow-sm hover:bg-secondary-container text-xs md:text-sm" type="button">
                         <span className="material-symbols-outlined text-[18px]">receipt_long</span><span>{t.viewClaimSlip}</span>
                       </button>
                     </article>
@@ -723,8 +726,8 @@ const ResidentDashboard: React.FC = () => {
                         <p className="font-semibold text-gray-900">{selectedRequest.doc}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Date Issued</p>
-                        <p className="font-semibold text-gray-900 text-xs">{new Date().toLocaleDateString('en-PH', { dateStyle: 'medium' })}</p>
+                        <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Date Released</p>
+                        <p className="font-semibold text-gray-900 text-xs">{selectedRequest.dateReleased || new Date().toLocaleDateString('en-PH', { dateStyle: 'medium' })}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Purok</p>
