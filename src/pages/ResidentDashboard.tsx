@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
 import { collection, onSnapshot, query, where, doc, getDoc, updateDoc } from "firebase/firestore";
-import { updatePassword, signOut } from "firebase/auth";
+import { updatePassword, signOut, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 import { auth, db } from '../firebase'; 
 import logoImage from '../assets/logo.png';
 
@@ -88,6 +88,7 @@ const ResidentDashboard: React.FC = () => {
   // ✅ MGA STATES PARA SA PROFILE / SETTINGS
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [editFullName, setEditFullName] = useState('');
+  const [currentPassword, setCurrentPassword] = useState(''); // ✅ BAGONG STATE
   const [newPassword, setNewPassword] = useState('');
   const [newPurok, setNewPurok] = useState('');
   const [profileMsg, setProfileMsg] = useState({ text: '', type: '' });
@@ -301,39 +302,47 @@ const ResidentDashboard: React.FC = () => {
     }
   };
 
+  // ✅ FIXED: Change Password with Reauthentication
   const handleChangePassword = async () => {
-    if (newPassword.length < 6) {
-      setProfileMsg({ text: 'Password must be at least 6 characters.', type: 'error' });
+    if (!currentPassword) {
+      setProfileMsg({ text: 'Please enter your current password.', type: 'error' });
       return;
     }
+    if (newPassword.length < 6) {
+      setProfileMsg({ text: 'New password must be at least 6 characters.', type: 'error' });
+      return;
+    }
+    
     setIsUpdating(true);
     setProfileMsg({ text: '', type: '' });
     
     try {
-      if (auth.currentUser) {
-        // ✅ SUBUKANG PALITAN ANG PASSWORD
-        await updatePassword(auth.currentUser, newPassword);
-        
-        // ✅ KAPAG SUCCESS, MAGPAKITA NG MENSAHE
-        setProfileMsg({ text: 'Password changed successfully! Logging you out...', type: 'success' });
-        setNewPassword('');
-        
-        // ✅ AUTOMATIC NA MAG-LOGOUT PAGKATAPOS NG 2 SEGUNDO
-        setTimeout(async () => {
-          localStorage.removeItem('residentUid');
-          await signOut(auth);
-          window.location.href = '/login';
-        }, 2000);
+      const user = auth.currentUser;
+      if (!user || !user.email) throw new Error("Session expired. Please logout and login again.");
 
-      } else {
-        throw new Error("Session expired. Please logout and login again.");
-      }
+      // 1. REAUTHENTICATE GAMIT ANG LUMANG PASSWORD
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+
+      // 2. KAPAG OKAY ANG LUMANG PASSWORD, PALITAN NA ANG BAGO
+      await updatePassword(user, newPassword);
+      
+      setProfileMsg({ text: 'Password changed successfully! Logging you out...', type: 'success' });
+      setCurrentPassword('');
+      setNewPassword('');
+      
+      // 3. AUTOMATIC LOGOUT PAGKATAPOS NG 2 SEGUNDO
+      setTimeout(async () => {
+        localStorage.removeItem('residentUid');
+        await signOut(auth);
+        window.location.href = '/login';
+      }, 2000);
+
     } catch (error: any) {
-      if (error.code === 'auth/requires-recent-login') {
-        setProfileMsg({ 
-          text: 'Security check: Please logout and login again before changing your password.', 
-          type: 'error' 
-        });
+      if (error.code === 'auth/wrong-password') {
+        setProfileMsg({ text: 'Incorrect current password. Please try again.', type: 'error' });
+      } else if (error.code === 'auth/requires-recent-login') {
+        setProfileMsg({ text: 'Security check failed. Please logout and login again.', type: 'error' });
       } else {
         setProfileMsg({ text: error.message || 'Failed to change password.', type: 'error' });
       }
@@ -473,6 +482,8 @@ const ResidentDashboard: React.FC = () => {
                   onClick={() => {
                     setEditFullName(userData?.fullName || '');
                     setNewPurok(userData?.purok || 'Purok 1 Centro');
+                    setCurrentPassword('');
+                    setNewPassword('');
                     setProfileMsg({ text: '', type: '' });
                     setIsProfileModalOpen(true);
                   }}
@@ -979,6 +990,16 @@ const ResidentDashboard: React.FC = () => {
 
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">Change Password</label>
+                  
+                  {/* ✅ CURRENT PASSWORD INPUT */}
+                  <input 
+                    type="password" 
+                    placeholder="Current Password" 
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2"
+                  />
+                  
                   <input 
                     type="password" 
                     placeholder="New Password (min 6 chars)" 
@@ -986,7 +1007,8 @@ const ResidentDashboard: React.FC = () => {
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm mb-2"
                   />
-                  <button onClick={handleChangePassword} disabled={isUpdating || !newPassword} className="w-full bg-primary text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-900 disabled:bg-gray-400 transition-colors">
+                  
+                  <button onClick={handleChangePassword} disabled={isUpdating || !currentPassword || !newPassword} className="w-full bg-primary text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-900 disabled:bg-gray-400 transition-colors">
                     Update Password
                   </button>
                 </div>
