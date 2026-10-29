@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { auth, db, logAction } from '../firebase'; 
 import logoImage from '../assets/logo.png';
 
