@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-// ✅ Tinanggal ang updateEmail dahil hindi naman ginagamit
 import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 import { auth, db, logAction } from '../firebase'; 
 import logoImage from '../assets/logo.png';
 
 const ResidentSettings: React.FC = () => {
-  // ✅ Tinanggal ang userData state dahil hindi naman ginagamit sa display
   const [fullName, setFullName] = useState('');
   const [purok, setPurok] = useState('');
   
@@ -19,7 +17,31 @@ const ResidentSettings: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // ✅ BAGONG STATES PARA SA MENU
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  
+  const [language, setLanguage] = useState<'en' | 'fil'>(() => {
+    return (localStorage.getItem('appLanguage') as 'en' | 'fil') || 'en';
+  });
+
+  const t = {
+    en: { 
+      dashboard: "Dashboard", settings: "Settings", langLabel: "Language", logout: "Logout",
+      cancel: "Cancel", yesLogout: "Yes, Log out", logoutTitle: "Are you sure you want to log out?",
+      logoutMessage: "You will need to sign in again to view your requests and apply for new documents.",
+      officeHours: "Office Hours: Monday-Sunday 8:00 AM – 5:00 PM",
+      advisory: "Advisory: Regular document processing schedule active."
+    },
+    fil: { 
+      dashboard: "Panel ng Residente", settings: "Mga Setting", langLabel: "Wika", logout: "Mag-logout",
+      cancel: "Kanselahin", yesLogout: "Oo, Mag-logout", logoutTitle: "Sigurado ka bang gusto mong mag-logout?",
+      logoutMessage: "Kailangan mong mag-login muli para makita ang iyong mga request at makapag-apply ng bagong dokumento.",
+      officeHours: "Oras ng Opisina: Lunes-Linggo 8:00 AM – 5:00 PM",
+      advisory: "Abiso: Regular ang iskedyul ng pagproseso ng dokumento."
+    }
+  }[language];
 
   const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ show: true, message, type });
@@ -27,10 +49,14 @@ const ResidentSettings: React.FC = () => {
   };
 
   useEffect(() => {
+    localStorage.setItem('appLanguage', language);
+  }, [language]);
+
+  useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 1024;
       setIsMobile(mobile);
-      if (!mobile) setSidebarOpen(false);
+      if (!mobile) setIsMobileMenuOpen(false);
     };
     window.addEventListener('resize', handleResize);
 
@@ -54,6 +80,16 @@ const ResidentSettings: React.FC = () => {
 
   const navigateTo = (path: string) => {
     window.location.href = path;
+  };
+
+  const handleLogoutClick = () => {
+    setIsMobileMenuOpen(false);
+    setIsLogoutModalOpen(true);
+  };
+
+  const confirmLogout = () => {
+    localStorage.removeItem('residentUid');
+    window.location.href = '/login';
   };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -91,11 +127,8 @@ const ResidentSettings: React.FC = () => {
     setIsSaving(true);
 
     try {
-      // Re-authenticate muna bago magpalit ng password
       const credential = EmailAuthProvider.credential(auth.currentUser.email!, currentPassword);
       await reauthenticateWithCredential(auth.currentUser, credential);
-
-      // Update password
       await updatePassword(auth.currentUser, newPassword);
 
       await logAction(
@@ -123,78 +156,117 @@ const ResidentSettings: React.FC = () => {
   return (
     <IonPage>
       <IonContent className="bg-surface">
-        <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8f9ff', fontFamily: "'Public Sans', sans-serif", color: '#0b1c30' }}>
+        <div className="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col">
           
-          {/* SIDEBAR */}
-          <aside style={{ width: '260px', position: 'fixed', top: 0, left: isMobile ? (sidebarOpen ? 0 : '-260px') : 0, height: '100vh', backgroundColor: '#ffffff', zIndex: 100, borderRight: '1px solid #e5eeff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', transition: 'left 0.3s ease-in-out', boxShadow: isMobile && sidebarOpen ? '4px 0 15px rgba(0,0,0,0.1)' : 'none' }}>
-            <div>
-              <div style={{ height: '64px', padding: '0 16px', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #eff4ff' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '50%', overflow: 'hidden', backgroundColor: '#ffffff', border: '1px solid #e5eeff' }}>
-                  <img src={logoImage} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          {/* HEADER */}
+          <header className="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+            <div className="bg-primary text-on-primary text-label-sm font-label-sm">
+              <div className="max-w-7xl mx-auto px-4 md:px-margin flex flex-col md:flex-row items-center justify-between py-2 md:py-0 md:h-8 gap-1.5 md:gap-0">
+                <div className="flex items-center justify-center gap-1 text-surface-container-high text-center md:text-left">
+                  <span className="material-symbols-outlined text-secondary-fixed text-[14px] shrink-0">domain</span>
+                  <span className="text-[10px] sm:text-[11px] md:text-sm leading-tight">{t.officeHours}</span>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: '15px', fontWeight: 'bold', color: '#00236f', lineHeight: 1.2 }}>BarangayEase</span>
-                  <span style={{ fontSize: '11px', color: '#444651', textTransform: 'uppercase' }}>Resident Portal</span>
+                <div className="flex items-center justify-center gap-1 text-tertiary-fixed text-center md:text-right">
+                  <span className="material-symbols-outlined text-[14px] shrink-0">campaign</span>
+                  <span className="font-medium text-[10px] sm:text-[11px] md:text-sm leading-tight">{t.advisory}</span>
                 </div>
               </div>
-              <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '16px 8px' }}>
-                <div onClick={() => navigateTo('/dashboard')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '8px', color: '#444651', cursor: 'pointer' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>dashboard</span>
-                  <span style={{ fontSize: '14px' }}>Dashboard</span>
-                </div>
-                {/* ACTIVE STATE */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '8px', backgroundColor: '#1e3a8a', color: '#ffffff', cursor: 'pointer' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>settings</span>
-                  <span style={{ fontSize: '14px' }}>Settings</span>
-                </div>
-              </nav>
             </div>
-          </aside>
+            
+            <div className="h-16 md:h-20 max-w-7xl mx-auto px-4 md:px-margin flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2 shrink-0">
+                <img alt="Logo" className="h-10 w-10 md:h-14 md:w-14 rounded-full object-cover bg-white shadow-sm" src={logoImage}/>
+                <div className="flex flex-col">
+                  <span className="font-title-lg text-sm md:text-title-lg font-bold text-primary tracking-tight leading-tight">BarangayEase</span>
+                  <span className="font-label-sm text-[10px] md:text-label-sm text-on-surface-variant font-medium leading-none">Brgy. Malinao, Naujan</span>
+                </div>
+              </div>
+              <nav className="hidden md:flex items-center justify-center gap-1 flex-1">
+                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/dashboard">{t.dashboard}</a>
+                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/documents">Request Document</a>
+                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/track-status">Track Status</a>
+                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/history">History</a>
+                <a className="px-3 py-2 transition-colors bg-primary text-on-primary font-bold rounded-lg shadow-sm text-sm whitespace-nowrap" href="/settings">{t.settings}</a>
+              </nav>
+              
+              <div className="flex items-center justify-end gap-2 shrink-0">
+                <div className="relative">
+                  <button 
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    className="p-2 text-primary cursor-pointer hover:bg-surface-container rounded-lg focus:outline-none transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[28px]">
+                      {isMobileMenuOpen ? 'close' : 'menu'}
+                    </span>
+                  </button>
+                  
+                  {isMobileMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-outline-variant/50 flex flex-col p-2 z-[999] overflow-hidden">
+                      
+                      <div className="flex flex-col md:hidden gap-1">
+                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/dashboard">{t.dashboard}</a>
+                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/documents">Request Document</a>
+                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/track-status">Track Status</a>
+                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/history">History</a>
+                        <a className="px-4 py-2.5 text-sm font-semibold text-primary bg-primary/10 rounded-lg" href="/settings">{t.settings}</a>
+                        <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
+                      </div>
+                      
+                      <div className="px-2 py-2">
+                        <p className="text-[10px] font-bold uppercase text-outline mb-2 px-2 tracking-wider">{t.langLabel}</p>
+                        <div className="flex bg-surface-container rounded-lg p-1">
+                          <button onClick={() => setLanguage('en')} className={`flex-1 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${language === 'en' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}>English</button>
+                          <button onClick={() => setLanguage('fil')} className={`flex-1 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${language === 'fil' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}>Filipino</button>
+                        </div>
+                      </div>
 
-          {isMobile && sidebarOpen && (
-            <div onClick={() => setSidebarOpen(false)} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(11, 28, 48, 0.4)', zIndex: 90, backdropFilter: 'blur(2px)' }}></div>
-          )}
+                      <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
+                      
+                      <button onClick={handleLogoutClick} className="mx-2 px-3 py-2.5 mt-1 text-sm text-left text-red-600 font-bold hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors">
+                        <span className="material-symbols-outlined text-[18px]">logout</span>{t.logout}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="h-[3px] w-full flex">
+              <div className="h-full w-1/3 bg-secondary-container"></div>
+              <div className="h-full w-1/3 bg-error"></div>
+              <div className="h-full w-1/3 bg-tertiary-fixed"></div>
+            </div>
+          </header>
 
           {/* MAIN CONTENT */}
-          <div style={{ marginLeft: isMobile ? 0 : '260px', display: 'flex', flexDirection: 'column', height: '100vh', width: isMobile ? '100%' : 'calc(100% - 260px)', overflowY: 'auto' }}>
-            
-            <header style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#ffffff', height: '64px', display: 'flex', alignItems: 'center', padding: isMobile ? '0 16px' : '0 32px', boxShadow: '0 1px 8px rgba(0,0,0,0.04)' }}>
-               {isMobile && (
-                  <button onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', marginRight: '12px' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '24px', color: '#0b1c30' }}>menu</span>
-                  </button>
-                )}
-                <span style={{ fontSize: '15px', fontWeight: 'bold', color: '#0b1c30' }}>Account Settings</span>
-            </header>
-
-            <main style={{ padding: isMobile ? '16px' : '32px', flex: 1, backgroundColor: '#f8f9ff' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px', margin: '0 auto' }}>
+          <main className="w-full pt-28 md:pt-32 bg-surface flex-1">
+            <div className="max-w-3xl mx-auto px-4 md:px-margin py-6 md:py-10">
+              <div className="flex flex-col gap-6">
                 
                 {/* PROFILE SECTION */}
-                <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', border: '1px solid #eff4ff' }}>
-                  <div style={{ borderBottom: '1px solid #eff4ff', paddingBottom: '16px', marginBottom: '24px' }}>
-                    <h2 style={{ fontSize: '18px', fontWeight: 'bold', color: '#0b1c30', margin: 0 }}>Profile Information</h2>
-                    <p style={{ fontSize: '13px', color: '#757682', marginTop: '4px' }}>Update your personal details.</p>
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                  <div className="border-b border-slate-100 pb-4 mb-6">
+                    <h2 className="text-lg font-bold text-slate-900">Profile Information</h2>
+                    <p className="text-sm text-slate-500 mt-1">Update your personal details.</p>
                   </div>
                   
-                  <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#444651' }}>Full Name</label>
+                  <form onSubmit={handleUpdateProfile} className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-slate-600">Full Name</label>
                       <input 
                         type="text" 
                         value={fullName} 
                         onChange={(e) => setFullName(e.target.value)} 
-                        style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e5eeff', backgroundColor: '#f8f9ff', fontSize: '14px' }}
+                        className="w-full px-3 py-2.5 rounded-lg border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all text-sm"
                         required
                       />
                     </div>
                     
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#444651' }}>Purok</label>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-slate-600">Purok</label>
                       <select 
                         value={purok} 
                         onChange={(e) => setPurok(e.target.value)}
-                        style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e5eeff', backgroundColor: '#f8f9ff', fontSize: '14px' }}
+                        className="w-full px-3 py-2.5 rounded-lg border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all text-sm cursor-pointer"
                       >
                         <option value="Purok 1 Centro">Purok 1 Centro</option>
                         <option value="Purok 2 Riverside">Purok 2 Riverside</option>
@@ -203,11 +275,11 @@ const ResidentSettings: React.FC = () => {
                       </select>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+                    <div className="flex justify-end mt-2">
                       <button 
                         type="submit" 
                         disabled={isSaving}
-                        style={{ padding: '10px 24px', borderRadius: '8px', backgroundColor: '#1e3a8a', color: '#ffffff', fontWeight: 'bold', border: 'none', cursor: isSaving ? 'not-allowed' : 'pointer' }}
+                        className={`px-6 py-2.5 rounded-lg ${isSaving ? 'bg-gray-400' : 'bg-[#00236f] hover:bg-[#00174d]'} text-white font-bold transition-colors`}
                       >
                         {isSaving ? 'Saving...' : 'Save Profile'}
                       </button>
@@ -216,51 +288,51 @@ const ResidentSettings: React.FC = () => {
                 </div>
 
                 {/* SECURITY SECTION */}
-                <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', border: '1px solid #eff4ff' }}>
-                  <div style={{ borderBottom: '1px solid #eff4ff', paddingBottom: '16px', marginBottom: '24px' }}>
-                    <h2 style={{ fontSize: '18px', fontWeight: 'bold', color: '#0b1c30', margin: 0 }}>Security</h2>
-                    <p style={{ fontSize: '13px', color: '#757682', marginTop: '4px' }}>Change your account password.</p>
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                  <div className="border-b border-slate-100 pb-4 mb-6">
+                    <h2 className="text-lg font-bold text-slate-900">Security</h2>
+                    <p className="text-sm text-slate-500 mt-1">Change your account password.</p>
                   </div>
                   
-                  <form onSubmit={handleUpdatePassword} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#444651' }}>Current Password</label>
+                  <form onSubmit={handleUpdatePassword} className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-slate-600">Current Password</label>
                       <input 
                         type="password" 
                         value={currentPassword} 
                         onChange={(e) => setCurrentPassword(e.target.value)} 
-                        style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e5eeff', backgroundColor: '#f8f9ff', fontSize: '14px' }}
+                        className="w-full px-3 py-2.5 rounded-lg border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all text-sm"
                         required
                       />
                     </div>
                     
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#444651' }}>New Password</label>
-                      <div style={{ position: 'relative' }}>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-slate-600">New Password</label>
+                      <div className="relative">
                         <input 
                           type={showPassword ? 'text' : 'password'} 
                           value={newPassword} 
                           onChange={(e) => setNewPassword(e.target.value)} 
-                          style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e5eeff', backgroundColor: '#f8f9ff', fontSize: '14px' }}
+                          className="w-full px-3 py-2.5 rounded-lg border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all text-sm"
                           required
                           minLength={6}
                         />
                         <button 
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#757682' }}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                         >
-                          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>{showPassword ? 'visibility_off' : 'visibility'}</span>
+                          <span className="material-symbols-outlined text-[20px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
                         </button>
                       </div>
-                      <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px' }}>Must be at least 6 characters long.</p>
+                      <p className="text-[11px] text-slate-400">Must be at least 6 characters long.</p>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+                    <div className="flex justify-end mt-2">
                       <button 
                         type="submit" 
                         disabled={isSaving}
-                        style={{ padding: '10px 24px', borderRadius: '8px', backgroundColor: '#b32424', color: '#ffffff', fontWeight: 'bold', border: 'none', cursor: isSaving ? 'not-allowed' : 'pointer' }}
+                        className={`px-6 py-2.5 rounded-lg ${isSaving ? 'bg-gray-400' : 'bg-[#b32424] hover:bg-[#93000a]'} text-white font-bold transition-colors`}
                       >
                         {isSaving ? 'Updating...' : 'Update Password'}
                       </button>
@@ -269,34 +341,60 @@ const ResidentSettings: React.FC = () => {
                 </div>
 
               </div>
-            </main>
-          </div>
+            </div>
+          </main>
+
+          {/* FOOTER */}
+          <footer className="w-full bg-primary text-on-primary pt-8 pb-6 shadow-[0_-2px_12px_rgba(0,0,0,0.05)] mt-auto">
+            <div className="max-w-7xl mx-auto px-4 text-center text-xs text-primary-fixed">
+              <p>© 2025 Barangay Malinao, Naujan. All Rights Reserved. BarangayEase Digital Civic Portal.</p>
+            </div>
+          </footer>
+
+          {/* TOAST NOTIFICATION */}
+          {toast.show && (
+            <div className="fixed top-6 right-6 z-[10000] bg-gray-900 text-white px-5 py-3 rounded-lg flex items-center gap-3 shadow-2xl animate-slide-in">
+              <span className="material-symbols-outlined" style={{ color: toast.type === 'success' ? '#68dba9' : '#ffb4ab', fontSize: '22px' }}>
+                {toast.type === 'success' ? 'check_circle' : 'error'}
+              </span>
+              <span className="text-sm font-semibold">{toast.message}</span>
+            </div>
+          )}
+
+          {/* LOGOUT CONFIRMATION MODAL */}
+          {isLogoutModalOpen && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary/50 backdrop-blur-sm p-4">
+              <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-16 h-16 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-4">
+                    <span className="material-symbols-outlined text-[36px]">logout</span>
+                  </div>
+                  <h2 className="text-lg md:text-xl font-bold text-primary">{t.logoutTitle}</h2>
+                  <p className="mt-2 text-xs md:text-sm text-slate-500 leading-relaxed">
+                    {t.logoutMessage}
+                  </p>
+                </div>
+                <div className="mt-6 flex flex-col-reverse sm:flex-row gap-2">
+                  <button onClick={() => setIsLogoutModalOpen(false)} className="flex-1 rounded-lg px-4 py-2.5 font-semibold text-primary bg-slate-100 hover:bg-slate-200 transition-colors">
+                    {t.cancel}
+                  </button>
+                  <button onClick={confirmLogout} className="flex-1 rounded-lg bg-red-600 px-4 py-2.5 font-bold text-white hover:bg-red-700 transition-colors flex items-center justify-center gap-1.5">
+                    <span className="material-symbols-outlined text-[18px]">logout</span>
+                    {t.yesLogout}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <style>
+            {`
+              @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+              .animate-slide-in { animation: slideIn 0.3s ease-out; }
+            `}
+          </style>
+
         </div>
-
-        {/* TOAST NOTIFICATION */}
-        {toast.show && (
-          <div style={{ 
-            position: 'fixed', top: '24px', right: '24px', zIndex: 10000, 
-            backgroundColor: toast.type === 'success' ? '#0b1c30' : '#dc2626', 
-            color: '#ffffff', padding: '14px 20px', borderRadius: '8px', 
-            display: 'flex', alignItems: 'center', gap: '10px', 
-            boxShadow: '0 10px 25px rgba(0,0,0,0.2)', animation: 'slideIn 0.3s ease-out' 
-          }}>
-            <span className="material-symbols-outlined" style={{ color: toast.type === 'success' ? '#68dba9' : '#ffffff', fontSize: '22px' }}>
-              {toast.type === 'success' ? 'check_circle' : 'error'}
-            </span>
-            <span style={{ fontSize: '14px', fontWeight: 600 }}>{toast.message}</span>
-          </div>
-        )}
-
-        <style>
-          {`
-            @keyframes slideIn {
-              from { transform: translateX(100%); opacity: 0; }
-              to { transform: translateX(0); opacity: 1; }
-            }
-          `}
-        </style>
       </IonContent>
     </IonPage>
   );
