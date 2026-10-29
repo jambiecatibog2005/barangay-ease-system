@@ -16,6 +16,8 @@ interface RequestData {
   status: string;
   fee: string;
   remarks?: string;
+  residentName?: string; // ✅ IDINAGDAG
+  purok?: string;        // ✅ IDINAGDAG
 }
 
 type Language = 'en' | 'fil';
@@ -880,7 +882,7 @@ const TrackStatus: React.FC = () => {
                     <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
                       <div className="col-span-2">
                         <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Resident Name</p>
-                        <p className="font-semibold text-gray-900">{localStorage.getItem('residentName') || 'Resident'}</p>
+                        <p className="font-semibold text-gray-900">{claimRequestData.residentName || 'Resident'}</p>
                       </div>
                       <div className="col-span-2">
                         <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Document Requested</p>
@@ -892,7 +894,7 @@ const TrackStatus: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Purok</p>
-                        <p className="font-semibold text-gray-900 text-xs">{localStorage.getItem('residentPurok') || 'N/A'}</p>
+                        <p className="font-semibold text-gray-900 text-xs">{claimRequestData.purok || 'N/A'}</p>
                       </div>
                       
                       {/* ✅ IDINAGDAG NA FEE */}
