@@ -74,7 +74,7 @@ type Language = 'en' | 'fil';
 const ResidentDashboard: React.FC = () => {
   const [filter, setFilter] = useState('all');
   const [isClaimSlipOpen, setIsClaimSlipOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState({ ref: '', doc: '' });
+  const [selectedRequest, setSelectedRequest] = useState({ ref: '', doc: '', fee: '' });
   
   const [requests, setRequests] = useState<RequestData[]>([]);
   const [userData, setUserData] = useState<any>(null);
@@ -141,7 +141,6 @@ const ResidentDashboard: React.FC = () => {
 
   // ✅ FETCH ANNOUNCEMENT & HOLIDAYS
   useEffect(() => {
-    // 1. Fetch Announcement
     const fetchAnnouncement = async () => {
       try {
         const docRef = doc(db, "system_settings", "announcement");
@@ -174,7 +173,6 @@ const ResidentDashboard: React.FC = () => {
       }
     };
 
-    // 2. Fetch Holidays
     const unsubscribeHolidays = onSnapshot(collection(db, "holidays"), (snapshot) => {
       const holidaysData = snapshot.docs.map(doc => ({
         id: doc.id,
@@ -216,8 +214,8 @@ const ResidentDashboard: React.FC = () => {
         return true;
       });
 
-  const handleOpenClaimSlip = (ref: string, doc: string) => { 
-    setSelectedRequest({ ref, doc }); 
+  const handleOpenClaimSlip = (ref: string, doc: string, fee: string) => { 
+    setSelectedRequest({ ref, doc, fee }); 
     setIsClaimSlipOpen(true); 
   };
 
@@ -416,7 +414,7 @@ const ResidentDashboard: React.FC = () => {
             <div className="max-w-7xl mx-auto px-4 md:px-margin pt-space-xl pb-8">
               <div className="flex flex-col w-full gap-6">
                 
-                {/* ✅ PUBLIC ANNOUNCEMENT BANNER (WALANG X BUTTON) */}
+                {/* ✅ PUBLIC ANNOUNCEMENT BANNER */}
                 {announcement && (
                   <section className="animate-fade-in">
                     <article className="relative rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 p-4 md:p-6 shadow-sm flex flex-col md:flex-row items-start justify-between gap-4 overflow-hidden">
@@ -470,7 +468,7 @@ const ResidentDashboard: React.FC = () => {
                           <p className="font-body-md text-xs md:text-sm text-on-secondary-fixed-variant leading-relaxed">Your {req.documentType} (Ref: {req.refNo}) {t.readyBannerMsg}</p>
                         </div>
                       </div>
-                      <button onClick={() => handleOpenClaimSlip(req.refNo, req.documentType)} className="w-full md:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg bg-secondary text-on-secondary font-bold shadow-sm hover:bg-secondary-container text-xs md:text-sm" type="button">
+                      <button onClick={() => handleOpenClaimSlip(req.refNo, req.documentType, req.fee)} className="w-full md:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg bg-secondary text-on-secondary font-bold shadow-sm hover:bg-secondary-container text-xs md:text-sm" type="button">
                         <span className="material-symbols-outlined text-[18px]">receipt_long</span><span>{t.viewClaimSlip}</span>
                       </button>
                     </article>
@@ -510,7 +508,7 @@ const ResidentDashboard: React.FC = () => {
                   </button>
                 </div>
 
-                {/* ✅ UPCOMING HOLIDAYS SECTION (Responsive Grid) */}
+                {/* ✅ UPCOMING HOLIDAYS SECTION */}
                 {holidays.length > 0 && (
                   <div className="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-outline-variant/30 flex flex-col gap-3">
                     <div className="flex items-center gap-2">
@@ -584,7 +582,7 @@ const ResidentDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* ✅ DESKTOP TABLE (hidden sa mobile) */}
+                  {/* ✅ DESKTOP TABLE */}
                   <div className="hidden md:block overflow-hidden rounded-xl bg-surface-container-lowest shadow-sm border border-outline-variant/30">
                     <div className="overflow-x-auto">
                       <table className="w-full text-left">
@@ -633,7 +631,7 @@ const ResidentDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* ✅ MOBILE CARD VIEW (hidden sa desktop) */}
+                  {/* ✅ MOBILE CARD VIEW */}
                   <div className="md:hidden flex flex-col gap-3">
                     {isLoading ? (
                       <div className="text-center text-outline text-sm py-8">{t.loading}</div>
@@ -643,7 +641,6 @@ const ResidentDashboard: React.FC = () => {
                       filteredRequests.map((req) => (
                         <div key={req.id} className="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-outline-variant/30 flex flex-col gap-3">
                           
-                          {/* Top Row: Ref & Status */}
                           <div className="flex justify-between items-start">
                             <span className="font-mono text-xs font-bold text-secondary bg-secondary/10 px-2 py-1 rounded-md">
                               #{req.refNo}
@@ -656,13 +653,11 @@ const ResidentDashboard: React.FC = () => {
                             </span>
                           </div>
 
-                          {/* Middle: Doc Type & Purpose */}
                           <div>
                             <div className="font-bold text-primary text-sm mb-1">{req.documentType}</div>
                             <div className="text-xs text-on-surface-variant mb-2">Purpose: {req.purpose}</div>
                           </div>
 
-                          {/* Bottom Row: Dates & Fee */}
                           <div className="grid grid-cols-2 gap-2 bg-surface-container-low p-2 rounded-lg">
                             <div>
                               <span className="text-[10px] text-outline uppercase block">Date Filed</span>
@@ -695,7 +690,7 @@ const ResidentDashboard: React.FC = () => {
             </div>
           </footer>
 
-          {/* CLAIM SLIP MODAL */}
+          {/* ✅ CLAIM SLIP MODAL (UPDATED) */}
           {isClaimSlipOpen && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary/50 backdrop-blur-sm p-4 print:bg-white print:p-0 print:static">
               
@@ -734,6 +729,13 @@ const ResidentDashboard: React.FC = () => {
                       <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Purok</p>
                       <p className="font-semibold text-gray-900 text-xs">{userData?.purok || 'N/A'}</p>
                     </div>
+                    
+                    {/* ✅ IDINAGDAG NA FEE SA CLAIM SLIP */}
+                    <div className="col-span-2 bg-blue-50/50 p-2.5 rounded-lg border border-blue-100 mt-1">
+                      <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Amount to Pay / Fee</p>
+                      <p className="font-bold text-blue-900 text-sm">{selectedRequest.fee || '₱0.00'}</p>
+                    </div>
+
                     <div className="col-span-2 mt-1">
                       <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Status</p>
                       <span className="inline-block px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase tracking-wider">Ready for Release</span>
@@ -756,13 +758,15 @@ const ResidentDashboard: React.FC = () => {
                     </div>
                   </div>
                 </div>
-
-                <div className="no-print mt-6 flex flex-wrap justify-end gap-2 bg-gray-50 p-3 rounded-xl border border-gray-200">
-                  <button onClick={() => setIsClaimSlipOpen(false)} className="rounded-lg px-3 py-1.5 font-semibold text-gray-600 hover:bg-gray-200 transition-colors text-xs sm:text-sm" type="button">{t.close}</button>
-                  <button onClick={() => window.print()} className="inline-flex items-center gap-1.5 rounded-lg bg-gray-800 px-3 py-1.5 font-bold text-white hover:bg-gray-900 transition-colors text-xs sm:text-sm" type="button"><span className="material-symbols-outlined text-[16px]">print</span>{t.print}</button>
-                  <button onClick={handleDownloadClaimSlip} className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 font-bold text-white hover:bg-primary-container transition-colors text-xs sm:text-sm" type="button"><span className="material-symbols-outlined text-[16px]">download</span>{t.download}</button>
-                </div>
               </div>
+
+              {/* ✅ MGA BUTTONS (Nasa labas na para hindi makasama sa PDF) */}
+              <div className="mt-6 flex flex-wrap justify-end gap-2 bg-gray-50 p-3 rounded-xl border border-gray-200" style={{ width: '100%', maxWidth: '28rem' }}>
+                <button onClick={() => setIsClaimSlipOpen(false)} className="rounded-lg px-3 py-1.5 font-semibold text-gray-600 hover:bg-gray-200 transition-colors text-xs sm:text-sm" type="button">{t.close}</button>
+                <button onClick={() => window.print()} className="inline-flex items-center gap-1.5 rounded-lg bg-gray-800 px-3 py-1.5 font-bold text-white hover:bg-gray-900 transition-colors text-xs sm:text-sm" type="button"><span className="material-symbols-outlined text-[16px]">print</span>{t.print}</button>
+                <button onClick={handleDownloadClaimSlip} className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 font-bold text-white hover:bg-primary-container transition-colors text-xs sm:text-sm" type="button"><span className="material-symbols-outlined text-[16px]">download</span>{t.download}</button>
+              </div>
+
             </div>
           )}
 
