@@ -17,7 +17,6 @@ const ResidentSettings: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   
-  // ✅ Tinanggal ang isMobile state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   
@@ -25,20 +24,73 @@ const ResidentSettings: React.FC = () => {
     return (localStorage.getItem('appLanguage') as 'en' | 'fil') || 'en';
   });
 
+  // ✅ KUMPLETONG TRANSLATIONS PARA SA BUONG PAGE
   const t = {
     en: { 
-      dashboard: "Dashboard", settings: "Settings", langLabel: "Language", logout: "Logout",
-      cancel: "Cancel", yesLogout: "Yes, Log out", logoutTitle: "Are you sure you want to log out?",
+      dashboard: "Dashboard", 
+      requestDoc: "Request Document", 
+      trackStatus: "Track Status", 
+      history: "Transaction History", 
+      settings: "Settings", 
+      langLabel: "Language", 
+      logout: "Logout",
+      cancel: "Cancel", 
+      yesLogout: "Yes, Log out", 
+      logoutTitle: "Are you sure you want to log out?",
       logoutMessage: "You will need to sign in again to view your requests and apply for new documents.",
       officeHours: "Office Hours: Monday-Sunday 8:00 AM – 5:00 PM",
-      advisory: "Advisory: Regular document processing schedule active."
+      advisory: "Advisory: Regular document processing schedule active.",
+      profileInfo: "Profile Information",
+      updateProfileDesc: "Update your personal details.",
+      fullNameLabel: "Full Name",
+      purokLabel: "Purok",
+      saveProfile: "Save Profile",
+      saving: "Saving...",
+      securityTitle: "Security",
+      changePasswordDesc: "Change your account password.",
+      currentPasswordLabel: "Current Password",
+      newPasswordLabel: "New Password",
+      passwordNote: "Must be at least 6 characters long.",
+      updatePassword: "Update Password",
+      updating: "Updating...",
+      successProfile: "Profile updated successfully!",
+      errorProfile: "Failed to update profile: ",
+      successPassword: "Password updated successfully!",
+      errorPasswordWrong: "Incorrect current password.",
+      errorPasswordFail: "Failed to update password: "
     },
     fil: { 
-      dashboard: "Panel ng Residente", settings: "Mga Setting", langLabel: "Wika", logout: "Mag-logout",
-      cancel: "Kanselahin", yesLogout: "Oo, Mag-logout", logoutTitle: "Sigurado ka bang gusto mong mag-logout?",
+      dashboard: "Panel ng Residente", 
+      requestDoc: "Humiling ng Dokumento", 
+      trackStatus: "Subaybayan ang Status", 
+      history: "Kasaysayan ng Transaksyon", 
+      settings: "Mga Setting", 
+      langLabel: "Wika", 
+      logout: "Mag-logout",
+      cancel: "Kanselahin", 
+      yesLogout: "Oo, Mag-logout", 
+      logoutTitle: "Sigurado ka bang gusto mong mag-logout?",
       logoutMessage: "Kailangan mong mag-login muli para makita ang iyong mga request at makapag-apply ng bagong dokumento.",
       officeHours: "Oras ng Opisina: Lunes-Linggo 8:00 AM – 5:00 PM",
-      advisory: "Abiso: Regular ang iskedyul ng pagproseso ng dokumento."
+      advisory: "Abiso: Regular ang iskedyul ng pagproseso ng dokumento.",
+      profileInfo: "Impormasyon ng Profile",
+      updateProfileDesc: "I-update ang iyong personal na detalye.",
+      fullNameLabel: "Buong Pangalan",
+      purokLabel: "Purok",
+      saveProfile: "I-save ang Profile",
+      saving: "Isinasave...",
+      securityTitle: "Seguridad",
+      changePasswordDesc: "Palitan ang password ng iyong account.",
+      currentPasswordLabel: "Kasalukuyang Password",
+      newPasswordLabel: "Bagong Password",
+      passwordNote: "Dapat hindi bababa sa 6 na karakter.",
+      updatePassword: "I-update ang Password",
+      updating: "Ina-update...",
+      successProfile: "Matagumpay na na-update ang profile!",
+      errorProfile: "Nabigong i-update ang profile: ",
+      successPassword: "Matagumpay na na-update ang password!",
+      errorPasswordWrong: "Mali ang kasalukuyang password.",
+      errorPasswordFail: "Nabigong i-update ang password: "
     }
   }[language];
 
@@ -52,7 +104,6 @@ const ResidentSettings: React.FC = () => {
   }, [language]);
 
   useEffect(() => {
-    // Fetch current user data
     const fetchUserData = async () => {
       const uid = localStorage.getItem('residentUid');
       if (uid) {
@@ -68,8 +119,6 @@ const ResidentSettings: React.FC = () => {
 
     fetchUserData();
   }, []);
-
-  // ✅ Tinanggal ang navigateTo function dahil direkta nang naka-href
 
   const handleLogoutClick = () => {
     setIsMobileMenuOpen(false);
@@ -102,9 +151,9 @@ const ResidentSettings: React.FC = () => {
         "Resident"
       );
 
-      showNotification("Profile updated successfully!", "success");
+      showNotification(t.successProfile, "success");
     } catch (error: any) {
-      showNotification("Failed to update profile: " + error.message, "error");
+      showNotification(t.errorProfile + error.message, "error");
     } finally {
       setIsSaving(false);
     }
@@ -128,14 +177,14 @@ const ResidentSettings: React.FC = () => {
         "Resident"
       );
 
-      showNotification("Password updated successfully!", "success");
+      showNotification(t.successPassword, "success");
       setCurrentPassword('');
       setNewPassword('');
     } catch (error: any) {
       if (error.code === 'auth/wrong-password') {
-        showNotification("Incorrect current password.", "error");
+        showNotification(t.errorPasswordWrong, "error");
       } else {
-        showNotification("Failed to update password: " + error.message, "error");
+        showNotification(t.errorPasswordFail + error.message, "error");
       }
     } finally {
       setIsSaving(false);
@@ -172,9 +221,9 @@ const ResidentSettings: React.FC = () => {
               </div>
               <nav className="hidden md:flex items-center justify-center gap-1 flex-1">
                 <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/dashboard">{t.dashboard}</a>
-                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/documents">Request Document</a>
-                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/track-status">Track Status</a>
-                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/history">History</a>
+                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/documents">{t.requestDoc}</a>
+                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/track-status">{t.trackStatus}</a>
+                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/history">{t.history}</a>
                 <a className="px-3 py-2 transition-colors bg-primary text-on-primary font-bold rounded-lg shadow-sm text-sm whitespace-nowrap" href="/settings">{t.settings}</a>
               </nav>
               
@@ -194,9 +243,9 @@ const ResidentSettings: React.FC = () => {
                       
                       <div className="flex flex-col md:hidden gap-1">
                         <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/dashboard">{t.dashboard}</a>
-                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/documents">Request Document</a>
-                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/track-status">Track Status</a>
-                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/history">History</a>
+                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/documents">{t.requestDoc}</a>
+                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/track-status">{t.trackStatus}</a>
+                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/history">{t.history}</a>
                         <a className="px-4 py-2.5 text-sm font-semibold text-primary bg-primary/10 rounded-lg" href="/settings">{t.settings}</a>
                         <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
                       </div>
@@ -234,13 +283,13 @@ const ResidentSettings: React.FC = () => {
                 {/* PROFILE SECTION */}
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
                   <div className="border-b border-slate-100 pb-4 mb-6">
-                    <h2 className="text-lg font-bold text-slate-900">Profile Information</h2>
-                    <p className="text-sm text-slate-500 mt-1">Update your personal details.</p>
+                    <h2 className="text-lg font-bold text-slate-900">{t.profileInfo}</h2>
+                    <p className="text-sm text-slate-500 mt-1">{t.updateProfileDesc}</p>
                   </div>
                   
                   <form onSubmit={handleUpdateProfile} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-semibold text-slate-600">Full Name</label>
+                      <label className="text-xs font-semibold text-slate-600">{t.fullNameLabel}</label>
                       <input 
                         type="text" 
                         value={fullName} 
@@ -251,7 +300,7 @@ const ResidentSettings: React.FC = () => {
                     </div>
                     
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-semibold text-slate-600">Purok</label>
+                      <label className="text-xs font-semibold text-slate-600">{t.purokLabel}</label>
                       <select 
                         value={purok} 
                         onChange={(e) => setPurok(e.target.value)}
@@ -270,7 +319,7 @@ const ResidentSettings: React.FC = () => {
                         disabled={isSaving}
                         className={`px-6 py-2.5 rounded-lg ${isSaving ? 'bg-gray-400' : 'bg-[#00236f] hover:bg-[#00174d]'} text-white font-bold transition-colors`}
                       >
-                        {isSaving ? 'Saving...' : 'Save Profile'}
+                        {isSaving ? t.saving : t.saveProfile}
                       </button>
                     </div>
                   </form>
@@ -279,13 +328,13 @@ const ResidentSettings: React.FC = () => {
                 {/* SECURITY SECTION */}
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
                   <div className="border-b border-slate-100 pb-4 mb-6">
-                    <h2 className="text-lg font-bold text-slate-900">Security</h2>
-                    <p className="text-sm text-slate-500 mt-1">Change your account password.</p>
+                    <h2 className="text-lg font-bold text-slate-900">{t.securityTitle}</h2>
+                    <p className="text-sm text-slate-500 mt-1">{t.changePasswordDesc}</p>
                   </div>
                   
                   <form onSubmit={handleUpdatePassword} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-semibold text-slate-600">Current Password</label>
+                      <label className="text-xs font-semibold text-slate-600">{t.currentPasswordLabel}</label>
                       <input 
                         type="password" 
                         value={currentPassword} 
@@ -296,7 +345,7 @@ const ResidentSettings: React.FC = () => {
                     </div>
                     
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-semibold text-slate-600">New Password</label>
+                      <label className="text-xs font-semibold text-slate-600">{t.newPasswordLabel}</label>
                       <div className="relative">
                         <input 
                           type={showPassword ? 'text' : 'password'} 
@@ -314,7 +363,7 @@ const ResidentSettings: React.FC = () => {
                           <span className="material-symbols-outlined text-[20px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
                         </button>
                       </div>
-                      <p className="text-[11px] text-slate-400">Must be at least 6 characters long.</p>
+                      <p className="text-[11px] text-slate-400">{t.passwordNote}</p>
                     </div>
 
                     <div className="flex justify-end mt-2">
@@ -323,7 +372,7 @@ const ResidentSettings: React.FC = () => {
                         disabled={isSaving}
                         className={`px-6 py-2.5 rounded-lg ${isSaving ? 'bg-gray-400' : 'bg-[#b32424] hover:bg-[#93000a]'} text-white font-bold transition-colors`}
                       >
-                        {isSaving ? 'Updating...' : 'Update Password'}
+                        {isSaving ? t.updating : t.updatePassword}
                       </button>
                     </div>
                   </form>
