@@ -13,11 +13,12 @@ interface RequestData {
   documentType: string;
   purpose: string;
   dateFiled: string;
+  dateReleased?: string; // ✅ IDINAGDAG
   status: string;
   fee: string;
   remarks?: string;
-  residentName?: string; // ✅ IDINAGDAG
-  purok?: string;        // ✅ IDINAGDAG
+  residentName?: string; 
+  purok?: string;        
 }
 
 type Language = 'en' | 'fil';
@@ -889,8 +890,8 @@ const TrackStatus: React.FC = () => {
                         <p className="font-semibold text-gray-900">{claimRequestData.documentType}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Date Issued</p>
-                        <p className="font-semibold text-gray-900 text-xs">{new Date().toLocaleDateString('en-PH', { dateStyle: 'medium' })}</p>
+                        <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Date Released</p>
+                        <p className="font-semibold text-gray-900 text-xs">{claimRequestData.dateReleased || new Date().toLocaleDateString('en-PH', { dateStyle: 'medium' })}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Purok</p>
