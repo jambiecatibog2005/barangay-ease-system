@@ -11,7 +11,7 @@ import ResidentDashboard from './pages/ResidentDashboard';
 import DocumentCatalog from './pages/DocumentCatalog';
 import TrackStatus from './pages/TrackStatus';
 import TransactionHistory from './pages/TransactionHistory';
-import ResidentSettings from './pages/ResidentSettings'; // ✅ IDINAGDAG
+// ❌ REMOVED: import ResidentSettings from './pages/ResidentSettings';
 
 // --- ADMIN/STAFF PAGES ---
 import AdminLogin from './pages/AdminLogin'; 
@@ -45,23 +45,19 @@ const App: React.FC = () => {
     window.addEventListener('popstate', handlePopState);
     
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      // ✅ KUNIN MUNA ANG MGA LOCALSTORAGE BAGO MAG-DESISYON
       const storedAdmin = localStorage.getItem('isAdminLoggedIn') === 'true';
       const storedStaff = localStorage.getItem('isStaffLoggedIn') === 'true';
       const storedStaffUid = localStorage.getItem('staffUid');
 
-      // ✅ KUNG MAY ADMIN SESSION, PAYAGAN SIYA
       if (storedAdmin) {
         setIsAdminLoggedIn(true);
       } else {
         setIsAdminLoggedIn(false);
       }
 
-      // ✅ KUNG MAY STAFF SESSION, PAYAGAN SIYA
       if (storedStaff && storedStaffUid) {
         setIsStaffLoggedIn(true);
       } else if (user && storedStaff) {
-        // Fallback kung naka-login sa Firebase pero nawala ang staffUid
         setIsStaffLoggedIn(true);
       } else {
         setIsStaffLoggedIn(false);
@@ -104,8 +100,7 @@ const App: React.FC = () => {
         <TrackStatus />
       ) : currentPath === '/history' ? (
         <TransactionHistory />
-      ) : currentPath === '/settings' ? (             /* ✅ IDINAGDAG */
-        <ResidentSettings />                           /* ✅ IDINAGDAG */
+      // ❌ REMOVED: /settings route for ResidentSettings
       
       ) : currentPath === '/admin-login' ? (
         <AdminLogin />
