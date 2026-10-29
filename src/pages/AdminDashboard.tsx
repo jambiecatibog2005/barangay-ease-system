@@ -49,7 +49,7 @@ const AdminDashboard: React.FC = () => {
   // ✅ STATES PARA SA CHART
   const [allRequests, setAllRequests] = useState<any[]>([]);
   const [chartFilter, setChartFilter] = useState('days'); 
-  const [chartData, setChartData] = useState<ChartDataPoint[]>([]); // ✅ Nilagyan ng type
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
 
   const adminName = localStorage.getItem('adminName') || 'Admin';
   const initials = adminName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
@@ -132,7 +132,7 @@ const AdminDashboard: React.FC = () => {
     const releasedReqs = allRequests.filter(r => r.status === 'Released');
     const today = new Date();
     let groupedData: Record<string, number> = {};
-    let result: ChartDataPoint[] = []; // ✅ Nilagyan ng type
+    let result: ChartDataPoint[] = [];
 
     if (chartFilter === 'days') {
       for (let i = 6; i >= 0; i--) {
@@ -343,7 +343,7 @@ const AdminDashboard: React.FC = () => {
                   
                   <div style={{ display: 'flex', gap: '12px', width: isMobile ? '100%' : 'auto', zIndex: 1 }}>
                     <button onClick={() => navigateTo('/admin-catalog')} style={{ flex: isMobile ? 1 : 'none', padding: '12px 24px', borderRadius: '8px', backgroundColor: '#ffffff', border: '1px solid #1e3a8a', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: 'bold', fontSize: '14px', color: '#1e3a8a', transition: 'all 0.2s' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>folder_copy</span> Fees
+                      <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>folder_copy</span> Document
                     </button>
                     <button onClick={() => navigateTo('/admin-audit-logs')} style={{ flex: isMobile ? 1 : 'none', padding: '12px 24px', borderRadius: '8px', backgroundColor: '#1e3a8a', color: '#ffffff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: 'bold', fontSize: '14px', transition: 'all 0.2s', boxShadow: '0 4px 10px rgba(30, 58, 138, 0.2)' }}>
                       <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>shield</span> Logs
@@ -412,7 +412,6 @@ const AdminDashboard: React.FC = () => {
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5eeff" />
                         <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#757682' }} dy={10} />
                         <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#757682' }} tickFormatter={(value) => `₱${value}`} width={isMobile ? 60 : 80} />
-                        {/* ✅ AYOS NA TOOLTIP FORMATTER */}
                         <Tooltip 
                           formatter={(value: any) => {
                             const num = typeof value === 'number' ? value : Number(value);
