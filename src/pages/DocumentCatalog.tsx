@@ -160,6 +160,7 @@ const translations = {
     navRequest: "Request Document",
     navTrack: "Track Status",
     navHistory: "Transaction History",
+    navSettings: "Settings",
     logout: "Logout",
     langLabel: "Language",
     officeHours: "Office Hours: Monday-Sunday 8:00 AM – 5:00 PM",
@@ -196,6 +197,7 @@ const translations = {
     navRequest: "Humiling ng Dokumento",
     navTrack: "Subaybayan ang Status",
     navHistory: "Kasaysayan ng Transaksyon",
+    navSettings: "Mga Setting",
     logout: "Mag-logout",
     langLabel: "Wika",
     officeHours: "Oras ng Opisina: Lunes-Linggo 8:00 AM – 5:00 PM",
@@ -263,10 +265,8 @@ const DocumentCatalog: React.FC = () => {
         const data = doc.data();
         const code = data.code || '';
         
-        // ✅ PINIPILI KUNG ENGLISH O FILIPINO ANG GAGAMITIN BASE SA WIKA
         const activeMasterData = language === 'en' ? masterDataEn : masterDataFil;
         
-        // ✅ FORCE NA KUNIN SA MASTER DATA KUNG MAY CODE, PARA MAIWASAN ANG DATABASE OVERRIDE
         const localInfo = activeMasterData[code] || {
           title: data.title || 'Unknown Document',
           desc: language === 'en' ? 'Official Barangay Document. Please prepare a valid ID.' : 'Opisyal na Dokumento ng Barangay. Mangyaring maghanda ng valid ID.',
@@ -286,7 +286,6 @@ const DocumentCatalog: React.FC = () => {
           numericFee: numericFee,
           isFree: isFree,
           processingTime: data.processingTime || 'N/A',
-          // ✅ DITO ANG FIX: Kung may match sa code, gamitin ang desc mula sa masterData
           description: activeMasterData[code] ? activeMasterData[code].desc : (data.description || localInfo.desc),
           requirements: activeMasterData[code] ? activeMasterData[code].reqs : (data.requirements || localInfo.reqs),
           icon: localInfo.icon,
@@ -434,6 +433,7 @@ const DocumentCatalog: React.FC = () => {
                 <a className="px-3 py-2 transition-colors bg-primary text-on-primary font-bold rounded-lg shadow-sm text-sm whitespace-nowrap" href="/documents">{t.navRequest}</a>
                 <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/track-status">{t.navTrack}</a>
                 <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/history">{t.navHistory}</a>
+                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/settings">{t.navSettings}</a>
               </nav>
 
               <div className="flex items-center justify-end gap-2 shrink-0">
@@ -449,6 +449,7 @@ const DocumentCatalog: React.FC = () => {
                         <a className="px-4 py-2.5 text-sm font-semibold text-primary bg-primary/10 rounded-lg" href="/documents">{t.navRequest}</a>
                         <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/track-status">{t.navTrack}</a>
                         <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/history">{t.navHistory}</a>
+                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/settings">{t.navSettings}</a>
                         <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
                       </div>
                       <div className="px-2 py-2">
