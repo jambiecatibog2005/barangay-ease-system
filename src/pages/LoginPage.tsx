@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db, logAction } from '../firebase'; 
 import logoImage from '../assets/logo.png';
@@ -12,6 +12,12 @@ const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState('');
+
+  // ✅ STATES PARA SA FORGOT PASSWORD MODAL
+  const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetMessage, setResetMessage] = useState({ text: '', type: '' });
+  const [isResetting, setIsResetting] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +79,39 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  // ✅ FUNCTION PARA SA FORGOT PASSWORD
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetEmail) {
+      setResetMessage({ text: 'Please enter your email address.', type: 'error' });
+      return;
+    }
+    
+    setIsResetting(true);
+    setResetMessage({ text: '', type: '' });
+
+    try {
+      await sendPasswordResetEmail(auth, resetEmail);
+      setResetMessage({ 
+        text: 'Password reset link sent! Please check your email inbox (and spam folder).', 
+        type: 'success' 
+      });
+      setResetEmail('');
+      setTimeout(() => {
+        setIsForgotModalOpen(false);
+        setResetMessage({ text: '', type: '' });
+      }, 4000);
+    } catch (error: any) {
+      if (error.code === 'auth/user-not-found') {
+        setResetMessage({ text: 'No account found with this email address.', type: 'error' });
+      } else {
+        setResetMessage({ text: 'Failed to send reset email. Please try again.', type: 'error' });
+      }
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   return (
     <IonPage>
       <IonContent className="bg-[#f0f4f8]">
@@ -120,7 +159,6 @@ const LoginPage: React.FC = () => {
                   <p className="text-gray-500 text-sm">Login to your BarangayEase account.</p>
                 </div>
 
-                {/* ✅ ERROR MESSAGE DISPLAY */}
                 {errorMessage && (
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-start gap-3">
                     <span className="material-symbols-outlined text-red-500 text-xl">error</span>
@@ -150,9 +188,19 @@ const LoginPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Password <span className="text-[#b32424]">*</span>
-                    </label>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="block text-sm font-semibold text-gray-700">
+                        Password <span className="text-[#b32424]">*</span>
+                      </label>
+                      {/* ✅ FORGOT PASSWORD LINK */}
+                      <button 
+                        type="button" 
+                        onClick={() => setIsForgotModalOpen(true)}
+                        className="text-xs font-bold text-[#00236f] hover:underline"
+                      >
+                        Forgot Password?
+                      </button>
+                    </div>
                     <div className="relative">
                       <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">lock</span>
                       <input 
@@ -210,6 +258,52 @@ const LoginPage: React.FC = () => {
               256-Bit Encrypted Municipal Records System
             </div>
           </footer>
+
+          {/* ✅ FORGOT PASSWORD MODAL */}
+          {isForgotModalOpen && (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#00236f]/50 backdrop-blur-sm p-4">
+              <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+                <div className="flex justify-between items-center mb-4 border-b pb-3">
+                  <h2 className="text-xl font-bold text-[#00236f]">Reset Password</h2>
+                  <button onClick={() => setIsForgotModalOpen(false)} className="text-gray-500 hover:bg-gray-100 rounded-full p-1">
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+
+                {resetMessage.text && (
+                  <div className={`p-3 mb-4 text-xs font-bold rounded-lg ${resetMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    {resetMessage.text}
+                  </div>
+                )}
+
+                <p className="text-sm text-gray-600 mb-4">
+                  Enter your registered email address and we'll send you a link to reset your password.
+                </p>
+
+                <form onSubmit={handleResetPassword} className="flex flex-col gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
+                    <input 
+                      type="email" 
+                      value={resetEmail}
+                      onChange={(e) => setResetEmail(e.target.value)}
+                      placeholder="e.g. juan@gmail.com"
+                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00236f]"
+                      required
+                      disabled={isResetting}
+                    />
+                  </div>
+                  <button 
+                    type="submit" 
+                    disabled={isResetting}
+                    className="w-full bg-[#00236f] text-white font-bold py-2.5 rounded-lg text-sm hover:bg-[#00174d] disabled:bg-gray-400 transition-colors"
+                  >
+                    {isResetting ? 'Sending...' : 'Send Reset Link'}
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
 
         </div>
       </IonContent>
