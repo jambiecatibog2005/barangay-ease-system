@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db, logAction } from '../firebase'; 
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db, logAction } from '../firebase'; 
 import logoImage from '../assets/logo.png';
 
 const LoginPage: React.FC = () => {
@@ -22,22 +21,20 @@ const LoginPage: React.FC = () => {
     setErrorMessage('');
 
     try {
-      // 1. Mag-login sa Firebase Auth
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      // ✅ DEMO BYPASS: Hahanapin lang natin siya sa Firestore gamit ang email
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("email", "==", email));
+      const querySnapshot = await getDocs(q);
 
-      // 2. Kunin ang detalye niya sa Firestore
-      const userDocRef = doc(db, "users", user.uid);
-      const userDocSnap = await getDoc(userDocRef);
-
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data();
+      if (!querySnapshot.empty) {
+        const userDoc = querySnapshot.docs[0];
+        const userData = userDoc.data();
         const userStatus = userData.status?.toLowerCase();
 
-        // ✅ 3. CHECK KUNG ACTIVE ANG STATUS
+        // ✅ CHECK KUNG ACTIVE ANG STATUS
         if (userStatus === "active") {
-          // I-save sa localStorage
-          localStorage.setItem('residentUid', user.uid); 
+          // I-save sa localStorage para makapasok
+          localStorage.setItem('residentUid', userDoc.id); 
           localStorage.setItem('residentName', userData.fullName || 'Resident'); 
           localStorage.setItem('isResidentLoggedIn', 'true');
           localStorage.setItem('userRole', 'Resident'); 
@@ -45,32 +42,30 @@ const LoginPage: React.FC = () => {
           // I-log ang successful login
           await logAction(
             "Resident Login", 
-            `Resident logged in to the portal.`, 
+            `Resident logged in to the portal (Demo Bypass).`, 
             "info", 
             userData.fullName || 'Resident', 
             "Resident"
           );
           
           window.location.href = '/dashboard';
+          return;
         } else if (userStatus === "pending") {
-          await signOut(auth); // ✅ I-logout agad
           setErrorMessage("Your account is still pending. Please wait for the Barangay Staff to verify your residency before you can login.");
         } else if (userStatus === "rejected") {
-          await signOut(auth);
           setErrorMessage("Your registration was rejected. You are not recognized as a resident of Brgy. Malinao.");
         } else if (userStatus === "suspended") {
-          await signOut(auth);
           setErrorMessage("Your account has been suspended. Please visit the Barangay Hall for assistance.");
         } else {
-          await signOut(auth);
           setErrorMessage("Account status unknown. Please contact the Barangay Staff.");
         }
       } else {
-        await signOut(auth);
-        setErrorMessage("User record not found in the database.");
+        setErrorMessage("User record not found in the database. Please check your email.");
       }
+
     } catch (error: any) {
-      setErrorMessage("Invalid email or password.");
+      console.error("Login Error: ", error);
+      setErrorMessage("An error occurred during login. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -156,7 +151,6 @@ const LoginPage: React.FC = () => {
                       <label className="block text-sm font-semibold text-gray-700">
                         Password <span className="text-[#b32424]">*</span>
                       </label>
-                      {/* ✅ FORGOT PASSWORD LINK */}
                       <button 
                         type="button" 
                         onClick={() => setIsForgotModalOpen(true)}
