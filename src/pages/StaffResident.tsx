@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
 import { collection, onSnapshot, doc, updateDoc } from "firebase/firestore";
-import { db, logAction } from '../firebase'; // ✅ IDINAGDAG ANG logAction
+import { db, logAction } from '../firebase'; 
 import logoImage from '../assets/logo.png';
 
 const StaffResident: React.FC = () => {
@@ -18,6 +18,13 @@ const StaffResident: React.FC = () => {
   // --- RESPONSIVE STATES ---
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // ✅ STATES PARA SA RESET PASSWORD MODAL
+  const [resetModalOpen, setResetModalOpen] = useState(false);
+  const [residentToReset, setResidentToReset] = useState<any>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetMessage, setResetMessage] = useState({ text: '', type: '' });
 
   useEffect(() => {
     const handleResize = () => {
@@ -76,7 +83,6 @@ const StaffResident: React.FC = () => {
       const userRef = doc(db, "users", id);
       await updateDoc(userRef, { status: newStatus });
 
-      // ✅ IDINAGDAG: I-LOG ANG STATUS UPDATE SA AUDIT LOGS
       const staffName = localStorage.getItem('staffName') || 'Staff Member';
       let actionName = "Updated Resident Status";
       let logType = "info";
@@ -106,12 +112,65 @@ const StaffResident: React.FC = () => {
     }
   };
 
+  // ✅ FUNCTION PARA SA PAG-RESET NG PASSWORD (MANUAL/DEMO)
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPassword || newPassword.length < 6) {
+      setResetMessage({ text: 'Password must be at least 6 characters.', type: 'error' });
+      return;
+    }
+
+    setIsResetting(true);
+    setResetMessage({ text: '', type: '' });
+
+    try {
+      // ✅ I-update ang password (temporaryPassword) sa Firestore
+      const userRef = doc(db, "users", residentToReset.id);
+      await updateDoc(userRef, { temporaryPassword: newPassword });
+      
+      const staffName = localStorage.getItem('staffName') || 'Staff Member';
+      await logAction(
+        "Password Reset Initiated",
+        `Staff set a new temporary password for ${residentToReset.fullName}.`,
+        "info",
+        staffName,
+        "Secretary"
+      );
+
+      setResetMessage({ 
+        text: `Success! The new temporary password for ${residentToReset.fullName} is: "${newPassword}". Please inform the resident to use this to login.`, 
+        type: 'success' 
+      });
+      
+      setTimeout(() => {
+        setResetModalOpen(false);
+        setResetMessage({ text: '', type: '' });
+        setResidentToReset(null);
+        setNewPassword('');
+      }, 5000);
+
+    } catch (error: any) {
+      console.error("Error resetting password: ", error);
+      setResetMessage({ text: 'Failed to reset password.', type: 'error' });
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
+  const openResetModal = (resident: any) => {
+    setResidentToReset(resident);
+    // Mag-generate ng random na 6-character na password
+    const randomPass = Math.random().toString(36).slice(-6);
+    setNewPassword(randomPass);
+    setResetMessage({ text: '', type: '' });
+    setResetModalOpen(true);
+  };
+
   const filteredData = residents.filter((res) => {
     const matchesSearch = (res.fullName || '').toLowerCase().includes(searchQuery.toLowerCase()) || (res.email || '').toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
 
-  // Bilang para sa Stats
   const totalResidents = residents.length;
   const pendingResidents = residents.filter(r => r.status && r.status.toLowerCase() === 'pending').length;
   const activeResidents = residents.filter(r => r.status && r.status.toLowerCase() === 'active').length;
@@ -323,7 +382,7 @@ const StaffResident: React.FC = () => {
 
                               {/* ACTION BUTTONS */}
                               <td style={{ padding: '12px 16px', textAlign: 'right' }}>
-                                <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                                <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                                   
                                   {res.status?.toLowerCase() === 'pending' && (
                                     <>
@@ -339,6 +398,14 @@ const StaffResident: React.FC = () => {
                                   {(res.status?.toLowerCase() === 'rejected' || res.status?.toLowerCase() === 'suspended') && (
                                     <button onClick={() => handleUpdateStatus(res.id, 'active', res.fullName)} style={{ padding: '6px 12px', borderRadius: '6px', backgroundColor: '#1e3a8a', color: '#ffffff', fontWeight: 'bold', fontSize: '11px', border: 'none', cursor: 'pointer' }}>Activate</button>
                                   )}
+
+                                  {/* ✅ BAGONG RESET PASSWORD BUTTON */}
+                                  <button 
+                                    onClick={() => openResetModal(res)} 
+                                    style={{ padding: '6px 12px', borderRadius: '6px', backgroundColor: '#eff4ff', color: '#1e3a8a', fontWeight: 'bold', fontSize: '11px', border: '1px solid #dce9ff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                  >
+                                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>key</span> Reset Pass
+                                  </button>
 
                                 </div>
                               </td>
@@ -389,6 +456,49 @@ const StaffResident: React.FC = () => {
                 </button>
               </div>
 
+            </div>
+          </div>
+        )}
+
+        {/* ✅ RESET PASSWORD MODAL */}
+        {resetModalOpen && residentToReset && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(11, 28, 48, 0.5)', backdropFilter: 'blur(4px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+            <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '400px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e3a8a', margin: 0 }}>Reset Password</h2>
+                <button onClick={() => setResetModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                  <span className="material-symbols-outlined" style={{ color: '#757682' }}>close</span>
+                </button>
+              </div>
+
+              {resetMessage.text && (
+                <div style={{ padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '12px', fontWeight: 'bold', backgroundColor: resetMessage.type === 'success' ? '#dcfce7' : '#fee2e2', color: resetMessage.type === 'success' ? '#15803d' : '#dc2626' }}>
+                  {resetMessage.text}
+                </div>
+              )}
+
+              <p style={{ fontSize: '13px', color: '#444651', marginBottom: '20px' }}>
+                Enter a new temporary password for <strong>{residentToReset.fullName}</strong>.
+              </p>
+
+              <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <input 
+                  type="text" 
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter temporary password"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #e5eeff', backgroundColor: '#f8f9ff', fontSize: '13px', outline: 'none' }}
+                  required
+                  disabled={isResetting}
+                />
+                <button 
+                  type="submit" 
+                  disabled={isResetting}
+                  style={{ width: '100%', padding: '12px', borderRadius: '8px', backgroundColor: '#1e3a8a', color: '#ffffff', fontWeight: 'bold', border: 'none', cursor: isResetting ? 'not-allowed' : 'pointer', fontSize: '14px', opacity: isResetting ? 0.7 : 1 }}
+                >
+                  {isResetting ? 'Setting Password...' : 'Set Temporary Password'}
+                </button>
+              </form>
             </div>
           </div>
         )}
