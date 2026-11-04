@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { auth, db, logAction } from '../firebase'; // ✅ IDINAGDAG ANG logAction
+import { auth, db, logAction } from '../firebase'; 
 import logoImage from '../assets/logo.png';
 
 const SignupPage: React.FC = () => {
@@ -13,11 +13,18 @@ const SignupPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // ✅ STATE PARA SA DATA PRIVACY CONSENT
+  const [agreePrivacy, setAgreePrivacy] = useState(false);
+
   // State para sa Custom Success Modal
   const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!agreePrivacy) {
+      alert("Please agree to the Data Privacy Policy to continue.");
+      return;
+    }
     setIsLoading(true);
 
     try {
@@ -30,8 +37,9 @@ const SignupPage: React.FC = () => {
         fullName: fullName,
         email: email,
         purok: purok,
+        password: password, // ✅ IDINAGDAG: Para sa demo login logic natin (dahil naka-bypass tayo sa Auth)
         role: "resident", 
-        status: "pending", // 👈 MAHALAGA: Ito ang maglalagay ng "Pending" sa Staff Side
+        status: "pending", 
         createdAt: new Date()
       });
 
@@ -235,10 +243,25 @@ const SignupPage: React.FC = () => {
                     </div>
                   </div>
 
+                  {/* ✅ DATA PRIVACY CONSENT CHECKBOX */}
+                  <div className="flex items-start gap-2 mt-2">
+                    <input 
+                      type="checkbox" 
+                      id="privacy-consent"
+                      checked={agreePrivacy}
+                      onChange={(e) => setAgreePrivacy(e.target.checked)}
+                      required
+                      className="mt-1 w-4 h-4 text-[#00236f] border-gray-300 rounded focus:ring-[#00236f] cursor-pointer"
+                    />
+                    <label htmlFor="privacy-consent" className="text-xs text-gray-600 leading-tight cursor-pointer">
+                      I hereby certify that the information provided is true and correct, and I agree to the collection and processing of my personal data in accordance with the <strong>Data Privacy Act of 2012 (RA 10173)</strong>.
+                    </label>
+                  </div>
+
                   <button 
                     type="submit" 
-                    disabled={isLoading || showSuccess}
-                    className={`w-full ${isLoading || showSuccess ? 'bg-gray-400' : 'bg-[#00236f] hover:bg-[#00174d]'} text-white font-bold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md mt-4`}
+                    disabled={isLoading || showSuccess || !agreePrivacy}
+                    className={`w-full ${isLoading || showSuccess || !agreePrivacy ? 'bg-gray-400' : 'bg-[#00236f] hover:bg-[#00174d]'} text-white font-bold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-md mt-4`}
                   >
                     <span className="material-symbols-outlined text-xl">
                       {isLoading ? 'sync' : 'person_add'}
