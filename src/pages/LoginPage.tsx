@@ -21,46 +21,58 @@ const LoginPage: React.FC = () => {
     setErrorMessage('');
 
     try {
-      // ✅ DEMO BYPASS: Hahanapin lang natin siya sa Firestore gamit ang email
+      // ✅ 1. Hanapin siya sa Firestore gamit ang email
       const usersRef = collection(db, "users");
       const q = query(usersRef, where("email", "==", email));
       const querySnapshot = await getDocs(q);
 
-      if (!querySnapshot.empty) {
-        const userDoc = querySnapshot.docs[0];
-        const userData = userDoc.data();
-        const userStatus = userData.status?.toLowerCase();
+      if (querySnapshot.empty) {
+        setErrorMessage("No account found with this email address.");
+        setIsLoading(false);
+        return;
+      }
 
-        // ✅ CHECK KUNG ACTIVE ANG STATUS
-        if (userStatus === "active") {
-          // I-save sa localStorage para makapasok
-          localStorage.setItem('residentUid', userDoc.id); 
-          localStorage.setItem('residentName', userData.fullName || 'Resident'); 
-          localStorage.setItem('isResidentLoggedIn', 'true');
-          localStorage.setItem('userRole', 'Resident'); 
+      const userDoc = querySnapshot.docs[0];
+      const userData = userDoc.data();
+      const userStatus = userData.status?.toLowerCase();
 
-          // I-log ang successful login
-          await logAction(
-            "Resident Login", 
-            `Resident logged in to the portal (Demo Bypass).`, 
-            "info", 
-            userData.fullName || 'Resident', 
-            "Resident"
-          );
-          
-          window.location.href = '/dashboard';
-          return;
-        } else if (userStatus === "pending") {
-          setErrorMessage("Your account is still pending. Please wait for the Barangay Staff to verify your residency before you can login.");
-        } else if (userStatus === "rejected") {
-          setErrorMessage("Your registration was rejected. You are not recognized as a resident of Brgy. Malinao.");
-        } else if (userStatus === "suspended") {
-          setErrorMessage("Your account has been suspended. Please visit the Barangay Hall for assistance.");
-        } else {
-          setErrorMessage("Account status unknown. Please contact the Barangay Staff.");
-        }
+      // ✅ 2. I-check kung tugma ang password sa temporaryPassword (na ni-reset ng staff)
+      // Kung walang temporaryPassword, titingnan natin kung may naka-save na "password" field.
+      const validPassword = userData.temporaryPassword || userData.password;
+
+      if (password !== validPassword) {
+        setErrorMessage("Invalid email or password. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      // ✅ 3. Kapag tugma ang password, tsaka natin i-check ang status
+      if (userStatus === "active") {
+        // I-save sa localStorage
+        localStorage.setItem('residentUid', userDoc.id); 
+        localStorage.setItem('residentName', userData.fullName || 'Resident'); 
+        localStorage.setItem('isResidentLoggedIn', 'true');
+        localStorage.setItem('userRole', 'Resident'); 
+
+        // I-log ang successful login
+        await logAction(
+          "Resident Login", 
+          `Resident logged in to the portal.`, 
+          "info", 
+          userData.fullName || 'Resident', 
+          "Resident"
+        );
+        
+        window.location.href = '/dashboard';
+        return;
+      } else if (userStatus === "pending") {
+        setErrorMessage("Your account is still pending. Please wait for the Barangay Staff to verify your residency before you can login.");
+      } else if (userStatus === "rejected") {
+        setErrorMessage("Your registration was rejected. You are not recognized as a resident of Brgy. Malinao.");
+      } else if (userStatus === "suspended") {
+        setErrorMessage("Your account has been suspended. Please visit the Barangay Hall for assistance.");
       } else {
-        setErrorMessage("User record not found in the database. Please check your email.");
+        setErrorMessage("Account status unknown. Please contact the Barangay Staff.");
       }
 
     } catch (error: any) {
