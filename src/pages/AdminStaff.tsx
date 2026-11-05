@@ -14,6 +14,7 @@ const AdminStaff: React.FC = () => {
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
   const [secretary, setSecretary] = useState<any>(null);
+  const [residents, setResidents] = useState<any[]>([]); // ✅ Bagong state para sa residents
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -36,8 +37,9 @@ const AdminStaff: React.FC = () => {
     };
     window.addEventListener('resize', handleResize);
 
+    // 1. Kunin ang Secretary
     const q = query(collection(db, "users"), where("role", "==", "secretary"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribeSec = onSnapshot(q, (snapshot) => {
       if (!snapshot.empty) {
         const doc = snapshot.docs[0];
         setSecretary({ id: doc.id, ...doc.data() });
@@ -47,9 +49,20 @@ const AdminStaff: React.FC = () => {
       setIsLoading(false);
     });
 
+    // 2. Kunin ang lahat ng Residents (Read-Only para kay Admin)
+    const unsubscribeRes = onSnapshot(collection(db, "users"), (snapshot) => {
+      const allUsers = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      const residentUsers = allUsers.filter((u: any) => u.role && u.role.toLowerCase() === 'resident');
+      setResidents(residentUsers);
+    });
+
     return () => {
       window.removeEventListener('resize', handleResize);
-      unsubscribe();
+      unsubscribeSec();
+      unsubscribeRes();
     };
   }, []);
 
@@ -69,16 +82,11 @@ const AdminStaff: React.FC = () => {
     const newStatus = secretary.status === 'Active' || !secretary.status ? 'Inactive' : 'Active';
     
     try {
-      const updates: any = { 
-        status: newStatus,
-      };
-
+      const updates: any = { status: newStatus };
       if (newStatus === 'Inactive') {
         updates.forceLogout = true; 
       }
-
       await updateDoc(doc(db, "users", secretary.id), updates);
-      
       await logAction(
         newStatus === 'Active' ? "Secretary Reactivated" : "Secretary Deactivated", 
         `${secretary.fullName}'s account has been set to ${newStatus}.`, 
@@ -116,31 +124,19 @@ const AdminStaff: React.FC = () => {
     
     setIsProcessing(true);
     try {
-      const updates: any = {
-        fullName: editName,
-        email: editEmail
-      };
-
+      const updates: any = { fullName: editName, email: editEmail };
       if (editPassword) {
         updates.temporaryPassword = editPassword; 
         updates.forceLogout = true; 
         updates.passwordLastUpdated = new Date().toISOString(); 
       }
-
       await updateDoc(doc(db, "users", secretary.id), updates);
       
       const logDetails = editPassword 
         ? `Updated profile for ${editName} and changed password. Forced logout initiated.` 
         : `Updated profile info for ${editName}.`;
         
-      await logAction(
-        "Secretary Profile Updated", 
-        logDetails, 
-        "info",
-        adminName, 
-        "Admin"    
-      );
-      
+      await logAction("Secretary Profile Updated", logDetails, "info", adminName, "Admin");
       showNotification(`Secretary profile ${editPassword ? 'and password ' : ''}updated successfully!`, "success");
       setShowEditModal(false);
     } catch (error) {
@@ -157,7 +153,7 @@ const AdminStaff: React.FC = () => {
         <IonContent>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f8f9ff', flexDirection: 'column', gap: '16px' }}>
             <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#00236f', animation: 'spin 1s linear infinite' }}>sync</span>
-            <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#444651' }}>Loading Secretary Data...</span>
+            <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#444651' }}>Loading Data...</span>
             <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
           </div>
         </IonContent>
@@ -257,29 +253,11 @@ const AdminStaff: React.FC = () => {
             </header>
 
             <main style={{ padding: isMobile ? '16px' : '32px', flex: 1, backgroundColor: '#f8f9ff' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px', margin: '0 auto' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1000px', margin: '0 auto' }}>
                 
-                <div style={{
-                  backgroundColor: '#ffffff',
-                  borderLeft: '6px solid #1e3a8a',
-                  borderRadius: '12px',
-                  padding: isMobile ? '20px 16px' : '24px 32px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '16px'
-                }}>
-                  <div style={{ 
-                    width: '56px', 
-                    height: '56px', 
-                    borderRadius: '50%', 
-                    backgroundColor: '#eff4ff', 
-                    color: '#1e3a8a', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    flexShrink: 0
-                  }}>
+                {/* ================= SECRETARY MANAGEMENT SECTION ================= */}
+                <div style={{ backgroundColor: '#ffffff', borderLeft: '6px solid #1e3a8a', borderRadius: '12px', padding: isMobile ? '20px 16px' : '24px 32px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: '#eff4ff', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <span className="material-symbols-outlined" style={{ fontSize: '28px' }}>manage_accounts</span>
                   </div>
                   <div>
@@ -299,7 +277,6 @@ const AdminStaff: React.FC = () => {
 
                 {secretary ? (
                   <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 flex flex-col gap-6">
-                    
                     <div className={`flex ${isMobile ? 'flex-col items-start' : 'items-center justify-between'} border-b border-gray-100 pb-6 gap-4`}>
                       <div className="flex items-center gap-4">
                         <div className="w-16 h-16 rounded-full bg-blue-900 text-white flex items-center justify-center text-2xl font-bold shrink-0">
@@ -324,29 +301,16 @@ const AdminStaff: React.FC = () => {
                     <div className="flex flex-col gap-3">
                       <h3 className="text-xs md:text-sm font-bold text-gray-700 uppercase tracking-wider">Account Controls</h3>
                       <div className="flex flex-col md:flex-row gap-3">
-                        
-                        <button 
-                          onClick={handleOpenEditModal} 
-                          disabled={isProcessing}
-                          className="w-full md:w-auto px-4 py-2.5 md:py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs md:text-sm font-semibold transition-colors flex items-center justify-center md:justify-start gap-2 disabled:opacity-50"
-                        >
+                        <button onClick={handleOpenEditModal} disabled={isProcessing} className="w-full md:w-auto px-4 py-2.5 md:py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs md:text-sm font-semibold transition-colors flex items-center justify-center md:justify-start gap-2 disabled:opacity-50">
                           <span className="material-symbols-outlined text-lg">edit</span> Edit Profile & Password
                         </button>
                         
                         {secretary.status !== 'Inactive' ? (
-                          <button 
-                            onClick={handleToggleStatus} 
-                            disabled={isProcessing}
-                            className="w-full md:w-auto px-4 py-2.5 md:py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs md:text-sm font-semibold transition-colors flex items-center justify-center md:justify-start gap-2 disabled:opacity-50"
-                          >
+                          <button onClick={handleToggleStatus} disabled={isProcessing} className="w-full md:w-auto px-4 py-2.5 md:py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs md:text-sm font-semibold transition-colors flex items-center justify-center md:justify-start gap-2 disabled:opacity-50">
                             <span className="material-symbols-outlined text-lg">block</span> Deactivate Account
                           </button>
                         ) : (
-                          <button 
-                            onClick={handleToggleStatus} 
-                            disabled={isProcessing}
-                            className="w-full md:w-auto px-4 py-2.5 md:py-2 rounded-lg bg-green-50 hover:bg-green-100 text-green-600 text-xs md:text-sm font-semibold transition-colors flex items-center justify-center md:justify-start gap-2 disabled:opacity-50"
-                          >
+                          <button onClick={handleToggleStatus} disabled={isProcessing} className="w-full md:w-auto px-4 py-2.5 md:py-2 rounded-lg bg-green-50 hover:bg-green-100 text-green-600 text-xs md:text-sm font-semibold transition-colors flex items-center justify-center md:justify-start gap-2 disabled:opacity-50">
                             <span className="material-symbols-outlined text-lg">check_circle</span> Reactivate Account
                           </button>
                         )}
@@ -359,6 +323,62 @@ const AdminStaff: React.FC = () => {
                     <p>No Secretary account found in the database.</p>
                   </div>
                 )}
+
+                {/* ================= BAGONG SECTION: RESIDENT DIRECTORY (READ-ONLY) ================= */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 flex flex-col gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-4">
+                    <div>
+                      <h2 className="text-lg font-bold text-gray-900">Resident Directory</h2>
+                      <p className="text-xs text-gray-500">Read-only list of all registered residents.</p>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-800 text-xs font-bold">
+                      Total: {residents.length}
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-gray-50 text-gray-500 uppercase text-[11px] font-bold tracking-wider">
+                          <th className="p-3 border-b border-gray-200">Name</th>
+                          <th className="p-3 border-b border-gray-200">Email</th>
+                          <th className="p-3 border-b border-gray-200">Purok</th>
+                          <th className="p-3 border-b border-gray-200">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-sm text-gray-700">
+                        {residents.length === 0 ? (
+                          <tr>
+                            <td colSpan={4} className="p-6 text-center text-gray-500">No residents registered yet.</td>
+                          </tr>
+                        ) : (
+                          residents.map((res) => (
+                            <tr key={res.id} className="hover:bg-gray-50 border-b border-gray-100 last:border-0">
+                              <td className="p-3 font-semibold text-gray-900">{res.fullName || 'N/A'}</td>
+                              <td className="p-3 text-gray-600">{res.email || 'N/A'}</td>
+                              <td className="p-3 text-gray-600">{res.purok || 'N/A'}</td>
+                              <td className="p-3">
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                                  res.status?.toLowerCase() === 'active' ? 'bg-green-100 text-green-700' : 
+                                  res.status?.toLowerCase() === 'pending' ? 'bg-blue-100 text-blue-700' : 
+                                  'bg-red-100 text-red-700'
+                                }`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${
+                                    res.status?.toLowerCase() === 'active' ? 'bg-green-500' : 
+                                    res.status?.toLowerCase() === 'pending' ? 'bg-blue-500' : 
+                                    'bg-red-500'
+                                  }`}></span>
+                                  {res.status?.toLowerCase() === 'active' ? 'Active' : res.status?.toLowerCase() === 'pending' ? 'Pending' : 'Suspended'}
+                                </span>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
               </div>
             </main>
           </div>
@@ -378,45 +398,20 @@ const AdminStaff: React.FC = () => {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <label style={{ fontSize: '12px', fontWeight: 600, color: '#444651' }}>Full Name</label>
-                <input 
-                  type="text" 
-                  value={editName} 
-                  onChange={(e) => setEditName(e.target.value)} 
-                  className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600" 
-                  style={{ fontSize: '13px', padding: '10px 12px' }}
-                />
+                <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600" style={{ fontSize: '13px', padding: '10px 12px' }} />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <label style={{ fontSize: '12px', fontWeight: 600, color: '#444651' }}>Email Address</label>
-                <input 
-                  type="email" 
-                  value={editEmail} 
-                  onChange={(e) => setEditEmail(e.target.value)} 
-                  className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600" 
-                  style={{ fontSize: '13px', padding: '10px 12px' }}
-                />
+                <input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600" style={{ fontSize: '13px', padding: '10px 12px' }} />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <label style={{ fontSize: '12px', fontWeight: 600, color: '#444651' }}>New Password <span style={{color: '#9ca3af', fontWeight: 'normal'}}>(Optional)</span></label>
                 <div style={{ position: 'relative' }}>
-                  <input 
-                    type={showPassword ? "text" : "password"} 
-                    value={editPassword} 
-                    onChange={(e) => setEditPassword(e.target.value)} 
-                    placeholder="Leave blank to keep current password"
-                    className="w-full px-3 py-2 pr-10 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600" 
-                    style={{ fontSize: '13px', padding: '10px 12px' }}
-                  />
-                  <button 
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#757682' }}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                      {showPassword ? 'visibility_off' : 'visibility'}
-                    </span>
+                  <input type={showPassword ? "text" : "password"} value={editPassword} onChange={(e) => setEditPassword(e.target.value)} placeholder="Leave blank to keep current password" className="w-full px-3 py-2 pr-10 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600" style={{ fontSize: '13px', padding: '10px 12px' }} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#757682' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>{showPassword ? 'visibility_off' : 'visibility'}</span>
                   </button>
                 </div>
                 <p style={{ fontSize: '10px', color: '#757682', marginTop: '2px' }}>Must be at least 6 characters long.</p>
@@ -445,36 +440,14 @@ const AdminStaff: React.FC = () => {
         {showLogoutModal && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(11, 28, 48, 0.6)', backdropFilter: 'blur(4px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
             <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '32px 24px', width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
-              
               <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#ffe4e6', color: '#e11d48', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
                 <span className="material-symbols-outlined" style={{ fontSize: '32px' }}>logout</span>
               </div>
-
-              <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#0f172a', margin: '0 0 8px 0' }}>
-                End Admin Session?
-              </h2>
-              
-              <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 24px 0', lineHeight: 1.5 }}>
-                Are you sure you want to log out? You will need to log in again to access the admin portal.
-              </p>
-
+              <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#0f172a', margin: '0 0 8px 0' }}>End Admin Session?</h2>
+              <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 24px 0', lineHeight: 1.5 }}>Are you sure you want to log out? You will need to log in again to access the admin portal.</p>
               <div style={{ display: 'flex', gap: '12px', width: '100%' }}>
-                <button 
-                  onClick={() => setShowLogoutModal(false)} 
-                  style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: '#f1f5f9', color: '#334155', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', transition: 'background 0.2s' }}
-                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}
-                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={handleLogout} 
-                  style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: '#dc2626', color: '#ffffff', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', transition: 'background 0.2s' }}
-                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#b91c1c'}
-                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
-                >
-                  Yes, Log Out
-                </button>
+                <button onClick={() => setShowLogoutModal(false)} style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: '#f1f5f9', color: '#334155', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', transition: 'background 0.2s' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}>Cancel</button>
+                <button onClick={handleLogout} style={{ flex: 1, padding: '12px', borderRadius: '8px', backgroundColor: '#dc2626', color: '#ffffff', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', transition: 'background 0.2s' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#b91c1c'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}>Yes, Log Out</button>
               </div>
             </div>
           </div>
