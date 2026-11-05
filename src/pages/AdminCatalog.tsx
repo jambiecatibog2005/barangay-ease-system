@@ -96,7 +96,7 @@ const AdminCatalog: React.FC = () => {
                 </div>
                 <div onClick={() => { navigateTo('/admin-staff'); setSidebarOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '8px', color: '#444651', cursor: 'pointer' }}>
                   <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>manage_accounts</span>
-                  <span style={{ fontSize: '14px' }}>Secretary Account</span>
+                  <span style={{ fontSize: '14px' }}>Staff Management</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '8px', backgroundColor: '#1e3a8a', color: '#ffffff', cursor: 'pointer' }}>
                   <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>folder_copy</span>
