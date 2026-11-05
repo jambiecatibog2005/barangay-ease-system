@@ -14,7 +14,7 @@ const AdminStaff: React.FC = () => {
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
   const [secretary, setSecretary] = useState<any>(null);
-  const [residents, setResidents] = useState<any[]>([]); // ✅ Bagong state para sa residents
+  const [residents, setResidents] = useState<any[]>([]); 
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -196,7 +196,7 @@ const AdminStaff: React.FC = () => {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '8px', backgroundColor: '#1e3a8a', color: '#ffffff', cursor: 'pointer' }}>
                   <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>manage_accounts</span>
-                  <span style={{ fontSize: '14px' }}>Secretary Account</span>
+                  <span style={{ fontSize: '14px' }}>Staff Management</span> {/* ✅ Pinalitan dito */}
                 </div>
                 <div onClick={() => { navigateTo('/admin-catalog'); setSidebarOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '8px', color: '#444651', cursor: 'pointer' }}>
                   <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>folder_copy</span>
@@ -238,7 +238,7 @@ const AdminStaff: React.FC = () => {
                     <span className="material-symbols-outlined" style={{ fontSize: '24px', color: '#0b1c30' }}>menu</span>
                   </button>
                 )}
-                {!isMobile && <span style={{ fontSize: '15px', fontWeight: 'bold', color: '#0b1c30' }}>Secretary Account</span>}
+                {!isMobile && <span style={{ fontSize: '15px', fontWeight: 'bold', color: '#0b1c30' }}>Staff Management</span>} {/* ✅ Pinalitan dito */}
               </div>
               
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -264,10 +264,10 @@ const AdminStaff: React.FC = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontWeight: 600, color: '#757682', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>
                       <span>BARANGAY CAPTAIN</span>
                       <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>chevron_right</span>
-                      <span style={{ color: '#0b1c30' }}>MANAGE SECRETARY</span>
+                      <span style={{ color: '#0b1c30' }}>MANAGE STAFF</span>
                     </div>
                     <h1 style={{ fontSize: isMobile ? '22px' : '26px', fontWeight: 'bold', color: '#0b1c30', margin: 0 }}>
-                      Manage Secretary
+                      Manage Staff
                     </h1>
                     <p style={{ fontSize: '14px', color: '#444651', marginTop: '4px', margin: 0 }}>
                       Control access and manage the primary user profile.
