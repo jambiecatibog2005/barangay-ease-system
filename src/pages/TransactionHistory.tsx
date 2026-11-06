@@ -582,7 +582,7 @@ const TransactionHistory: React.FC = () => {
               </div>
             </div>
           )}
-
+ 
         </div>
       </IonContent>
     </IonPage>
