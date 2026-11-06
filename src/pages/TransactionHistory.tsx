@@ -543,39 +543,10 @@ const TransactionHistory: React.FC = () => {
             </div>
           </main>
 
-          {/* FOOTER */}
-          <footer className="w-full bg-primary text-on-primary pt-8 pb-6 shadow-[0_-2px_12px_rgba(0,0,0,0.05)]">
-            <div className="max-w-7xl mx-auto px-4 md:px-margin">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 pb-8">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-secondary-fixed text-[20px] md:text-[24px]">verified</span>
-                    <h3 className="text-sm md:text-base font-bold text-on-primary">{t.footerRepTitle}</h3>
-                  </div>
-                  <p className="text-xs md:text-sm text-primary-fixed whitespace-pre-line">{t.footerRepDesc}</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-secondary-fixed text-[20px] md:text-[24px]">shield</span>
-                    <h3 className="text-sm md:text-base font-bold text-on-primary">{t.footerPrivacyTitle}</h3>
-                  </div>
-                  <p className="text-xs md:text-sm text-primary-fixed">{t.footerPrivacyDesc}</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-secondary-fixed text-[20px] md:text-[24px]">contact_support</span>
-                    <h3 className="text-sm md:text-base font-bold text-on-primary">{t.footerContactTitle}</h3>
-                  </div>
-                  <ul className="space-y-1.5 text-xs md:text-sm text-primary-fixed">
-                    <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-secondary-fixed">call</span><span>{t.hotline}</span></li>
-                    <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-secondary-fixed">mail</span><span>{t.email}</span></li>
-                    <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-secondary-fixed">location_on</span><span>{t.address}</span></li>
-                  </ul>
-                </div>
-              </div>
-              <div className="pt-4 flex flex-col md:flex-row items-center justify-between text-on-primary-container text-xs gap-2 border-t border-primary-container/30">
-                <p className="text-center md:text-left">{t.copyright}</p>
-              </div>
+          {/* ✅ FOOTER (PINASIMPLE — KATULAD NG SA TRACK STATUS) */}
+          <footer className="w-full bg-primary text-on-primary pt-8 pb-6 shadow-[0_-2px_12px_rgba(0,0,0,0.05)] mt-auto">
+            <div className="max-w-7xl mx-auto px-4 text-center text-xs text-primary-fixed">
+              <p>© 2025 Barangay Malinao, Naujan. All Rights Reserved. BarangayEase Digital Civic Portal.</p>
             </div>
           </footer>
 
