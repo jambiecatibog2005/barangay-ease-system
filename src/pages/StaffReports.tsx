@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, getDocs } from "firebase/firestore";
 import { db } from '../firebase'; 
 import logoImage from '../assets/logo.png';
 import jsPDF from 'jspdf';
@@ -26,34 +26,63 @@ const Reports: React.FC = () => {
     };
     window.addEventListener('resize', handleResize);
 
-    const unsubscribe = onSnapshot(collection(db, "requests"), (snapshot) => {
-      let pending = 0;
-      const requestsData: any[] = [];
+    const fetchData = async () => {
+      // 1. Kunin lahat ng residents para makuha ang Purok nila
+      const residentsSnapshot = await getDocs(collection(db, "users")); // Palitan kung iba ang collection name mo
+      const residentPuroks: Record<string, string> = {};
       
-      snapshot.forEach((doc) => {
+      residentsSnapshot.forEach((doc) => {
         const data = doc.data();
-        if (data.status === 'Pending') pending++;
-        requestsData.push({ id: doc.id, ...data });
+        if (data.email && data.purok) {
+          residentPuroks[data.email.toLowerCase()] = data.purok;
+        }
       });
 
-      requestsData.sort((a, b) => {
-        const dateA = new Date(a.dateFiled).getTime() || 0;
-        const dateB = new Date(b.dateFiled).getTime() || 0;
-        return dateB - dateA;
+      // 2. Kunin ang requests at i-merge ang purok
+      const unsubscribe = onSnapshot(collection(db, "requests"), (snapshot) => {
+        let pending = 0;
+        const requestsData: any[] = [];
+        
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.status === 'Pending') pending++;
+          
+          const reqEmail = data.email ? data.email.toLowerCase() : ''; // Palitan kung iba ang tawag sa email field mo
+          const purok = residentPuroks[reqEmail] || 'Unknown Purok';
+
+          requestsData.push({ 
+            id: doc.id, 
+            ...data, 
+            purok: purok 
+          });
+        });
+
+        requestsData.sort((a, b) => {
+          const dateA = new Date(a.dateFiled).getTime() || 0;
+          const dateB = new Date(b.dateFiled).getTime() || 0;
+          return dateB - dateA;
+        });
+
+        setAllRequests(requestsData);
+        setPendingCount(pending);
+        setIsLoading(false);
       });
 
-      setAllRequests(requestsData);
-      setPendingCount(pending);
-      setIsLoading(false);
+      return unsubscribe;
+    };
+
+    let unsubscribeRef: any = null;
+
+    fetchData().then((unsub) => {
+      unsubscribeRef = unsub;
     });
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      unsubscribe();
+      if (unsubscribeRef) unsubscribeRef();
     };
   }, []);
 
-  // ✅ INAYOS ANG LOGOUT (localStorage)
   const handleLogout = () => {
     localStorage.removeItem('isStaffLoggedIn');
     localStorage.removeItem('staffName');
@@ -64,16 +93,10 @@ const Reports: React.FC = () => {
     window.location.href = path;
   };
 
-  // ==========================================
-  // 🛠️ HELPER FUNCTION PARA SA REVENUE COMPUTATION
-  // Kinukuha ang amountPaid, kung wala, kukunin ang fee string at iconvert sa number
-  // ==========================================
   const getRevenueAmount = (req: any) => {
-    // 1. Kung may amountPaid (number), gamitin ito
     if (req.amountPaid && !isNaN(Number(req.amountPaid))) {
       return Number(req.amountPaid);
     }
-    // 2. Kung wala, kunin ang fee string (e.g. "₱150.00"), alisin ang ₱ at comma, at i-convert
     if (req.fee) {
       const cleanFee = String(req.fee).replace(/[^0-9.-]+/g, "");
       return Number(cleanFee) || 0;
@@ -88,7 +111,6 @@ const Reports: React.FC = () => {
   let totalRevenue = 0;
 
   allRequests.forEach(req => {
-    // ✅ Automatic na mabibilang basta 'Released' (bayad na)
     if (req.status === 'Released') {
       totalRevenue += getRevenueAmount(req);
     }
@@ -112,7 +134,6 @@ const Reports: React.FC = () => {
     docTypes[docName].total++;
     if (req.status === 'Released') {
       docTypes[docName].approved++;
-      // ✅ Same logic para sa per-document type na revenue
       docTypes[docName].revenue += getRevenueAmount(req);
     } else if (req.status === 'Rejected') {
       docTypes[docName].rejected++;
@@ -123,6 +144,24 @@ const Reports: React.FC = () => {
     name: key,
     ...docTypes[key]
   })).sort((a, b) => b.total - a.total);
+
+  // ==========================================
+  // PUROK DISTRIBUTION CALCULATION
+  // ==========================================
+  const purokCounts: Record<string, number> = {};
+  
+  allRequests.forEach(req => {
+    const purokName = req.purok || 'Unknown Purok'; 
+    if (!purokCounts[purokName]) purokCounts[purokName] = 0;
+    purokCounts[purokName]++;
+  });
+
+  const sortedPuroks = Object.keys(purokCounts).map(key => ({
+    name: key,
+    count: purokCounts[key]
+  })).sort((a, b) => b.count - a.count).slice(0, 5); // Top 5 Puroks
+
+  const maxPurokCount = sortedPuroks.length > 0 ? Math.max(...sortedPuroks.map(p => p.count)) : 1;
 
   // ==========================================
   // DOWNLOAD / EXPORT / PRINT HANDLERS
@@ -141,7 +180,7 @@ const Reports: React.FC = () => {
       `"${req.residentName || ''}"`,
       req.documentType || '',
       req.dateFiled || '',
-      getRevenueAmount(req), // 👈 Ginamit ang helper para accurate ang lalabas
+      getRevenueAmount(req),
       req.status || ''
     ]);
 
@@ -196,7 +235,7 @@ const Reports: React.FC = () => {
         req.residentName || '',
         req.documentType || '',
         req.dateFiled || '',
-        `PHP ${getRevenueAmount(req)}`, // 👈 Accurate na value sa PDF
+        `PHP ${getRevenueAmount(req)}`,
         req.status || ''
       ]),
       styles: { fontSize: 8, cellPadding: 2 },
@@ -412,7 +451,6 @@ const Reports: React.FC = () => {
                   <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', border: '1px solid #eff4ff' }}>
                     <span style={{ fontSize: '11px', fontWeight: 600, color: '#757682', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Revenue</span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-                      {/* ✅ ACCURATE NA ANG TOTAL REVENUE DITO */}
                       <span style={{ fontSize: isMobile ? '20px' : '24px', fontWeight: 'bold', color: '#1e3a8a' }}>₱{isLoading ? '...' : totalRevenue.toLocaleString()}</span>
                     </div>
                   </div>
@@ -465,27 +503,36 @@ const Reports: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Purok Distribution */}
+                  {/* Purok Distribution — FUNCTIONAL NA ITO */}
                   <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', border: '1px solid #eff4ff' }}>
                     <div style={{ marginBottom: '16px' }}>
                       <h2 style={{ fontSize: '16px', fontWeight: 'bold', color: '#0b1c30', margin: 0 }}>Purok Distribution</h2>
                       <p style={{ fontSize: '11px', color: '#757682', margin: '2px 0 0 0' }}>(Top Puroks)</p>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <span style={{ width: '80px', fontSize: '12px', fontWeight: 600 }}>Purok 1</span>
-                        <div style={{ flex: 1, backgroundColor: '#f3f4f6', borderRadius: '4px', height: '8px' }}>
-                          <div style={{ width: '50%', backgroundColor: '#1e3a8a', height: '100%', borderRadius: '4px' }}></div>
-                        </div>
-                        <span style={{ fontSize: '11px', fontFamily: 'monospace' }}>Data Soon</span>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <span style={{ width: '80px', fontSize: '12px', fontWeight: 600 }}>Purok 2</span>
-                        <div style={{ flex: 1, backgroundColor: '#f3f4f6', borderRadius: '4px', height: '8px' }}>
-                          <div style={{ width: '30%', backgroundColor: '#1e3a8a', height: '100%', borderRadius: '4px' }}></div>
-                        </div>
-                        <span style={{ fontSize: '11px', fontFamily: 'monospace' }}>Data Soon</span>
-                      </div>
+                      {isLoading ? (
+                        <p style={{ fontSize: '12px', color: '#757682' }}>Loading data...</p>
+                      ) : sortedPuroks.length === 0 ? (
+                        <p style={{ fontSize: '12px', color: '#757682' }}>No data available.</p>
+                      ) : (
+                        sortedPuroks.map((purok, index) => {
+                          const barWidth = maxPurokCount > 0 ? (purok.count / maxPurokCount) * 100 : 0;
+                          
+                          return (
+                            <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <span style={{ width: '80px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {purok.name}
+                              </span>
+                              <div style={{ flex: 1, backgroundColor: '#f3f4f6', borderRadius: '4px', height: '8px' }}>
+                                <div style={{ width: `${barWidth}%`, backgroundColor: '#1e3a8a', height: '100%', borderRadius: '4px' }}></div>
+                              </div>
+                              <span style={{ fontSize: '11px', fontFamily: 'monospace', minWidth: '40px', textAlign: 'right' }}>
+                                {purok.count} req
+                              </span>
+                            </div>
+                          );
+                        })
+                      )}
                     </div>
                   </div>
                 </div>
@@ -518,7 +565,6 @@ const Reports: React.FC = () => {
                               <td style={{ padding: '12px 16px', textAlign: 'center', fontFamily: 'monospace' }}>{doc.total}</td>
                               <td style={{ padding: '12px 16px', textAlign: 'center', fontFamily: 'monospace', color: '#15803d', fontWeight: 'bold' }}>{doc.approved}</td>
                               <td style={{ padding: '12px 16px', textAlign: 'center', fontFamily: 'monospace', color: '#dc2626' }}>{doc.rejected}</td>
-                              {/* ✅ ACCURATE NA RIN DITO */}
                               <td style={{ padding: '12px 16px', textAlign: 'right', fontFamily: 'monospace', fontWeight: 'bold' }}>₱{doc.revenue.toLocaleString()}</td>
                             </tr>
                           ))
@@ -566,7 +612,6 @@ const Reports: React.FC = () => {
                   <td style={{ padding: '8px', border: '1px solid #ccc' }}>{req.residentName}</td>
                   <td style={{ padding: '8px', border: '1px solid #ccc' }}>{req.documentType}</td>
                   <td style={{ padding: '8px', border: '1px solid #ccc' }}>{req.dateFiled}</td>
-                  {/* ✅ ACCURATE NA RIN SA PRINT */}
                   <td style={{ padding: '8px', border: '1px solid #ccc' }}>₱{getRevenueAmount(req)}</td>
                   <td style={{ padding: '8px', border: '1px solid #ccc' }}>{req.status}</td>
                 </tr>
