@@ -53,7 +53,7 @@ const Reports: React.FC = () => {
             const data = doc.data();
             if (data.status === 'Pending') pending++;
             
-            // Kunin ang Pangalan mula sa request (sinusubukan lahat ng posibleng field names)
+            // Kunin ang Pangalan mula sa request
             const reqNameRaw = data.residentName || data.fullName || data.name || '';
             const cleanReqName = String(reqNameRaw).toLowerCase().trim().replace(/\s+/g, ' ');
 
@@ -160,12 +160,16 @@ const Reports: React.FC = () => {
   })).sort((a, b) => b.total - a.total);
 
   // ==========================================
-  // PUROK DISTRIBUTION CALCULATION
+  // PUROK DISTRIBUTION CALCULATION (FILTERED)
   // ==========================================
   const purokCounts: Record<string, number> = {};
   
   allRequests.forEach(req => {
-    const purokName = req.purok || 'Unknown Purok'; 
+    const purokName = req.purok;
+    
+    // 👇 ITO ANG FILTER: Skip kung unknown o walang purok
+    if (!purokName || purokName === 'Unknown Purok') return;
+
     if (!purokCounts[purokName]) purokCounts[purokName] = 0;
     purokCounts[purokName]++;
   });
