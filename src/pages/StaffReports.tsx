@@ -27,54 +27,68 @@ const Reports: React.FC = () => {
     window.addEventListener('resize', handleResize);
 
     const fetchData = async () => {
-      // 1. Kunin lahat ng residents para makuha ang Purok nila
-      const residentsSnapshot = await getDocs(collection(db, "users")); // Palitan kung iba ang collection name mo
-      const residentPuroks: Record<string, string> = {};
-      
-      residentsSnapshot.forEach((doc) => {
-        const data = doc.data();
-        if (data.email && data.purok) {
-          residentPuroks[data.email.toLowerCase()] = data.purok;
-        }
-      });
-
-      // 2. Kunin ang requests at i-merge ang purok
-      const unsubscribe = onSnapshot(collection(db, "requests"), (snapshot) => {
-        let pending = 0;
-        const requestsData: any[] = [];
+      try {
+        // 1. Kunin lahat ng residents para makuha ang Purok nila base sa Pangalan
+        const residentsSnapshot = await getDocs(collection(db, "users")); 
+        const residentPuroksByName: Record<string, string> = {};
         
-        snapshot.forEach((doc) => {
+        residentsSnapshot.forEach((doc) => {
           const data = doc.data();
-          if (data.status === 'Pending') pending++;
+          const nameField = data.fullName; 
+          const purokField = data.purok;
+
+          if (nameField && purokField) {
+            // Gawing lowercase at tanggalin ang sobrang spaces para pantay ang comparison
+            const cleanName = String(nameField).toLowerCase().trim().replace(/\s+/g, ' ');
+            residentPuroksByName[cleanName] = purokField;
+          }
+        });
+
+        // 2. Kunin ang requests at i-merge ang purok base sa Pangalan
+        const unsubscribe = onSnapshot(collection(db, "requests"), (snapshot) => {
+          let pending = 0;
+          const requestsData: any[] = [];
           
-          const reqEmail = data.email ? data.email.toLowerCase() : ''; // Palitan kung iba ang tawag sa email field mo
-          const purok = residentPuroks[reqEmail] || 'Unknown Purok';
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.status === 'Pending') pending++;
+            
+            // Kunin ang Pangalan mula sa request (sinusubukan lahat ng posibleng field names)
+            const reqNameRaw = data.residentName || data.fullName || data.name || '';
+            const cleanReqName = String(reqNameRaw).toLowerCase().trim().replace(/\s+/g, ' ');
 
-          requestsData.push({ 
-            id: doc.id, 
-            ...data, 
-            purok: purok 
+            // I-match ang pangalan sa Purok
+            const purok = residentPuroksByName[cleanReqName] || 'Unknown Purok';
+
+            requestsData.push({ 
+              id: doc.id, 
+              ...data, 
+              purok: purok 
+            });
           });
+
+          requestsData.sort((a, b) => {
+            const dateA = new Date(a.dateFiled).getTime() || 0;
+            const dateB = new Date(b.dateFiled).getTime() || 0;
+            return dateB - dateA;
+          });
+
+          setAllRequests(requestsData);
+          setPendingCount(pending);
+          setIsLoading(false);
         });
 
-        requestsData.sort((a, b) => {
-          const dateA = new Date(a.dateFiled).getTime() || 0;
-          const dateB = new Date(b.dateFiled).getTime() || 0;
-          return dateB - dateA;
-        });
-
-        setAllRequests(requestsData);
-        setPendingCount(pending);
+        return unsubscribe;
+      } catch (error) {
+        console.error("Error fetching data: ", error);
         setIsLoading(false);
-      });
-
-      return unsubscribe;
+      }
     };
 
     let unsubscribeRef: any = null;
 
     fetchData().then((unsub) => {
-      unsubscribeRef = unsub;
+      if (unsub) unsubscribeRef = unsub;
     });
 
     return () => {
@@ -159,7 +173,7 @@ const Reports: React.FC = () => {
   const sortedPuroks = Object.keys(purokCounts).map(key => ({
     name: key,
     count: purokCounts[key]
-  })).sort((a, b) => b.count - a.count).slice(0, 5); // Top 5 Puroks
+  })).sort((a, b) => b.count - a.count).slice(0, 5); 
 
   const maxPurokCount = sortedPuroks.length > 0 ? Math.max(...sortedPuroks.map(p => p.count)) : 1;
 
@@ -177,7 +191,7 @@ const Reports: React.FC = () => {
     
     const rows = allRequests.map(req => [
       req.refNo || '',
-      `"${req.residentName || ''}"`,
+      `"${req.residentName || req.fullName || ''}"`,
       req.documentType || '',
       req.dateFiled || '',
       getRevenueAmount(req),
@@ -232,7 +246,7 @@ const Reports: React.FC = () => {
       head: [['Ref No.', 'Resident Name', 'Document Type', 'Date Filed', 'Amount', 'Status']],
       body: allRequests.map(req => [
         req.refNo || '',
-        req.residentName || '',
+        req.residentName || req.fullName || '',
         req.documentType || '',
         req.dateFiled || '',
         `PHP ${getRevenueAmount(req)}`,
@@ -503,7 +517,7 @@ const Reports: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Purok Distribution — FUNCTIONAL NA ITO */}
+                  {/* Purok Distribution */}
                   <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', border: '1px solid #eff4ff' }}>
                     <div style={{ marginBottom: '16px' }}>
                       <h2 style={{ fontSize: '16px', fontWeight: 'bold', color: '#0b1c30', margin: 0 }}>Purok Distribution</h2>
@@ -609,7 +623,7 @@ const Reports: React.FC = () => {
               {allRequests.map((req, idx) => (
                 <tr key={idx} style={{ borderBottom: '1px solid #ccc' }}>
                   <td style={{ padding: '8px', border: '1px solid #ccc' }}>{req.refNo}</td>
-                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{req.residentName}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{req.residentName || req.fullName}</td>
                   <td style={{ padding: '8px', border: '1px solid #ccc' }}>{req.documentType}</td>
                   <td style={{ padding: '8px', border: '1px solid #ccc' }}>{req.dateFiled}</td>
                   <td style={{ padding: '8px', border: '1px solid #ccc' }}>₱{getRevenueAmount(req)}</td>
