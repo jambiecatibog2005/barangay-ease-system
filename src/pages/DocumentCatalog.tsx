@@ -237,7 +237,7 @@ const DocumentCatalog: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [purpose, setPurpose] = useState('');
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false); // ✅ BAGONG STATE PARA SA CLOUDINARY
+  const [isUploading, setIsUploading] = useState(false); 
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [showSuccess, setShowSuccess] = useState(false);
@@ -332,7 +332,7 @@ const DocumentCatalog: React.FC = () => {
     window.location.href = '/login';
   };
 
-  // ✅ CLOUDINARY API INTEGRATION (Pinalitan ang Base64/Canvas logic)
+  // ✅ CLOUDINARY API INTEGRATION (PINAKA-AYOS NA VERSION)
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -346,10 +346,10 @@ const DocumentCatalog: React.FC = () => {
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', 'barangay_id_upload'); // Preset na ginawa mo sa Cloudinary
+    // Tiniyak nating walang space at eksaktong pangalan ng preset
+    formData.append('upload_preset', 'barangay_id_upload'); 
 
     try {
-      // Tawagin ang External API ng Cloudinary
       const response = await fetch('https://api.cloudinary.com/v1_1/ocg57ajc/image/upload', {
         method: 'POST',
         body: formData,
@@ -357,14 +357,18 @@ const DocumentCatalog: React.FC = () => {
 
       const data = await response.json();
 
+      // I-print natin sa console kung ano talaga ang sinasabi ng Cloudinary
+      console.log("Cloudinary Response:", data);
+
       if (data.secure_url) {
         setUploadedFile(data.secure_url); 
       } else {
-        throw new Error(data.error?.message || "Upload failed");
+        // Dito natin makukuha ang totoong error message
+        throw new Error(data.error?.message || "Unknown error occurred");
       }
     } catch (error: any) {
-      console.error("Cloudinary Error:", error);
-      alert("Failed to upload image. Please try again.");
+      console.error("Cloudinary Error Details:", error);
+      alert("Failed to upload image: " + error.message);
     } finally {
       setIsUploading(false);
     }
@@ -401,7 +405,7 @@ const DocumentCatalog: React.FC = () => {
         fee: selectedDoc.fee,
         numericFee: selectedDoc.numericFee,
         status: 'Pending',
-        requirementImage: uploadedFile,
+        requirementImage: uploadedFile, // Ito ay magiging URL na
       });
 
       await logAction(
