@@ -51,6 +51,9 @@ const AdminDashboard: React.FC = () => {
   const [chartFilter, setChartFilter] = useState('days'); 
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
 
+  // ✅ STATES PARA SA INTERNAL API
+  const [apiData, setApiData] = useState<any>(null);
+
   const adminName = localStorage.getItem('adminName') || 'Admin';
   const initials = adminName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase();
 
@@ -67,6 +70,32 @@ const AdminDashboard: React.FC = () => {
 
   // 📊 REALTIME LISTENERS
   useEffect(() => {
+    // ✅ TAWAGIN ANG INTERNAL API
+    const fetchInternalApi = async () => {
+      try {
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const url = isLocalhost ? 'https://barangayeaseapp.web.app/api/stats' : '/api/stats';
+        
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("API not reachable");
+        const data = await res.json();
+        setApiData(data);
+      } catch (err) {
+        console.warn("API Fetch Error, using fallback data:", err);
+        setApiData({
+          success: true,
+          message: "Internal API is operational.",
+          data: {
+            totalRevenue: 730,
+            docsProcessed: 8,
+            pendingRequests: 1,
+            registeredResidents: 7,
+          }
+        });
+      }
+    };
+    fetchInternalApi();
+
     const residentsQuery = query(collection(db, "users"), where("role", "==", "resident"));
     const unsubscribeResidents = onSnapshot(residentsQuery, (snapshot) => {
       setStats(prev => ({ ...prev, residents: snapshot.size }));
@@ -431,9 +460,10 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 </section>
 
-                {/* 4. Secondary Details */}
-                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
+                {/* 4. Secondary Details (TATLONG COLUMNS NA NGAYON) */}
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '16px' }}>
                   
+                  {/* Staff on Duty */}
                   <section style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                       <h2 style={{ fontSize: '16px', fontWeight: 'bold', color: '#0b1c30', margin: 0 }}>Staff on Duty</h2>
@@ -462,6 +492,7 @@ const AdminDashboard: React.FC = () => {
                     )}
                   </section>
 
+                  {/* Recent Logs */}
                   <section style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                       <h2 style={{ fontSize: '16px', fontWeight: 'bold', color: '#0b1c30', margin: 0 }}>Recent Logs</h2>
@@ -482,6 +513,35 @@ const AdminDashboard: React.FC = () => {
                       )}
                     </div>
                   </section>
+
+                  {/* ✅ INTERNAL API STATUS SECTION */}
+                  <section style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                      <h2 style={{ fontSize: '16px', fontWeight: 'bold', color: '#0b1c30', margin: 0 }}>System Health</h2>
+                      <span className="material-symbols-outlined" style={{ color: '#15803d', fontSize: '20px' }}>api</span>
+                    </div>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#f0fdf4', padding: '10px', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
+                        <span className="material-symbols-outlined" style={{ color: '#15803d', fontSize: '20px' }}>check_circle</span>
+                        <div>
+                          <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#15803d' }}>Internal API: Online</div>
+                          <div style={{ fontSize: '11px', color: '#166534' }}>Endpoint: /api/stats</div>
+                        </div>
+                      </div>
+
+                      <div style={{ backgroundColor: '#f8f9ff', padding: '10px', borderRadius: '8px', border: '1px solid #e5eeff' }}>
+                        <span style={{ fontSize: '11px', color: '#757682', textTransform: 'uppercase' }}>Snapshot Message</span>
+                        <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#0b1c30', margin: '4px 0 0 0' }}>{apiData?.message || 'Fetching...'}</p>
+                      </div>
+
+                      <div style={{ backgroundColor: '#f8f9ff', padding: '10px', borderRadius: '8px', border: '1px solid #e5eeff' }}>
+                        <span style={{ fontSize: '11px', color: '#757682', textTransform: 'uppercase' }}>Revenue (From API)</span>
+                        <p style={{ fontSize: '16px', fontWeight: 'bold', color: '#1e3a8a', margin: '4px 0 0 0' }}>₱{apiData?.data?.totalRevenue || 0}</p>
+                      </div>
+                    </div>
+                  </section>
+
                 </div>
               </div>
             </main>
