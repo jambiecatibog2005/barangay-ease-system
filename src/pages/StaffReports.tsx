@@ -29,14 +29,30 @@ const Reports: React.FC = () => {
     };
     window.addEventListener('resize', handleResize);
 
-    // ✅ TAWAGIN ANG INTERNAL API
+    // ✅ INTERNAL API FETCH (MAY FALLBACK PARA SA LOCALHOST)
     const fetchInternalApi = async () => {
       try {
-        const res = await fetch('/api/stats');
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        // Kapag local, idinadagdag natin ang .json
+        const url = isLocalhost ? '/api/stats.json' : '/api/stats';
+        
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("File not found");
         const data = await res.json();
         setApiData(data);
       } catch (err) {
-        console.error("Failed to fetch internal API", err);
+        console.warn("API Fetch Error, using fallback data:", err);
+        // ✅ FALLBACK DATA para may lumabas kahit mag-error
+        setApiData({
+          success: true,
+          message: "Internal API (Fallback Mode - Check public/api/stats.json)",
+          data: {
+            totalRevenue: 730,
+            docsProcessed: 8,
+            pendingRequests: 1,
+            registeredResidents: 7,
+          }
+        });
       }
     };
     fetchInternalApi();
