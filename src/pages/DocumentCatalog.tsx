@@ -168,7 +168,7 @@ const DocumentCatalog: React.FC = () => {
     window.location.href = '/login';
   };
 
-  // ✅ IMGBB API INTEGRATION (Pinalitan na ng API Key mo)
+  // ✅ IMGBB API INTEGRATION (Pinalitan na ng BAGONG API Key mo)
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -184,10 +184,14 @@ const DocumentCatalog: React.FC = () => {
     formData.append('image', file); 
 
     try {
-      // ✅ GAMIT NA ANG API KEY MO
-      const apiKey = '101b09bbeed0b70c2938dd9c66f737ce'; 
+      // ✅ BAGONG API KEY MO
+      const apiKey = 'eac8d1bc2f4d9ddcd2533c8050b57a4c'; 
       
-      const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+      // Gumamit ng URLSearchParams para 100% safe sa URL formatting
+      const url = new URL('https://api.imgbb.com/1/upload');
+      url.searchParams.append('key', apiKey);
+
+      const response = await fetch(url.toString(), {
         method: 'POST',
         body: formData,
       });
@@ -239,7 +243,7 @@ const DocumentCatalog: React.FC = () => {
         fee: selectedDoc.fee,
         numericFee: selectedDoc.numericFee,
         status: 'Pending',
-        requirementImage: uploadedFile, // Ito ay magiging ImgBB URL na
+        requirementImage: uploadedFile, // ImgBB URL na ito
       });
 
       await logAction(
