@@ -18,6 +18,9 @@ const Reports: React.FC = () => {
   const [pendingCount, setPendingCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
+  // ✅ STATE PARA SA INTERNAL API
+  const [apiData, setApiData] = useState<any>(null);
+
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 1024;
@@ -25,6 +28,18 @@ const Reports: React.FC = () => {
       if (!mobile) setSidebarOpen(false);
     };
     window.addEventListener('resize', handleResize);
+
+    // ✅ TAWAGIN ANG INTERNAL API
+    const fetchInternalApi = async () => {
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+        setApiData(data);
+      } catch (err) {
+        console.error("Failed to fetch internal API", err);
+      }
+    };
+    fetchInternalApi();
 
     const fetchData = async () => {
       try {
@@ -553,6 +568,32 @@ const Reports: React.FC = () => {
                       )}
                     </div>
                   </div>
+                </div>
+
+                {/* ✅ INTERNAL API INTEGRATION BOX */}
+                <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', border: '1px solid #eff4ff' }}>
+                  <h2 style={{ fontSize: '16px', fontWeight: 'bold', color: '#0b1c30', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span className="material-symbols-outlined" style={{ color: '#15803d' }}>api</span>
+                    Internal API Status
+                  </h2>
+                  <p style={{ fontSize: '12px', color: '#757682', marginTop: '4px' }}>
+                    Data fetched from our custom Firebase Hosting API endpoint (<code>/api/stats</code>).
+                  </p>
+                  
+                  {apiData ? (
+                    <div style={{ marginTop: '16px', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: '12px' }}>
+                      <div style={{ padding: '12px', backgroundColor: '#f8f9ff', borderRadius: '8px', border: '1px solid #e5eeff' }}>
+                        <span style={{ fontSize: '11px', color: '#757682', textTransform: 'uppercase' }}>API Message</span>
+                        <p style={{ fontSize: '14px', fontWeight: 'bold', color: '#0b1c30', margin: '4px 0 0 0' }}>{apiData.message}</p>
+                      </div>
+                      <div style={{ padding: '12px', backgroundColor: '#f8f9ff', borderRadius: '8px', border: '1px solid #e5eeff' }}>
+                        <span style={{ fontSize: '11px', color: '#757682', textTransform: 'uppercase' }}>Total Revenue (From API)</span>
+                        <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#15803d', margin: '4px 0 0 0' }}>₱{apiData.data.totalRevenue}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p style={{ fontSize: '13px', color: '#757682', marginTop: '12px' }}>Fetching data from API...</p>
+                  )}
                 </div>
 
                 {/* Summary Ledger Table */}
