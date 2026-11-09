@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "message": "Internal API is working!",
+  "data": {
+    "totalRevenue": 730,
+    "docsProcessed": 8,
+    "pendingRequests": 0,
+    "registeredResidents": 7
+  }
+}

@@ -13,5 +13,19 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- ✅ ITO ANG TAWAG SA INTERNAL API MO -->
+    <script>
+      // Tawagin ang API pagka-load ng page
+      window.addEventListener('DOMContentLoaded', async () => {
+        try {
+          const response = await fetch('/api/stats.json');
+          const data = await response.json();
+          console.log("🔥 INTERNAL API RESPONSE:", data);
+        } catch (error) {
+          console.error("❌ Internal API Error:", error);
+        }
+      });
+    </script>
   </body>
 </html>

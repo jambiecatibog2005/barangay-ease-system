@@ -8,6 +8,10 @@
     ],
     "rewrites": [
       {
+        "source": "/api/stats",
+        "destination": "/api/stats.json"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
