@@ -21,211 +21,51 @@ interface DocumentType {
 
 // --- MASTER DATA (ENGLISH) ---
 const masterDataEn: Record<string, { title: string, desc: string, reqs: string[], icon: string, color: string }> = {
-  'BRGY-CLR-01': { 
-    title: 'Barangay Clearance', 
-    desc: 'Required for employment, postal ID, bank transactions, and legal verification.', 
-    reqs: ['1 Valid Government-issued ID', 'Proof of Residency', 'Cedula'], 
-    icon: 'badge', 
-    color: 'text-primary' 
-  },
-  'BRGY-IND-02': { 
-    title: 'Certificate of Indigency', 
-    desc: 'Issued to low-income residents for medical assistance, hospital billing, PCSO claims.', 
-    reqs: ['1 Valid ID', 'Sitio Kagawad Referral', 'Hospital Bill (if applicable)'], 
-    icon: 'volunteer_activism', 
-    color: 'text-tertiary-container' 
-  },
-  'BRGY-RES-03': {
-    title: 'Certificate of Residency',
-    desc: 'Attests that the applicant is a bonafide resident of Barangay Malinao for at least 6 months.',
-    reqs: ['1 Valid ID', 'Barangay Household ID', 'Proof of 6 Months Dwelling'],
-    icon: 'home_pin',
-    color: 'text-secondary'
-  },
-  'BRGY-BUS-04': {
-    title: 'Barangay Business Clearance',
-    desc: 'Mandatory prerequisite for new or renewing micro, small, and medium businesses.',
-    reqs: ['DTI / SEC Registration', 'Contract of Lease', 'Previous Clearance'],
-    icon: 'storefront',
-    color: 'text-primary'
-  },
-  'BRGY-JOB-05': {
-    title: 'First-Time Jobseeker (RA 11261)',
-    desc: 'Waives all local government fees for clearances for first-time Filipino jobseekers.',
-    reqs: ['Signed Oath of Undertaking', 'Proof of Graduation', '1 Valid ID'],
-    icon: 'work',
-    color: 'text-secondary'
-  },
-  'BRGY-CTC-06': {
-    title: 'Cedula (Community Tax Certificate)',
-    desc: 'Serves as a basic proof of identity and tax payment required for various legal, government, and private transactions.',
-    reqs: ['1 Valid ID', 'Proof of Income (if applicable)'],
-    icon: 'receipt',
-    color: 'text-primary'
-  },
-  'BRGY-SOL-07': {
-    title: 'Certificate of Solo Parent',
-    desc: 'Issued to single parents to avail of benefits and privileges mandated by the Solo Parents\' Welfare Act (RA 8972).',
-    reqs: ['1 Valid ID', 'Birth Certificate of Child/Children', 'Proof of Single Status (Death/Marriage Cert.)'],
-    icon: 'family_restroom',
-    color: 'text-tertiary'
-  },
-  'BRGY-SEN-08': {
-    title: 'Senior Citizen Certificate',
-    desc: 'Certifies that the applicant is a senior citizen eligible for mandatory 20% discounts and other benefits under RA 9994.',
-    reqs: ['1 Valid ID (showing birthdate)', '2x2 Picture'],
-    icon: 'elderly',
-    color: 'text-secondary'
-  },
-  'BRGY-BLT-09': {
-    title: 'Complaint / Blotter Report',
-    desc: 'Official recording of disputes, incidents, or complaints for legal documentation and barangay mediation.',
-    reqs: ['1 Valid ID', 'Incident Details / Narrative Report', 'Witnesses (if applicable)'],
-    icon: 'gavel',
-    color: 'text-error'
-  }
+  'BRGY-CLR-01': { title: 'Barangay Clearance', desc: 'Required for employment, postal ID, bank transactions, and legal verification.', reqs: ['1 Valid Government-issued ID', 'Proof of Residency', 'Cedula'], icon: 'badge', color: 'text-primary' },
+  'BRGY-IND-02': { title: 'Certificate of Indigency', desc: 'Issued to low-income residents for medical assistance, hospital billing, PCSO claims.', reqs: ['1 Valid ID', 'Sitio Kagawad Referral', 'Hospital Bill (if applicable)'], icon: 'volunteer_activism', color: 'text-tertiary-container' },
+  'BRGY-RES-03': { title: 'Certificate of Residency', desc: 'Attests that the applicant is a bonafide resident of Barangay Malinao for at least 6 months.', reqs: ['1 Valid ID', 'Barangay Household ID', 'Proof of 6 Months Dwelling'], icon: 'home_pin', color: 'text-secondary' },
+  'BRGY-BUS-04': { title: 'Barangay Business Clearance', desc: 'Mandatory prerequisite for new or renewing micro, small, and medium businesses.', reqs: ['DTI / SEC Registration', 'Contract of Lease', 'Previous Clearance'], icon: 'storefront', color: 'text-primary' },
+  'BRGY-JOB-05': { title: 'First-Time Jobseeker (RA 11261)', desc: 'Waives all local government fees for clearances for first-time Filipino jobseekers.', reqs: ['Signed Oath of Undertaking', 'Proof of Graduation', '1 Valid ID'], icon: 'work', color: 'text-secondary' },
+  'BRGY-CTC-06': { title: 'Cedula (Community Tax Certificate)', desc: 'Serves as a basic proof of identity and tax payment required for various legal, government, and private transactions.', reqs: ['1 Valid ID', 'Proof of Income (if applicable)'], icon: 'receipt', color: 'text-primary' },
+  'BRGY-SOL-07': { title: 'Certificate of Solo Parent', desc: 'Issued to single parents to avail of benefits and privileges mandated by the Solo Parents\' Welfare Act (RA 8972).', reqs: ['1 Valid ID', 'Birth Certificate of Child/Children', 'Proof of Single Status (Death/Marriage Cert.)'], icon: 'family_restroom', color: 'text-tertiary' },
+  'BRGY-SEN-08': { title: 'Senior Citizen Certificate', desc: 'Certifies that the applicant is a senior citizen eligible for mandatory 20% discounts and other benefits under RA 9994.', reqs: ['1 Valid ID (showing birthdate)', '2x2 Picture'], icon: 'elderly', color: 'text-secondary' },
+  'BRGY-BLT-09': { title: 'Complaint / Blotter Report', desc: 'Official recording of disputes, incidents, or complaints for legal documentation and barangay mediation.', reqs: ['1 Valid ID', 'Incident Details / Narrative Report', 'Witnesses (if applicable)'], icon: 'gavel', color: 'text-error' }
 };
 
 // --- MASTER DATA (FILIPINO) ---
 const masterDataFil: Record<string, { title: string, desc: string, reqs: string[], icon: string, color: string }> = {
-  'BRGY-CLR-01': { 
-    title: 'Barangay Clearance', 
-    desc: 'Kailangan para sa trabaho, postal ID, mga transaksyon sa bangko, at legal na beripikasyon.', 
-    reqs: ['1 Balidong ID na galing sa Gobyerno', 'Patunay ng Paninirahan (Proof of Residency)', 'Sedula (Cedula)'], 
-    icon: 'badge', 
-    color: 'text-primary' 
-  },
-  'BRGY-IND-02': { 
-    title: 'Certificate of Indigency', 
-    desc: 'Ipinagkakaloob sa mga residenteng mahirap para sa tulong medikal, bayarin sa ospital, at PCSO claims.', 
-    reqs: ['1 Balidong ID', 'Rekomendasyon mula sa Sitio Kagawad', 'Bill sa Ospital (kung meron)'], 
-    icon: 'volunteer_activism', 
-    color: 'text-tertiary-container' 
-  },
-  'BRGY-RES-03': {
-    title: 'Certificate of Residency',
-    desc: 'Nagpapatunay na ang aplikante ay tunay na residente ng Barangay Malinao nang hindi bababa sa 6 na buwan.',
-    reqs: ['1 Balidong ID', 'Barangay Household ID', 'Patunay ng 6 na Buwan na Paninirahan'],
-    icon: 'home_pin',
-    color: 'text-secondary'
-  },
-  'BRGY-BUS-04': {
-    title: 'Barangay Business Clearance',
-    desc: 'Sapilitang kailangan para sa bago o nagpapa-renew na micro, small, at medium businesses.',
-    reqs: ['DTI / SEC Registration', 'Kontrata ng Pag-upa (Contract of Lease)', 'Dating Clearance'],
-    icon: 'storefront',
-    color: 'text-primary'
-  },
-  'BRGY-JOB-05': {
-    title: 'First-Time Jobseeker (RA 11261)',
-    desc: 'Libre ang bayad sa clearance para sa mga first-time na jobseeker ayon sa batas.',
-    reqs: ['Pirmadong Oath of Undertaking', 'Patunay ng Pagtatapos (Proof of Graduation)', '1 Balidong ID'],
-    icon: 'work',
-    color: 'text-secondary'
-  },
-  'BRGY-CTC-06': {
-    title: 'Cedula (Community Tax Certificate)',
-    desc: 'Nagsisilbing pangunahing patunay ng pagkakakilanlan at pagbabayad ng buwis na kailangan sa iba\'t ibang transaksyon sa gobyerno at pribadong sektor.',
-    reqs: ['1 Balidong ID', 'Patunay ng Kita (kung applicable)'],
-    icon: 'receipt',
-    color: 'text-primary'
-  },
-  'BRGY-SOL-07': {
-    title: 'Certificate of Solo Parent',
-    desc: 'Ipinagkakaloob sa mga nag-iisang magulang upang makuha ang mga benepisyo at pribilehiyo na nakasaad sa Solo Parents\' Welfare Act (RA 8972).',
-    reqs: ['1 Balidong ID', 'Birth Certificate ng Anak/Anak', 'Patunay na Walang Asawa (Death/Marriage Cert.)'],
-    icon: 'family_restroom',
-    color: 'text-tertiary'
-  },
-  'BRGY-SEN-08': {
-    title: 'Senior Citizen Certificate',
-    desc: 'Nagpapatunay na ang aplikante ay isang senior citizen na kwalipikado sa 20% diskwento at iba pang benepisyo ayon sa RA 9994.',
-    reqs: ['1 Balidong ID (may petsa ng kapanganakan)', '2x2 Larawan (Picture)'],
-    icon: 'elderly',
-    color: 'text-secondary'
-  },
-  'BRGY-BLT-09': {
-    title: 'Complaint / Blotter Report',
-    desc: 'Opisyal na pag-tala ng mga hindi pagkakaunawaan, insidente, o reklamo para sa legal na dokumentasyon at medyasyon ng barangay.',
-    reqs: ['1 Balidong ID', 'Detalye ng Insidente / Paliwanag', 'Mga Saksi (kung meron)'],
-    icon: 'gavel',
-    color: 'text-error'
-  }
+  'BRGY-CLR-01': { title: 'Barangay Clearance', desc: 'Kailangan para sa trabaho, postal ID, mga transaksyon sa bangko, at legal na beripikasyon.', reqs: ['1 Balidong ID na galing sa Gobyerno', 'Patunay ng Paninirahan (Proof of Residency)', 'Sedula (Cedula)'], icon: 'badge', color: 'text-primary' },
+  'BRGY-IND-02': { title: 'Certificate of Indigency', desc: 'Ipinagkakaloob sa mga residenteng mahirap para sa tulong medikal, bayarin sa ospital, at PCSO claims.', reqs: ['1 Balidong ID', 'Rekomendasyon mula sa Sitio Kagawad', 'Bill sa Ospital (kung meron)'], icon: 'volunteer_activism', color: 'text-tertiary-container' },
+  'BRGY-RES-03': { title: 'Certificate of Residency', desc: 'Nagpapatunay na ang aplikante ay tunay na residente ng Barangay Malinao nang hindi bababa sa 6 na buwan.', reqs: ['1 Balidong ID', 'Barangay Household ID', 'Patunay ng 6 na Buwan na Paninirahan'], icon: 'home_pin', color: 'text-secondary' },
+  'BRGY-BUS-04': { title: 'Barangay Business Clearance', desc: 'Sapilitang kailangan para sa bago o nagpapa-renew na micro, small, at medium businesses.', reqs: ['DTI / SEC Registration', 'Kontrata ng Pag-upa (Contract of Lease)', 'Dating Clearance'], icon: 'storefront', color: 'text-primary' },
+  'BRGY-JOB-05': { title: 'First-Time Jobseeker (RA 11261)', desc: 'Libre ang bayad sa clearance para sa mga first-time na jobseeker ayon sa batas.', reqs: ['Pirmadong Oath of Undertaking', 'Patunay ng Pagtatapos (Proof of Graduation)', '1 Balidong ID'], icon: 'work', color: 'text-secondary' },
+  'BRGY-CTC-06': { title: 'Cedula (Community Tax Certificate)', desc: 'Nagsisilbing pangunahing patunay ng pagkakakilanlan at pagbabayad ng buwis na kailangan sa iba\'t ibang transaksyon sa gobyerno at pribadong sektor.', reqs: ['1 Balidong ID', 'Patunay ng Kita (kung applicable)'], icon: 'receipt', color: 'text-primary' },
+  'BRGY-SOL-07': { title: 'Certificate of Solo Parent', desc: 'Ipinagkakaloob sa mga nag-iisang magulang upang makuha ang mga benepisyo at pribilehiyo na nakasaad sa Solo Parents\' Welfare Act (RA 8972).', reqs: ['1 Balidong ID', 'Birth Certificate ng Anak/Anak', 'Patunay na Walang Asawa (Death/Marriage Cert.)'], icon: 'family_restroom', color: 'text-tertiary' },
+  'BRGY-SEN-08': { title: 'Senior Citizen Certificate', desc: 'Nagpapatunay na ang aplikante ay isang senior citizen na kwalipikado sa 20% diskwento at iba pang benepisyo ayon sa RA 9994.', reqs: ['1 Balidong ID (may petsa ng kapanganakan)', '2x2 Larawan (Picture)'], icon: 'elderly', color: 'text-secondary' },
+  'BRGY-BLT-09': { title: 'Complaint / Blotter Report', desc: 'Opisyal na pag-tala ng mga hindi pagkakaunawaan, insidente, o reklamo para sa legal na dokumentasyon at medyasyon ng barangay.', reqs: ['1 Balidong ID', 'Detalye ng Insidente / Paliwanag', 'Mga Saksi (kung meron)'], icon: 'gavel', color: 'text-error' }
 };
 
 // --- TRANSLATIONS DICTIONARY ---
 const translations = {
   en: {
-    navDashboard: "Dashboard",
-    navRequest: "Request Document",
-    navTrack: "Track Status",
-    navHistory: "Transaction History",
-    logout: "Logout",
-    langLabel: "Language",
-    officeHours: "Office Hours: Monday-Sunday 8:00 AM – 5:00 PM",
-    advisory: "Advisory: Regular document processing schedule active.",
-    
-    portalTitle: "Official Document Issuance Portal",
-    mainHeading: "Select a Barangay Document",
-    subHeading: "Choose a Document or Certification",
-    searchLabel: "Quick Find Document",
-    searchPlaceholder: "Search clearance...",
-    standardFee: "Standard Fee",
-    requestBtn: "Request",
-
-    reqForm: "Request Form",
-    requirements: "Requirements:",
-    purposeLabel: "Purpose",
-    purposePlaceholder: "e.g. Employment, Medical Assistance...",
-    uploadLabel: "Upload Valid ID (Picture)",
-    uploadNote: "Please upload a clear photo of your Valid ID / Cedula.",
-    toPay: "Amount to Pay:",
-    cancel: "Cancel",
-    submit: "Submit Request",
-    submitting: "Submitting...",
-
-    successTitle: "Request Submitted!",
-    successMsg: "Your request has been successfully submitted. You can view it on your Dashboard.",
-
-    logoutTitle: "Are you sure you want to log out?",
-    logoutMsg: "You will need to sign in again to view your requests and apply for new documents.",
-    logoutConfirm: "Yes, Log out",
+    navDashboard: "Dashboard", navRequest: "Request Document", navTrack: "Track Status", navHistory: "Transaction History", logout: "Logout", langLabel: "Language",
+    officeHours: "Office Hours: Monday-Sunday 8:00 AM – 5:00 PM", advisory: "Advisory: Regular document processing schedule active.",
+    portalTitle: "Official Document Issuance Portal", mainHeading: "Select a Barangay Document", subHeading: "Choose a Document or Certification",
+    searchLabel: "Quick Find Document", searchPlaceholder: "Search clearance...", standardFee: "Standard Fee", requestBtn: "Request",
+    reqForm: "Request Form", requirements: "Requirements:", purposeLabel: "Purpose", purposePlaceholder: "e.g. Employment, Medical Assistance...",
+    uploadLabel: "Upload Valid ID (Picture)", uploadNote: "Please upload a clear photo of your Valid ID / Cedula.", toPay: "Amount to Pay:",
+    cancel: "Cancel", submit: "Submit Request", submitting: "Submitting...", successTitle: "Request Submitted!", successMsg: "Your request has been successfully submitted. You can view it on your Dashboard.",
+    logoutTitle: "Are you sure you want to log out?", logoutMsg: "You will need to sign in again to view your requests and apply for new documents.", logoutConfirm: "Yes, Log out",
   },
   fil: {
-    navDashboard: "Panel ng Residente",
-    navRequest: "Humiling ng Dokumento",
-    navTrack: "Subaybayan ang Status",
-    navHistory: "Kasaysayan ng Transaksyon",
-    logout: "Mag-logout",
-    langLabel: "Wika",
-    officeHours: "Oras ng Opisina: Lunes-Linggo 8:00 AM – 5:00 PM",
-    advisory: "Abiso: Regular ang iskedyul ng pagproseso ng dokumento.",
-    
-    portalTitle: "Opisyal na Portal ng Pagbibigay ng Dokumento",
-    mainHeading: "Pumili ng Dokumento sa Barangay",
-    subHeading: "Pumili ng Dokumento o Sertipikasyon",
-    searchLabel: "Mabilisang Hanapin",
-    searchPlaceholder: "Maghanap ng clearance...",
-    standardFee: "Karaniwang Bayad",
-    requestBtn: "Humiling",
-
-    reqForm: "Form ng Kahilingan",
-    requirements: "Mga Kailangan:",
-    purposeLabel: "Layunin",
-    purposePlaceholder: "hal. Trabaho, Tulong Medikal...",
-    uploadLabel: "Mag-upload ng Valid ID (Larawan)",
-    uploadNote: "Mangyaring mag-upload ng malinaw na larawan ng iyong Valid ID / Cedula.",
-    toPay: "Babayaran:",
-    cancel: "Kanselahin",
-    submit: "Ipasa ang Kahilingan",
-    submitting: "Isinusumite...",
-
-    successTitle: "Naipasa ang Kahilingan!",
-    successMsg: "Matagumpay na naipasa ang iyong request. Makikita mo na ito sa iyong Dashboard.",
-
-    logoutTitle: "Sigurado ka bang gusto mong mag-logout?",
-    logoutMsg: "Kailangan mong mag-login muli para makita ang iyong mga request at makapag-apply ng bagong dokumento.",
-    logoutConfirm: "Oo, Mag-logout",
+    navDashboard: "Panel ng Residente", navRequest: "Humiling ng Dokumento", navTrack: "Subaybayan ang Status", navHistory: "Kasaysayan ng Transaksyon", logout: "Mag-logout", langLabel: "Wika",
+    officeHours: "Oras ng Opisina: Lunes-Linggo 8:00 AM – 5:00 PM", advisory: "Abiso: Regular ang iskedyul ng pagproseso ng dokumento.",
+    portalTitle: "Opisyal na Portal ng Pagbibigay ng Dokumento", mainHeading: "Pumili ng Dokumento sa Barangay", subHeading: "Pumili ng Dokumento o Sertipikasyon",
+    searchLabel: "Mabilisang Hanapin", searchPlaceholder: "Maghanap ng clearance...", standardFee: "Karaniwang Bayad", requestBtn: "Humiling",
+    reqForm: "Form ng Kahilingan", requirements: "Mga Kailangan:", purposeLabel: "Layunin", purposePlaceholder: "hal. Trabaho, Tulong Medikal...",
+    uploadLabel: "Mag-upload ng Valid ID (Larawan)", uploadNote: "Mangyaring mag-upload ng malinaw na larawan ng iyong Valid ID / Cedula.", toPay: "Babayaran:",
+    cancel: "Kanselahin", submit: "Ipasa ang Kahilingan", submitting: "Isinusumite...", successTitle: "Naipasa ang Kahilingan!", successMsg: "Matagumpay na naipasa ang iyong request. Makikita mo na ito sa iyong Dashboard.",
+    logoutTitle: "Sigurado ka bang gusto mong mag-logout?", logoutMsg: "Kailangan mong mag-login muli para makita ang iyong mga request at makapag-apply ng bagong dokumento.", logoutConfirm: "Oo, Mag-logout",
   }
 };
 
@@ -243,7 +83,6 @@ const DocumentCatalog: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-  // Firebase Documents State
   const [documents, setDocuments] = useState<DocumentType[]>([]);
   const [isLoadingDocs, setIsLoadingDocs] = useState(true);
 
@@ -257,13 +96,11 @@ const DocumentCatalog: React.FC = () => {
     localStorage.setItem('appLanguage', language);
   }, [language]);
 
-  // --- FETCH DYNAMIC DOCUMENTS AT I-MERGE SA MASTER LIST ---
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "documentTypes"), (snapshot) => {
       const docsData = snapshot.docs.map(doc => {
         const data = doc.data();
         const code = data.code || '';
-        
         const activeMasterData = language === 'en' ? masterDataEn : masterDataFil;
         
         const localInfo = activeMasterData[code] || {
@@ -294,7 +131,6 @@ const DocumentCatalog: React.FC = () => {
       });
       
       const activeDocs = docsData.filter((d: any) => d.status !== 'Inactive');
-      
       setDocuments(activeDocs);
       setIsLoadingDocs(false);
     });
@@ -332,7 +168,7 @@ const DocumentCatalog: React.FC = () => {
     window.location.href = '/login';
   };
 
-  // ✅ CLOUDINARY API INTEGRATION (FINAL FIX)
+  // ✅ IMGBB API INTEGRATION (Pinalitan na ng API Key mo)
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -344,29 +180,28 @@ const DocumentCatalog: React.FC = () => {
 
     setIsUploading(true);
 
-    // Gumamit tayo ng FormData para maayos ang multipart request
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'barangay_id_upload'); 
-    // Optional: Kung gusto mo lagyan ng folder sa Cloudinary
-    // formData.append('folder', 'barangay_ids');
+    formData.append('image', file); 
 
     try {
-      const response = await fetch('https://api.cloudinary.com/v1_1/ocg57ajc/image/upload', {
+      // ✅ GAMIT NA ANG API KEY MO
+      const apiKey = '101b09bbeed0b70c2938dd9c66f737ce'; 
+      
+      const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
         method: 'POST',
         body: formData,
       });
 
       const data = await response.json();
-      console.log("Cloudinary Response:", data); 
+      console.log("ImgBB Response:", data);
 
-      if (data.secure_url) {
-        setUploadedFile(data.secure_url); 
+      if (data.success) {
+        setUploadedFile(data.data.url); 
       } else {
         throw new Error(data.error?.message || "Upload failed");
       }
     } catch (error: any) {
-      console.error("Cloudinary Error:", error);
+      console.error("ImgBB Error:", error);
       alert("Failed to upload image: " + error.message);
     } finally {
       setIsUploading(false);
@@ -404,7 +239,7 @@ const DocumentCatalog: React.FC = () => {
         fee: selectedDoc.fee,
         numericFee: selectedDoc.numericFee,
         status: 'Pending',
-        requirementImage: uploadedFile, // Ito ay magiging URL na
+        requirementImage: uploadedFile, // Ito ay magiging ImgBB URL na
       });
 
       await logAction(
@@ -432,10 +267,7 @@ const DocumentCatalog: React.FC = () => {
       <IonContent className="bg-surface">
         <div className="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col">
           
-          {/* HEADER */}
           <header className="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-            
-            {/* TOP BAR (Office Hours at Advisory) */}
             <div className="bg-primary text-on-primary text-label-sm font-label-sm">
               <div className="max-w-7xl mx-auto px-4 md:px-margin flex flex-col md:flex-row items-center justify-between py-2 md:py-0 md:h-8 gap-1.5 md:gap-0">
                 <div className="flex items-center justify-center gap-1 text-surface-container-high text-center md:text-left">
@@ -449,7 +281,6 @@ const DocumentCatalog: React.FC = () => {
               </div>
             </div>
             
-            {/* MAIN NAV BAR */}
             <div className="h-16 md:h-20 max-w-7xl mx-auto px-4 md:px-margin flex items-center justify-between gap-4">
               <div className="flex items-center gap-2 shrink-0">
                 <img alt="Logo" className="h-10 w-10 md:h-14 md:w-14 rounded-full object-cover bg-white shadow-sm" src={logoImage}/>
@@ -504,30 +335,18 @@ const DocumentCatalog: React.FC = () => {
             </div>
           </header>
 
-          {/* MAIN CONTENT */}
           <main className="w-full pt-28 md:pt-32 bg-surface flex-1">
             <div className="max-w-7xl mx-auto px-4 md:px-margin py-6 md:py-10">
-              
               <div className="flex flex-col gap-6 md:gap-8">
-                
                 <section className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 md:gap-6">
                   <div className="flex flex-col max-w-2xl">
                     <div className="flex items-center gap-2 mb-2 md:mb-3 text-[#0a558c]">
-                      <span className="material-symbols-outlined text-[18px] md:text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                        verified_user
-                      </span>
-                      <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest">
-                        {t.portalTitle}
-                      </span>
+                      <span className="material-symbols-outlined text-[18px] md:text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified_user</span>
+                      <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest">{t.portalTitle}</span>
                     </div>
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#00236f] tracking-tight mb-1 md:mb-2">
-                      {t.mainHeading}
-                    </h1>
-                    <p className="text-sm md:text-[15px] font-medium text-[#0a558c]">
-                      {t.subHeading}
-                    </p>
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#00236f] tracking-tight mb-1 md:mb-2">{t.mainHeading}</h1>
+                    <p className="text-sm md:text-[15px] font-medium text-[#0a558c]">{t.subHeading}</p>
                   </div>
-                  
                   <div className="w-full lg:w-96 flex flex-col gap-1">
                     <label className="text-xs md:text-sm font-semibold text-slate-600" htmlFor="catalog-search">{t.searchLabel}</label>
                     <div className="relative flex items-center mt-1">
@@ -571,11 +390,7 @@ const DocumentCatalog: React.FC = () => {
                           <p className="text-xs md:text-sm text-slate-600 mt-1.5 md:mt-2 line-clamp-3">{doc.description}</p>
                         </div>
                         <div className="p-5 md:p-6 pt-0 md:pt-0 mt-2">
-                          <button 
-                            type="button"
-                            onClick={() => handleRequestClick(doc)} 
-                            className={`w-full h-10 md:h-11 ${doc.btnClass} font-bold rounded-lg flex items-center justify-center gap-2 shadow-sm text-sm transition-transform active:scale-95`}
-                          >
+                          <button type="button" onClick={() => handleRequestClick(doc)} className={`w-full h-10 md:h-11 ${doc.btnClass} font-bold rounded-lg flex items-center justify-center gap-2 shadow-sm text-sm transition-transform active:scale-95`}>
                             {t.requestBtn} <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                           </button>
                         </div>
@@ -587,14 +402,12 @@ const DocumentCatalog: React.FC = () => {
             </div>
           </main>
           
-          {/* FOOTER */}
           <footer className="w-full bg-primary text-on-primary pt-8 pb-6 shadow-[0_-2px_12px_rgba(0,0,0,0.05)] mt-auto">
             <div className="max-w-7xl mx-auto px-4 text-center text-xs text-primary-fixed">
               <p>© 2025 Barangay Malinao, Naujan. All Rights Reserved. BarangayEase Digital Civic Portal.</p>
             </div>
           </footer>
 
-          {/* REQUEST MODAL */}
           {isModalOpen && selectedDoc && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary/50 backdrop-blur-sm p-4">
               <div className="w-full max-w-md rounded-2xl bg-surface-container-lowest p-5 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -621,32 +434,15 @@ const DocumentCatalog: React.FC = () => {
 
                   <div>
                     <label className="block text-xs md:text-sm font-semibold text-gray-700 mb-1">{t.uploadLabel} <span className="text-red-500">*</span></label>
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      onChange={handleFileUpload} 
-                      className="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-outline-variant/50 text-xs md:text-sm" 
-                      required={!uploadedFile}
-                      disabled={isUploading || isSubmitting}
-                    />
-                    {isUploading && (
-                      <p className="text-[10px] text-blue-600 mt-1 animate-pulse font-bold">
-                        Uploading Valid ID to Cloudinary...
-                      </p>
-                    )}
-                    {uploadedFile && !isUploading && (
-                      <p className="text-[10px] text-green-600 mt-1 font-bold">
-                        ✓ ID Uploaded Successfully!
-                      </p>
-                    )}
+                    <input type="file" accept="image/*" onChange={handleFileUpload} className="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-outline-variant/50 text-xs md:text-sm" required={!uploadedFile} disabled={isUploading || isSubmitting} />
+                    {isUploading && <p className="text-[10px] text-blue-600 mt-1 animate-pulse font-bold">Uploading Valid ID to ImgBB...</p>}
+                    {uploadedFile && !isUploading && <p className="text-[10px] text-green-600 mt-1 font-bold">✓ ID Uploaded Successfully!</p>}
                     <p className="text-[10px] text-gray-500 mt-1">{t.uploadNote}</p>
                   </div>
 
                   <div className="flex items-center justify-between bg-tertiary-fixed/30 p-3 rounded-lg mt-2">
                     <span className="text-xs md:text-sm font-bold text-tertiary">{t.toPay}</span>
-                    <span className="text-base md:text-lg font-bold text-tertiary">
-                      {selectedDoc.isFree ? '₱0.00' : selectedDoc.fee}
-                    </span>
+                    <span className="text-base md:text-lg font-bold text-tertiary">{selectedDoc.isFree ? '₱0.00' : selectedDoc.fee}</span>
                   </div>
 
                   <div className="mt-4 flex gap-2">
@@ -660,7 +456,6 @@ const DocumentCatalog: React.FC = () => {
             </div>
           )}
 
-          {/* SUCCESS MODAL */}
           {showSuccess && (
             <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(11, 28, 48, 0.7)', backdropFilter: 'blur(4px)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
               <div style={{ backgroundColor: '#ffffff', borderRadius: '24px', padding: '32px 24px', width: '100%', maxWidth: '360px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
@@ -676,7 +471,6 @@ const DocumentCatalog: React.FC = () => {
             </div>
           )}
 
-          {/* LOGOUT CONFIRMATION MODAL */}
           {isLogoutModalOpen && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary/50 backdrop-blur-sm p-4">
               <div className="w-full max-w-sm rounded-2xl bg-surface-container-lowest p-6 shadow-2xl">
