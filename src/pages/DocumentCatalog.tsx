@@ -237,6 +237,7 @@ const DocumentCatalog: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [purpose, setPurpose] = useState('');
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false); // ✅ BAGONG STATE PARA SA CLOUDINARY
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [showSuccess, setShowSuccess] = useState(false);
@@ -331,43 +332,41 @@ const DocumentCatalog: React.FC = () => {
     window.location.href = '/login';
   };
 
-  // ✅ BINAGO LANG DITO: RESIZE AT COMPRESS ANG IMAGE PARA SA FIRESTORE LIMIT
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // ✅ CLOUDINARY API INTEGRATION (Pinalitan ang Base64/Canvas logic)
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const img = new Image();
-        img.src = reader.result as string;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 800; 
-          const MAX_HEIGHT = 800; 
-          let width = img.width;
-          let height = img.height;
+    if (!file) return;
 
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
-          
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
-          
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-          setUploadedFile(compressedDataUrl);
-        };
-      };
-      reader.readAsDataURL(file);
+    if (!file.type.startsWith('image/')) {
+      alert(language === 'en' ? "Please upload a valid image file (JPG, PNG)." : "Mangyaring mag-upload ng tamang image file (JPG, PNG).");
+      return;
+    }
+
+    setIsUploading(true);
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'barangay_id_upload'); // Preset na ginawa mo sa Cloudinary
+
+    try {
+      // Tawagin ang External API ng Cloudinary
+      const response = await fetch('https://api.cloudinary.com/v1_1/ocg57ajc/image/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.secure_url) {
+        setUploadedFile(data.secure_url); 
+      } else {
+        throw new Error(data.error?.message || "Upload failed");
+      }
+    } catch (error: any) {
+      console.error("Cloudinary Error:", error);
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -619,7 +618,24 @@ const DocumentCatalog: React.FC = () => {
 
                   <div>
                     <label className="block text-xs md:text-sm font-semibold text-gray-700 mb-1">{t.uploadLabel} <span className="text-red-500">*</span></label>
-                    <input type="file" accept="image/*" onChange={handleFileUpload} className="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-outline-variant/50 text-xs md:text-sm" required />
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleFileUpload} 
+                      className="w-full px-3 py-2 rounded-lg bg-surface-container-low border border-outline-variant/50 text-xs md:text-sm" 
+                      required={!uploadedFile}
+                      disabled={isUploading || isSubmitting}
+                    />
+                    {isUploading && (
+                      <p className="text-[10px] text-blue-600 mt-1 animate-pulse font-bold">
+                        Uploading Valid ID to Cloudinary...
+                      </p>
+                    )}
+                    {uploadedFile && !isUploading && (
+                      <p className="text-[10px] text-green-600 mt-1 font-bold">
+                        ✓ ID Uploaded Successfully!
+                      </p>
+                    )}
                     <p className="text-[10px] text-gray-500 mt-1">{t.uploadNote}</p>
                   </div>
 
@@ -632,7 +648,7 @@ const DocumentCatalog: React.FC = () => {
 
                   <div className="mt-4 flex gap-2">
                     <button type="button" onClick={closeModal} className="flex-1 rounded-lg px-4 py-2.5 font-semibold text-primary bg-surface-container hover:bg-surface-container-high transition-colors text-xs md:text-sm">{t.cancel}</button>
-                    <button type="submit" disabled={isSubmitting} className="flex-1 rounded-lg bg-primary px-4 py-2.5 font-bold text-on-primary hover:bg-primary-container transition-colors disabled:bg-gray-400 text-xs md:text-sm">
+                    <button type="submit" disabled={isSubmitting || isUploading} className="flex-1 rounded-lg bg-primary px-4 py-2.5 font-bold text-on-primary hover:bg-primary-container transition-colors disabled:bg-gray-400 text-xs md:text-sm">
                       {isSubmitting ? t.submitting : t.submit}
                     </button>
                   </div>
