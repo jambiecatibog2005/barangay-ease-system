@@ -332,7 +332,7 @@ const DocumentCatalog: React.FC = () => {
     window.location.href = '/login';
   };
 
-  // ✅ CLOUDINARY API INTEGRATION (PINAKA-AYOS NA VERSION)
+  // ✅ CLOUDINARY API INTEGRATION (FINAL FIX)
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -344,10 +344,12 @@ const DocumentCatalog: React.FC = () => {
 
     setIsUploading(true);
 
+    // Gumamit tayo ng FormData para maayos ang multipart request
     const formData = new FormData();
     formData.append('file', file);
-    // Tiniyak nating walang space at eksaktong pangalan ng preset
     formData.append('upload_preset', 'barangay_id_upload'); 
+    // Optional: Kung gusto mo lagyan ng folder sa Cloudinary
+    // formData.append('folder', 'barangay_ids');
 
     try {
       const response = await fetch('https://api.cloudinary.com/v1_1/ocg57ajc/image/upload', {
@@ -356,18 +358,15 @@ const DocumentCatalog: React.FC = () => {
       });
 
       const data = await response.json();
-
-      // I-print natin sa console kung ano talaga ang sinasabi ng Cloudinary
-      console.log("Cloudinary Response:", data);
+      console.log("Cloudinary Response:", data); 
 
       if (data.secure_url) {
         setUploadedFile(data.secure_url); 
       } else {
-        // Dito natin makukuha ang totoong error message
-        throw new Error(data.error?.message || "Unknown error occurred");
+        throw new Error(data.error?.message || "Upload failed");
       }
     } catch (error: any) {
-      console.error("Cloudinary Error Details:", error);
+      console.error("Cloudinary Error:", error);
       alert("Failed to upload image: " + error.message);
     } finally {
       setIsUploading(false);
