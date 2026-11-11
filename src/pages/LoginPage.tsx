@@ -36,8 +36,7 @@ const LoginPage: React.FC = () => {
       const userData = userDoc.data();
       const userStatus = userData.status?.toLowerCase();
 
-      // ✅ 2. I-check kung tugma ang password sa temporaryPassword (na ni-reset ng staff)
-      // Kung walang temporaryPassword, titingnan natin kung may naka-save na "password" field.
+      // ✅ 2. I-check kung tugma ang password sa temporaryPassword
       const validPassword = userData.temporaryPassword || userData.password;
 
       if (password !== validPassword) {
@@ -48,13 +47,11 @@ const LoginPage: React.FC = () => {
 
       // ✅ 3. Kapag tugma ang password, tsaka natin i-check ang status
       if (userStatus === "active") {
-        // I-save sa localStorage
         localStorage.setItem('residentUid', userDoc.id); 
         localStorage.setItem('residentName', userData.fullName || 'Resident'); 
         localStorage.setItem('isResidentLoggedIn', 'true');
         localStorage.setItem('userRole', 'Resident'); 
 
-        // I-log ang successful login
         await logAction(
           "Resident Login", 
           `Resident logged in to the portal.`, 
@@ -88,24 +85,26 @@ const LoginPage: React.FC = () => {
       <IonContent className="bg-[#f0f4f8]">
         <div className="min-h-screen flex flex-col font-sans text-gray-800">
           
-          <header className="w-full bg-white border-b border-gray-100 py-3 px-6 md:px-12 flex flex-col sm:flex-row items-center justify-between shadow-sm gap-4 z-10 relative">
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <div className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0">
+          {/* ✅ BAGONG HEADER: Icon-only Home Button */}
+          <header className="w-full bg-white border-b border-gray-100 py-3 px-4 sm:px-6 md:px-12 flex flex-row items-center justify-between shadow-sm z-10 relative">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 md:w-14 md:h-14 flex-shrink-0">
                 <img src={logoImage} alt="BarangayEase Logo" className="w-full h-full object-contain rounded-full" />
               </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-lg text-[#00236f] leading-tight">BarangayEase</span>
-                <span className="text-xs text-gray-500 font-medium">Barangay Malinao Local Government Portal</span>
+              <div className="flex flex-col text-left">
+                <span className="font-bold text-base md:text-lg text-[#00236f] leading-tight">BarangayEase</span>
+                <span className="text-[10px] md:text-xs text-gray-500 font-medium hidden sm:block">Barangay Malinao Local Government Portal</span>
               </div>
             </div>
             
-            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <div className="flex items-center justify-end">
               <button 
                 onClick={() => window.location.href = '/'}
-                className="flex items-center gap-1.5 bg-[#00236f] text-white border border-[#00236f] hover:bg-[#00174d] active:bg-[#000d29] active:scale-95 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all shadow-md hover:shadow-lg"
+                title="Home"
+                className="flex items-center justify-center w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2 bg-[#00236f] text-white hover:bg-[#00174d] active:bg-[#000d29] active:scale-95 rounded-full md:rounded-lg text-sm font-bold transition-all shadow-md hover:shadow-lg"
               >
-                <span className="material-symbols-outlined text-[18px]">home</span>
-                <span>Home</span>
+                <span className="material-symbols-outlined text-[20px] md:text-[18px]">home</span>
+                <span className="hidden md:inline ml-1.5">Home</span>
               </button>
             </div>
           </header>
