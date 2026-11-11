@@ -35,7 +35,7 @@ interface HolidayData {
 
 const translations = {
   en: {
-    dashboard: "Home", requestDocument: "Request", trackStatus: "Track", transactionHistory: "History",
+    dashboard: "Dashboard", requestDocument: "Request Document", trackStatus: "Track Status", transactionHistory: "Transaction History",
     logout: "Logout", cancel: "Cancel", yesLogout: "Yes, Log out", logoutTitle: "Are you sure you want to log out?",
     logoutMessage: "You will need to sign in again to view your requests and apply for new documents.",
     welcome: "Welcome", active: "Active", requestNewDoc: "Request New Document", trackMyRequests: "Track My Requests",
@@ -52,7 +52,7 @@ const translations = {
     slaNote: "Note: SLA deadlines for document requests are paused on these dates."
   },
   fil: {
-    dashboard: "Home", requestDocument: "Humiling", trackStatus: "Subaybayan", transactionHistory: "Kasaysayan",
+    dashboard: "Panel ng Residente", requestDocument: "Humiling ng Dokumento", trackStatus: "Subaybayan ang Status", transactionHistory: "Kasaysayan ng Transaksyon",
     logout: "Mag-logout", cancel: "Kanselahin", yesLogout: "Oo, Mag-logout", logoutTitle: "Sigurado ka bang gusto mong mag-logout?",
     logoutMessage: "Kailangan mong mag-login muli para makita ang iyong mga request at makapag-apply ng bagong dokumento.",
     welcome: "Mabuhay", active: "Aktibo", requestNewDoc: "Humiling ng Bagong Dokumento", trackMyRequests: "Subaybayan ang Aking Request",
@@ -353,16 +353,12 @@ const ResidentDashboard: React.FC = () => {
                 margin: 10mm; 
               }
             }
-            @media (max-width: 768px) {
-               .bottom-nav { display: flex !important; }
-               .main-content-mobile { padding-bottom: 90px !important; }
-            }
           `}
         </style>
 
         <div className="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col">
           
-          {/* HEADER: Logo lang at Menu icon */}
+          {/* HEADER */}
           <header className="no-print fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
             <div className="bg-primary text-on-primary text-label-sm font-label-sm">
               <div className="max-w-7xl mx-auto px-4 md:px-margin flex flex-col md:flex-row items-center justify-between py-2 md:py-0 md:h-8 gap-1.5 md:gap-0">
@@ -370,6 +366,12 @@ const ResidentDashboard: React.FC = () => {
                   <span className="material-symbols-outlined text-secondary-fixed text-[14px] shrink-0">domain</span>
                   <span className="text-[10px] sm:text-[11px] md:text-sm leading-tight">
                     {language === 'en' ? 'Office Hours: Monday-Sunday 8:00 AM – 5:00 PM' : 'Oras ng Opisina: Lunes-Linggo 8:00 AM – 5:00 PM'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-center gap-1 text-tertiary-fixed text-center md:text-right">
+                  <span className="material-symbols-outlined text-[14px] shrink-0">campaign</span>
+                  <span className="font-medium text-[10px] sm:text-[11px] md:text-sm leading-tight">
+                    {language === 'en' ? 'Advisory: Regular document processing schedule active.' : 'Abiso: Regular ang iskedyul ng pagproseso ng dokumento.'}
                   </span>
                 </div>
               </div>
@@ -383,8 +385,6 @@ const ResidentDashboard: React.FC = () => {
                   <span className="font-label-sm text-[10px] md:text-label-sm text-on-surface-variant font-medium leading-none">Brgy. Malinao, Naujan</span>
                 </div>
               </div>
-              
-              {/* Desktop Nav */}
               <nav className="hidden md:flex items-center justify-center gap-1 flex-1">
                 <a className="px-3 py-2 transition-colors bg-primary text-on-primary font-bold rounded-lg shadow-sm text-sm whitespace-nowrap" href="/dashboard">{t.dashboard}</a>
                 <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/documents">{t.requestDocument}</a>
@@ -392,45 +392,55 @@ const ResidentDashboard: React.FC = () => {
                 <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/history">{t.transactionHistory}</a>
               </nav>
               
-              {/* Mobile Header Menu (For Language & Logout) */}
-              <div className="flex items-center justify-end gap-2 shrink-0 relative">
-                <button 
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="p-2 text-primary cursor-pointer hover:bg-surface-container rounded-lg focus:outline-none transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[28px]">
-                    {isMobileMenuOpen ? 'close' : 'menu'}
-                  </span>
-                </button>
-                
-                {isMobileMenuOpen && (
-                  <div className="absolute right-0 top-12 w-60 bg-white rounded-xl shadow-xl border border-outline-variant/50 flex flex-col p-2 z-[999] overflow-hidden">
-                    <div className="px-2 py-2">
-                      <p className="text-[10px] font-bold uppercase text-outline mb-2 px-2 tracking-wider">{t.language}</p>
-                      <div className="flex bg-surface-container rounded-lg p-1">
-                        <button
-                          onClick={() => { setLanguage('en'); setIsMobileMenuOpen(false); }}
-                          className={`flex-1 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${language === 'en' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
-                        >
-                          English
-                        </button>
-                        <button
-                          onClick={() => { setLanguage('fil'); setIsMobileMenuOpen(false); }}
-                          className={`flex-1 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${language === 'fil' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
-                        >
-                          Filipino
-                        </button>
+              <div className="flex items-center justify-end gap-2 shrink-0">
+                <div className="relative">
+                  <button 
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    className="p-2 text-primary cursor-pointer hover:bg-surface-container rounded-lg focus:outline-none transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[28px]">
+                      {isMobileMenuOpen ? 'close' : 'menu'}
+                    </span>
+                  </button>
+                  
+                  {isMobileMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-outline-variant/50 flex flex-col p-2 z-[999] overflow-hidden">
+                      
+                      <div className="flex flex-col md:hidden gap-1">
+                        <a className="px-4 py-2.5 text-sm font-semibold text-primary bg-primary/10 rounded-lg" href="/dashboard">{t.dashboard}</a>
+                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/documents">{t.requestDocument}</a>
+                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/track-status">{t.trackStatus}</a>
+                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/history">{t.transactionHistory}</a>
+                        <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
                       </div>
-                    </div>
+                      
+                      <div className="px-2 py-2">
+                        <p className="text-[10px] font-bold uppercase text-outline mb-2 px-2 tracking-wider">{t.language}</p>
+                        <div className="flex bg-surface-container rounded-lg p-1">
+                          <button
+                            onClick={() => setLanguage('en')}
+                            className={`flex-1 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${language === 'en' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
+                          >
+                            English
+                          </button>
+                          <button
+                            onClick={() => setLanguage('fil')}
+                            className={`flex-1 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${language === 'fil' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
+                          >
+                            Filipino
+                          </button>
+                        </div>
+                      </div>
 
-                    <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
-                    
-                    <button onClick={handleLogoutClick} className="mx-2 px-3 py-2.5 mt-1 text-sm text-left text-red-600 font-bold hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors">
-                      <span className="material-symbols-outlined text-[18px]">logout</span>
-                      {t.logout}
-                    </button>
-                  </div>
-                )}
+                      <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
+                      
+                      <button onClick={handleLogoutClick} className="mx-2 px-3 py-2.5 mt-1 text-sm text-left text-red-600 font-bold hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors">
+                        <span className="material-symbols-outlined text-[18px]">logout</span>
+                        {t.logout}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <div className="h-[3px] w-full flex">
@@ -441,7 +451,7 @@ const ResidentDashboard: React.FC = () => {
           </header>
 
           {/* MAIN CONTENT */}
-          <main className="no-print w-full pt-28 md:pt-32 bg-surface flex-1 main-content-mobile">
+          <main className="no-print w-full pt-28 md:pt-32 bg-surface flex-1">
             <div className="max-w-7xl mx-auto px-4 md:px-margin pt-space-xl pb-8">
               <div className="flex flex-col w-full gap-6">
                 
@@ -458,9 +468,27 @@ const ResidentDashboard: React.FC = () => {
                             <span className="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 text-[10px] font-bold uppercase tracking-wider">
                               {t.publicAnnouncement}
                             </span>
+                            <span className="px-2 py-0.5 rounded-md bg-gray-200 text-gray-700 text-[10px] font-bold uppercase tracking-wider">
+                              {t.for}: {announcement.audience}
+                            </span>
                           </div>
                           <h3 className="font-title-md text-lg md:text-xl font-bold text-gray-900 mt-1">{announcement.title}</h3>
                           <p className="font-body-sm text-sm text-gray-700 leading-relaxed mt-1 whitespace-pre-wrap">{announcement.details}</p>
+                          
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-xs font-semibold text-gray-600">
+                            {announcement.date && (
+                              <span className="flex items-center gap-1">
+                                <span className="material-symbols-outlined text-[16px]">calendar_month</span>
+                                {formatDateDisplay(announcement.date)}
+                              </span>
+                            )}
+                            {announcement.location && (
+                              <span className="flex items-center gap-1">
+                                <span className="material-symbols-outlined text-[16px]">location_on</span>
+                                {announcement.location}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </article>
@@ -476,6 +504,7 @@ const ResidentDashboard: React.FC = () => {
                         <div className="flex flex-col space-y-0.5 w-full">
                           <div className="flex items-center gap-2">
                             <span className="font-title-md text-sm md:text-base font-bold text-on-secondary-fixed">{t.readyBannerTitle}</span>
+                            <span className="animate-pulse inline-block w-2.5 h-2.5 rounded-full bg-secondary"></span>
                           </div>
                           <p className="font-body-md text-xs md:text-sm text-on-secondary-fixed-variant leading-relaxed">Your {req.documentType} (Ref: {req.refNo}) {t.readyBannerMsg}</p>
                         </div>
@@ -489,6 +518,7 @@ const ResidentDashboard: React.FC = () => {
 
                 {/* WELCOME BANNER */}
                 <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-primary via-primary-container to-primary p-5 md:p-8 shadow-sm text-on-primary">
+                  <div className="absolute -right-10 -bottom-10 w-64 h-64 rounded-full bg-secondary-container/10 blur-2xl pointer-events-none"></div>
                   <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                     <div className="flex items-start sm:items-center gap-4">
                       <div className="w-14 h-14 md:w-20 md:h-20 rounded-full bg-white text-primary font-bold flex items-center justify-center text-xl md:text-3xl shadow-md border-2 border-primary-fixed shrink-0">
@@ -534,6 +564,7 @@ const ResidentDashboard: React.FC = () => {
                         </div>
                       ))}
                     </div>
+                    <p className="text-[11px] text-gray-500 italic mt-1">{t.slaNote}</p>
                   </div>
                 )}
 
@@ -700,29 +731,9 @@ const ResidentDashboard: React.FC = () => {
             </div>
           </footer>
 
-          {/* ✅ BOTTOM NAVIGATION BAR (Mobile Only) */}
-          <nav className="bottom-nav hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 justify-around items-center h-16 z-[100] pb-safe" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-            <a href="/dashboard" className="flex flex-col items-center justify-center w-full h-full text-primary">
-              <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
-              <span className="text-[10px] font-bold mt-1"></span>
-            </a>
-            <a href="/documents" className="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-primary transition-colors">
-              <span className="material-symbols-outlined text-[24px]">description</span>
-              <span className="text-[10px] font-bold mt-1">Request</span>
-            </a>
-            <a href="/track-status" className="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-primary transition-colors">
-              <span className="material-symbols-outlined text-[24px]">track_changes</span>
-              <span className="text-[10px] font-bold mt-1">Track</span>
-            </a>
-            <a href="/history" className="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-primary transition-colors">
-              <span className="material-symbols-outlined text-[24px]">receipt_long</span>
-              <span className="text-[10px] font-bold mt-1">History</span>
-            </a>
-          </nav>
-
           {/* ✅ CLAIM SLIP MODAL */}
           {isClaimSlipOpen && (
-            <div className="fixed inset-0 z-[200] flex items-center justify-center bg-primary/50 backdrop-blur-sm p-4 print:bg-white print:p-0 print:static">
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary/50 backdrop-blur-sm p-4 print:bg-white print:p-0 print:static">
               
               <div 
                 ref={claimSlipRef} 
@@ -804,7 +815,7 @@ const ResidentDashboard: React.FC = () => {
 
           {/* ================= LOGOUT CONFIRMATION MODAL ================= */}
           {isLogoutModalOpen && (
-            <div className="no-print fixed inset-0 z-[200] flex items-center justify-center bg-primary/50 backdrop-blur-sm p-4">
+            <div className="no-print fixed inset-0 z-[100] flex items-center justify-center bg-primary/50 backdrop-blur-sm p-4">
               <div className="w-full max-w-sm rounded-2xl bg-surface-container-lowest p-6 shadow-2xl">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-16 h-16 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-4">
