@@ -12,7 +12,6 @@ const StaffDashboard: React.FC = () => {
 
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
-  // ✅ State para sa Dynamic Name
   const [staffName, setStaffName] = useState(localStorage.getItem('staffName') || 'Secretary');
 
   const [pendingCount, setPendingCount] = useState(0);
@@ -22,12 +21,10 @@ const StaffDashboard: React.FC = () => {
   const [recentRequests, setRecentRequests] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // ✅ FORCE LOGOUT STATES
   const [showForceLogout, setShowForceLogout] = useState(false);
   const [countdown, setCountdown] = useState(5);
   const [hasTriggeredLogout, setHasTriggeredLogout] = useState(false);
 
-  // ✅ LISTENER PARA SA SECRETARY ACCOUNT
   useEffect(() => {
     const q = query(collection(db, "users"), where("role", "==", "secretary"));
     
@@ -36,7 +33,6 @@ const StaffDashboard: React.FC = () => {
         const secretaryDoc = snapshot.docs[0];
         const secretaryData = secretaryDoc.data();
 
-        // ✅ DYNAMIC NAME
         if (secretaryData.fullName) {
           let displayName = secretaryData.fullName;
           if (displayName.toLowerCase().startsWith('officer')) {
@@ -48,13 +44,11 @@ const StaffDashboard: React.FC = () => {
           localStorage.setItem('staffName', displayName);
         }
 
-        // ✅ TRIGGER FORCE LOGOUT
         if (secretaryData.forceLogout === true && !hasTriggeredLogout) {
-          setHasTriggeredLogout(true); // I-lock para hindi mag-doble ang timer
+          setHasTriggeredLogout(true);
           setShowForceLogout(true);
           setCountdown(5);
 
-          // Simulan ang 5-second countdown
           let timeLeft = 5;
           const timer = setInterval(() => {
             timeLeft -= 1;
@@ -63,14 +57,10 @@ const StaffDashboard: React.FC = () => {
             if (timeLeft <= 0) {
               clearInterval(timer);
               
-              // ✅ Reset forceLogout sa Firestore
               updateDoc(doc(db, "users", secretaryDoc.id), { forceLogout: false }).then(() => {
-                // Linisin ang localStorage ng staff
                 localStorage.removeItem('isStaffLoggedIn');
                 localStorage.removeItem('staffName');
                 localStorage.removeItem('staffUid');
-                
-                // ✅ I-redirect sa login page
                 window.location.href = '/staff-login';
               });
             }
@@ -82,7 +72,6 @@ const StaffDashboard: React.FC = () => {
     return () => unsubscribe();
   }, [hasTriggeredLogout]);
 
-  // ✅ REQUESTS & DATE LISTENER
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 1024;
@@ -255,7 +244,8 @@ const StaffDashboard: React.FC = () => {
               </div>
             </header>
 
-            <main style={{ padding: isMobile ? '16px' : '32px', flex: 1, backgroundColor: '#f8f9ff' }}>
+            {/* ✅ DITO ANG DAGDAG NA CLASS: pb-24 (padding bottom para hindi matakpan ng bottom nav) */}
+            <main style={{ padding: isMobile ? '16px' : '32px', paddingBottom: isMobile ? '90px' : '32px', flex: 1, backgroundColor: '#f8f9ff' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1400px', margin: '0 auto' }}>
                 
                 <section style={{ backgroundColor: '#ffffff', borderLeft: pendingCount > 0 ? '6px solid #1e3a8a' : '6px solid #68dba9', borderRadius: '12px', padding: isMobile ? '20px 16px' : '24px 32px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', gap: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
@@ -426,6 +416,33 @@ const StaffDashboard: React.FC = () => {
           </div>
         </div>
 
+        {/* ✅ MOBILE BOTTOM NAVIGATION BAR */}
+        {isMobile && (
+          <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, backgroundColor: '#ffffff', borderTop: '1px solid #e5eeff', display: 'flex', justifyContent: 'space-around', alignItems: 'center', height: '64px', zIndex: 100, paddingBottom: 'env(safe-area-inset-bottom)' }}>
+            
+            <a href="/staff-dashboard" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: '#1e3a8a', textDecoration: 'none' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '24px', fontVariationSettings: "'FILL' 1" }}>dashboard</span>
+              <span style={{ fontSize: '10px', fontWeight: 'bold', marginTop: '2px' }}>Dashboard</span>
+            </a>
+            
+            <a href="/staff-requests" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: '#757682', textDecoration: 'none' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>description</span>
+              <span style={{ fontSize: '10px', fontWeight: 'bold', marginTop: '2px' }}>Requests</span>
+            </a>
+            
+            <a href="/staff-residents" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: '#757682', textDecoration: 'none' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>badge</span>
+              <span style={{ fontSize: '10px', fontWeight: 'bold', marginTop: '2px' }}>Residents</span>
+            </a>
+            
+            <a href="/staff-transactions" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: '#757682', textDecoration: 'none' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>receipt_long</span>
+              <span style={{ fontSize: '10px', fontWeight: 'bold', marginTop: '2px' }}>History</span>
+            </a>
+
+          </nav>
+        )}
+
         {/* ================= FORCE LOGOUT WARNING MODAL ================= */}
         {showForceLogout && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(11, 28, 48, 0.85)', backdropFilter: 'blur(8px)', zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
@@ -441,7 +458,6 @@ const StaffDashboard: React.FC = () => {
                 Your account password was recently changed by the Administrator. For security reasons, you will be logged out automatically in:
               </p>
 
-              {/* ✅ MALAKING COUNTDOWN NUMBER */}
               <div style={{ fontSize: '64px', fontWeight: 'bold', color: '#ef4444', margin: '10px 0 20px 0' }}>
                 {countdown}
               </div>
