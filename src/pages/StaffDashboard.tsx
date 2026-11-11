@@ -244,8 +244,8 @@ const StaffDashboard: React.FC = () => {
               </div>
             </header>
 
-            {/* ✅ DITO ANG DAGDAG NA CLASS: pb-24 (padding bottom para hindi matakpan ng bottom nav) */}
-            <main style={{ padding: isMobile ? '16px' : '32px', paddingBottom: isMobile ? '90px' : '32px', flex: 1, backgroundColor: '#f8f9ff' }}>
+            {/* ✅ IBINALIK SA NORMAL PADDING DAHIL WALA NANG BOTTOM NAV */}
+            <main style={{ padding: isMobile ? '16px' : '32px', flex: 1, backgroundColor: '#f8f9ff' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1400px', margin: '0 auto' }}>
                 
                 <section style={{ backgroundColor: '#ffffff', borderLeft: pendingCount > 0 ? '6px solid #1e3a8a' : '6px solid #68dba9', borderRadius: '12px', padding: isMobile ? '20px 16px' : '24px 32px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', gap: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
@@ -415,33 +415,6 @@ const StaffDashboard: React.FC = () => {
             </main>
           </div>
         </div>
-
-        {/* ✅ MOBILE BOTTOM NAVIGATION BAR */}
-        {isMobile && (
-          <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, backgroundColor: '#ffffff', borderTop: '1px solid #e5eeff', display: 'flex', justifyContent: 'space-around', alignItems: 'center', height: '64px', zIndex: 100, paddingBottom: 'env(safe-area-inset-bottom)' }}>
-            
-            <a href="/staff-dashboard" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: '#1e3a8a', textDecoration: 'none' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '24px', fontVariationSettings: "'FILL' 1" }}>dashboard</span>
-              <span style={{ fontSize: '10px', fontWeight: 'bold', marginTop: '2px' }}>Dashboard</span>
-            </a>
-            
-            <a href="/staff-requests" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: '#757682', textDecoration: 'none' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>description</span>
-              <span style={{ fontSize: '10px', fontWeight: 'bold', marginTop: '2px' }}>Requests</span>
-            </a>
-            
-            <a href="/staff-residents" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: '#757682', textDecoration: 'none' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>badge</span>
-              <span style={{ fontSize: '10px', fontWeight: 'bold', marginTop: '2px' }}>Residents</span>
-            </a>
-            
-            <a href="/staff-transactions" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: '#757682', textDecoration: 'none' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>receipt_long</span>
-              <span style={{ fontSize: '10px', fontWeight: 'bold', marginTop: '2px' }}>History</span>
-            </a>
-
-          </nav>
-        )}
 
         {/* ================= FORCE LOGOUT WARNING MODAL ================= */}
         {showForceLogout && (
