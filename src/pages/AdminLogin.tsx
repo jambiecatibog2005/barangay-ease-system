@@ -62,26 +62,35 @@ const AdminLogin: React.FC = () => {
       <IonContent className="bg-[#f0f4f8]">
         <div className="min-h-screen flex flex-col font-sans text-gray-800">
           
-          {/* HEADER */}
-          <header className="w-full bg-white border-b border-gray-100 py-3 px-6 md:px-12 flex flex-col sm:flex-row items-center justify-between shadow-sm gap-4 z-10 relative">
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <div className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0">
+          {/* ✅ BAGONG HEADER: Icon-only Buttons sa Mobile */}
+          <header className="w-full bg-white border-b border-gray-100 py-3 px-4 sm:px-6 md:px-12 flex flex-row items-center justify-between shadow-sm z-10 relative">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 md:w-14 md:h-14 flex-shrink-0">
                 <img src={logoImage} alt="BarangayEase Logo" className="w-full h-full object-contain rounded-full" />
               </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-lg text-[#00236f] leading-tight">BarangayEase</span>
-                <span className="text-xs text-gray-500 font-medium">Barangay Malinao Local Government Portal</span>
+              <div className="flex flex-col text-left">
+                <span className="font-bold text-base md:text-lg text-[#00236f] leading-tight">BarangayEase</span>
+                <span className="text-[10px] md:text-xs text-gray-500 font-medium hidden sm:block">Barangay Malinao Local Government Portal</span>
               </div>
             </div>
             
-            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-              <button onClick={() => window.location.href = '/staff-login'} className="flex items-center gap-1.5 bg-white text-[#00236f] border border-gray-200 hover:bg-gray-50 active:bg-gray-200 active:scale-95 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all shadow-sm">
-                <span className="material-symbols-outlined text-[18px]">badge</span>
-                <span>Staff Portal</span>
+            <div className="flex items-center justify-end gap-2">
+              <button 
+                onClick={() => window.location.href = '/staff-login'} 
+                title="Staff Portal"
+                className="flex items-center justify-center w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2 bg-white text-[#00236f] border border-gray-200 hover:bg-gray-50 active:bg-gray-200 active:scale-95 rounded-full md:rounded-lg text-xs sm:text-sm font-bold transition-all shadow-sm"
+              >
+                <span className="material-symbols-outlined text-[20px] md:text-[18px]">badge</span>
+                <span className="hidden md:inline ml-1.5">Staff Portal</span>
               </button>
-              <button onClick={() => window.location.href = '/'} className="flex items-center gap-1.5 bg-[#00236f] text-white border border-[#00236f] hover:bg-[#00174d] active:bg-[#000d29] active:scale-95 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all shadow-md hover:shadow-lg">
-                <span className="material-symbols-outlined text-[18px]">home</span>
-                <span>Home</span>
+              
+              <button 
+                onClick={() => window.location.href = '/'} 
+                title="Home"
+                className="flex items-center justify-center w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2 bg-[#00236f] text-white border border-[#00236f] hover:bg-[#00174d] active:bg-[#000d29] active:scale-95 rounded-full md:rounded-lg text-xs sm:text-sm font-bold transition-all shadow-md hover:shadow-lg"
+              >
+                <span className="material-symbols-outlined text-[20px] md:text-[18px]">home</span>
+                <span className="hidden md:inline ml-1.5">Home</span>
               </button>
             </div>
           </header>
@@ -99,7 +108,7 @@ const AdminLogin: React.FC = () => {
 
               <div className="p-8 md:p-10">
                 <div className="flex flex-col items-center text-center mb-8">
-                  <div className="w-32 h-32 flex items-center justify-center mb-4">
+                  <div className="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center mb-4">
                     <img src={logoImage} alt="BarangayEase Logo" className="w-full h-full object-contain rounded-full" />
                   </div>
                   
