@@ -35,7 +35,7 @@ interface HolidayData {
 
 const translations = {
   en: {
-    dashboard: "Home", requestDocument: "Request", trackStatus: "Track", transactionHistory: "History",
+    dashboard: "Dashboard", requestDocument: "Request", trackStatus: "Track", transactionHistory: "History",
     logout: "Logout", cancel: "Cancel", yesLogout: "Yes, Log out", logoutTitle: "Are you sure you want to log out?",
     logoutMessage: "You will need to sign in again to view your requests and apply for new documents.",
     welcome: "Welcome", active: "Active", requestNewDoc: "Request New Document", trackMyRequests: "Track My Requests",
@@ -52,7 +52,7 @@ const translations = {
     slaNote: "Note: SLA deadlines for document requests are paused on these dates."
   },
   fil: {
-    dashboard: "Home", requestDocument: "Humiling", trackStatus: "Subaybayan", transactionHistory: "Kasaysayan",
+    dashboard: "Dashboard", requestDocument: "Humiling", trackStatus: "Subaybayan", transactionHistory: "Kasaysayan",
     logout: "Mag-logout", cancel: "Kanselahin", yesLogout: "Oo, Mag-logout", logoutTitle: "Sigurado ka bang gusto mong mag-logout?",
     logoutMessage: "Kailangan mong mag-login muli para makita ang iyong mga request at makapag-apply ng bagong dokumento.",
     welcome: "Mabuhay", active: "Aktibo", requestNewDoc: "Humiling ng Bagong Dokumento", trackMyRequests: "Subaybayan ang Aking Request",
@@ -701,10 +701,10 @@ const ResidentDashboard: React.FC = () => {
           </footer>
 
           {/* ✅ BOTTOM NAVIGATION BAR (Mobile Only) */}
-          <nav className="bottom-nav hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 justify-around items-center h-16 z-[100] pb-safe" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          <nav className="bottom-nav md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 justify-around items-center h-16 z-[100]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
             <a href="/dashboard" className="flex flex-col items-center justify-center w-full h-full text-primary">
               <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
-              <span className="text-[10px] font-bold mt-1">Dashboard</span>
+              <span className="text-[10px] font-bold mt-1">Home</span>
             </a>
             <a href="/documents" className="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-primary transition-colors">
               <span className="material-symbols-outlined text-[24px]">description</span>
