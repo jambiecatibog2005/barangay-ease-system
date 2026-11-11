@@ -353,20 +353,16 @@ const ResidentDashboard: React.FC = () => {
                 margin: 10mm; 
               }
             }
-            
-            /* ✅ BOTTOM NAV - Always visible */
-            .bottom-nav { 
-              display: flex !important; 
-            }
-            .main-content-mobile { 
-              padding-bottom: 100px !important; 
+            @media (max-width: 768px) {
+               .bottom-nav { display: flex !important; }
+               .main-content-mobile { padding-bottom: 90px !important; }
             }
           `}
         </style>
 
         <div className="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col">
           
-          {/* HEADER: Logo + Desktop Nav + Desktop Language/Logout only */}
+          {/* HEADER: Logo lang at Menu icon */}
           <header className="no-print fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
             <div className="bg-primary text-on-primary text-label-sm font-label-sm">
               <div className="max-w-7xl mx-auto px-4 md:px-margin flex flex-col md:flex-row items-center justify-between py-2 md:py-0 md:h-8 gap-1.5 md:gap-0">
@@ -380,7 +376,6 @@ const ResidentDashboard: React.FC = () => {
             </div>
             
             <div className="h-16 md:h-20 max-w-7xl mx-auto px-4 md:px-margin flex items-center justify-between gap-4">
-              {/* Logo */}
               <div className="flex items-center gap-2 shrink-0">
                 <img alt="Logo" className="h-10 w-10 md:h-14 md:w-14 rounded-full object-cover bg-white shadow-sm" src={logoImage}/>
                 <div className="flex flex-col">
@@ -389,41 +384,16 @@ const ResidentDashboard: React.FC = () => {
                 </div>
               </div>
               
-              {/* Desktop Nav - remains in header */}
+              {/* Desktop Nav */}
               <nav className="hidden md:flex items-center justify-center gap-1 flex-1">
                 <a className="px-3 py-2 transition-colors bg-primary text-on-primary font-bold rounded-lg shadow-sm text-sm whitespace-nowrap" href="/dashboard">{t.dashboard}</a>
                 <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/documents">{t.requestDocument}</a>
                 <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/track-status">{t.trackStatus}</a>
                 <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/history">{t.transactionHistory}</a>
               </nav>
-
-              {/* Desktop: Language + Logout in header */}
-              <div className="hidden md:flex items-center gap-2 shrink-0">
-                <div className="flex bg-surface-container rounded-lg p-1">
-                  <button
-                    onClick={() => setLanguage('en')}
-                    className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${language === 'en' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
-                  >
-                    EN
-                  </button>
-                  <button
-                    onClick={() => setLanguage('fil')}
-                    className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${language === 'fil' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
-                  >
-                    FIL
-                  </button>
-                </div>
-                <button 
-                  onClick={handleLogoutClick} 
-                  className="px-3 py-2 text-sm text-red-600 font-bold hover:bg-red-50 rounded-lg flex items-center gap-1.5 transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[18px]">logout</span>
-                  {t.logout}
-                </button>
-              </div>
-
-              {/* Mobile: Hamburger button */}
-              <div className="flex md:hidden items-center justify-end gap-2 shrink-0 relative">
+              
+              {/* Mobile Header Menu (For Language & Logout) */}
+              <div className="flex items-center justify-end gap-2 shrink-0 relative">
                 <button 
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                   className="p-2 text-primary cursor-pointer hover:bg-surface-container rounded-lg focus:outline-none transition-colors"
@@ -432,6 +402,35 @@ const ResidentDashboard: React.FC = () => {
                     {isMobileMenuOpen ? 'close' : 'menu'}
                   </span>
                 </button>
+                
+                {isMobileMenuOpen && (
+                  <div className="absolute right-0 top-12 w-60 bg-white rounded-xl shadow-xl border border-outline-variant/50 flex flex-col p-2 z-[999] overflow-hidden">
+                    <div className="px-2 py-2">
+                      <p className="text-[10px] font-bold uppercase text-outline mb-2 px-2 tracking-wider">{t.language}</p>
+                      <div className="flex bg-surface-container rounded-lg p-1">
+                        <button
+                          onClick={() => { setLanguage('en'); setIsMobileMenuOpen(false); }}
+                          className={`flex-1 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${language === 'en' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
+                        >
+                          English
+                        </button>
+                        <button
+                          onClick={() => { setLanguage('fil'); setIsMobileMenuOpen(false); }}
+                          className={`flex-1 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${language === 'fil' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
+                        >
+                          Filipino
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
+                    
+                    <button onClick={handleLogoutClick} className="mx-2 px-3 py-2.5 mt-1 text-sm text-left text-red-600 font-bold hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors">
+                      <span className="material-symbols-outlined text-[18px]">logout</span>
+                      {t.logout}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
             <div className="h-[3px] w-full flex">
@@ -701,97 +700,25 @@ const ResidentDashboard: React.FC = () => {
             </div>
           </footer>
 
-          {/* ✅ BOTTOM NAVIGATION BAR - TAB BUTTONS with labels */}
-          <nav className="bottom-nav fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-[100] shadow-[0_-2px_8px_rgba(0,0,0,0.06)]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-            <div className="flex justify-around items-stretch h-16 max-w-7xl mx-auto">
-              
-              {/* Tab 1: Dashboard */}
-              <a 
-                href="/dashboard" 
-                className="flex flex-col items-center justify-center gap-1 flex-1 h-full text-primary bg-primary/5 border-t-2 border-primary"
-              >
-                <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
-                <span className="text-[10px] font-bold leading-none">{t.dashboard}</span>
-              </a>
-              
-              {/* Tab 2: Request */}
-              <a 
-                href="/documents" 
-                className="flex flex-col items-center justify-center gap-1 flex-1 h-full text-gray-500 hover:text-primary transition-colors border-t-2 border-transparent"
-              >
-                <span className="material-symbols-outlined text-[24px]">description</span>
-                <span className="text-[10px] font-bold leading-none">{t.requestDocument}</span>
-              </a>
-              
-              {/* Tab 3: Track */}
-              <a 
-                href="/track-status" 
-                className="flex flex-col items-center justify-center gap-1 flex-1 h-full text-gray-500 hover:text-primary transition-colors border-t-2 border-transparent"
-              >
-                <span className="material-symbols-outlined text-[24px]">track_changes</span>
-                <span className="text-[10px] font-bold leading-none">{t.trackStatus}</span>
-              </a>
-              
-              {/* Tab 4: History */}
-              <a 
-                href="/history" 
-                className="flex flex-col items-center justify-center gap-1 flex-1 h-full text-gray-500 hover:text-primary transition-colors border-t-2 border-transparent"
-              >
-                <span className="material-symbols-outlined text-[24px]">receipt_long</span>
-                <span className="text-[10px] font-bold leading-none">{t.transactionHistory}</span>
-              </a>
-              
-              {/* Tab 5: Language */}
-              <button 
-                onClick={() => setLanguage(language === 'en' ? 'fil' : 'en')}
-                className="flex flex-col items-center justify-center gap-1 flex-1 h-full text-gray-500 hover:text-primary transition-colors border-t-2 border-transparent"
-              >
-                <span className="material-symbols-outlined text-[24px]">translate</span>
-                <span className="text-[10px] font-bold leading-none">{language === 'en' ? 'EN' : 'FIL'}</span>
-              </button>
-              
-              {/* Tab 6: Logout */}
-              <button 
-                onClick={handleLogoutClick}
-                className="flex flex-col items-center justify-center gap-1 flex-1 h-full text-red-500 hover:text-red-700 transition-colors border-t-2 border-transparent"
-              >
-                <span className="material-symbols-outlined text-[24px]">logout</span>
-                <span className="text-[10px] font-bold leading-none">{t.logout}</span>
-              </button>
-            </div>
+          {/* ✅ BOTTOM NAVIGATION BAR (Mobile Only) */}
+          <nav className="bottom-nav md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 justify-around items-center h-16 z-[100]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+            <a href="/dashboard" className="flex flex-col items-center justify-center w-full h-full text-primary">
+              <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
+              <span className="text-[10px] font-bold mt-1">Home</span>
+            </a>
+            <a href="/documents" className="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-primary transition-colors">
+              <span className="material-symbols-outlined text-[24px]">description</span>
+              <span className="text-[10px] font-bold mt-1">Request</span>
+            </a>
+            <a href="/track-status" className="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-primary transition-colors">
+              <span className="material-symbols-outlined text-[24px]">track_changes</span>
+              <span className="text-[10px] font-bold mt-1">Track</span>
+            </a>
+            <a href="/history" className="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-primary transition-colors">
+              <span className="material-symbols-outlined text-[24px]">receipt_long</span>
+              <span className="text-[10px] font-bold mt-1">History</span>
+            </a>
           </nav>
-
-          {/* ✅ MOBILE MENU BOTTOM SHEET (for hamburger menu) */}
-          {isMobileMenuOpen && (
-            <div className="fixed inset-0 z-[150] md:hidden">
-              <div className="absolute inset-0 bg-black/40" onClick={() => setIsMobileMenuOpen(false)}></div>
-              <div className="absolute bottom-20 left-4 right-4 bg-white rounded-2xl shadow-2xl p-4 flex flex-col gap-2">
-                <p className="text-[10px] font-bold uppercase text-outline mb-1 px-2 tracking-wider">{t.language}</p>
-                <div className="flex bg-surface-container rounded-lg p-1">
-                  <button
-                    onClick={() => { setLanguage('en'); setIsMobileMenuOpen(false); }}
-                    className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-all ${language === 'en' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
-                  >
-                    English
-                  </button>
-                  <button
-                    onClick={() => { setLanguage('fil'); setIsMobileMenuOpen(false); }}
-                    className={`flex-1 px-4 py-2 rounded-md text-sm font-bold transition-all ${language === 'fil' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
-                  >
-                    Filipino
-                  </button>
-                </div>
-                <div className="h-px bg-outline-variant/50 my-1"></div>
-                <button 
-                  onClick={handleLogoutClick} 
-                  className="w-full px-4 py-3 text-left text-red-600 font-bold hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[20px]">logout</span>
-                  {t.logout}
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* ✅ CLAIM SLIP MODAL */}
           {isClaimSlipOpen && (
