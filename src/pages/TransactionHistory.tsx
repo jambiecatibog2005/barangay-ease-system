@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IonContent, IonPage } from '@ionic/react';
+import { IonContent, IonPage, useIonRouter } from '@ionic/react'; // ✅ useIonRouter
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { auth, db } from '../firebase';
 import logoImage from '../assets/logo.png';
@@ -130,6 +130,8 @@ const translations = {
 };
 
 const TransactionHistory: React.FC = () => {
+  const router = useIonRouter(); // ✅ Tamang navigation
+
   // --- STATES ---
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -276,14 +278,38 @@ const TransactionHistory: React.FC = () => {
                 </div>
               </div>
 
-              <nav className="hidden md:flex items-center justify-center gap-1 flex-1">
-                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/dashboard">{t.navDashboard}</a>
-                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/documents">{t.navRequest}</a>
-                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/track-status">{t.navTrack}</a>
-                <a className="px-3 py-2 transition-colors bg-primary text-on-primary font-bold rounded-lg shadow-sm text-sm whitespace-nowrap" href="/history">{t.navHistory}</a>
-              </nav>
+              {/* ✅ RIGHT SIDE: PILL-SHAPED NAVIGATION + HAMBURGER */}
+              <div className="flex items-center justify-end gap-3 flex-1">
+                
+                {/* Desktop Navigation (Option 2 Pill Tabs, naka-right side) */}
+                <nav className="hidden md:flex items-center gap-1.5">
+                  <button 
+                    onClick={() => router.push('/dashboard')} 
+                    className="px-4 py-2 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all font-semibold text-sm whitespace-nowrap"
+                  >
+                    {t.navDashboard}
+                  </button>
+                  <button 
+                    onClick={() => router.push('/documents')} 
+                    className="px-4 py-2 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all font-semibold text-sm whitespace-nowrap"
+                  >
+                    {t.navRequest}
+                  </button>
+                  <button 
+                    onClick={() => router.push('/track-status')} 
+                    className="px-4 py-2 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all font-semibold text-sm whitespace-nowrap"
+                  >
+                    {t.navTrack}
+                  </button>
+                  <button 
+                    onClick={() => router.push('/history')} 
+                    className="px-4 py-2 rounded-full bg-blue-50 text-primary font-bold text-sm whitespace-nowrap shadow-sm border border-blue-100"
+                  >
+                    {t.navHistory}
+                  </button>
+                </nav>
 
-              <div className="flex items-center justify-end gap-2 shrink-0">
+                {/* Hamburger Menu (Mobile & Desktop) */}
                 <div className="relative">
                   <details className="group [&_summary::-webkit-details-marker]:hidden">
                     <summary className="list-none outline-none p-2 text-primary cursor-pointer hover:bg-surface-container rounded-lg focus:outline-none transition-colors">
@@ -293,14 +319,16 @@ const TransactionHistory: React.FC = () => {
                     
                     <div className="absolute right-0 mt-2 w-60 bg-surface-container-lowest rounded-xl shadow-xl border border-outline-variant/50 flex flex-col p-2 z-[100] overflow-hidden">
                       
+                      {/* Mobile Nav Links */}
                       <div className="flex flex-col md:hidden gap-1">
-                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/dashboard">{t.navDashboard}</a>
-                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/documents">{t.navRequest}</a>
-                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/track-status">{t.navTrack}</a>
-                        <a className="px-4 py-2.5 text-sm font-semibold text-primary bg-primary/10 rounded-lg" href="/history">{t.navHistory}</a>
+                        <button onClick={() => router.push('/dashboard')} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.navDashboard}</button>
+                        <button onClick={() => router.push('/documents')} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.navRequest}</button>
+                        <button onClick={() => router.push('/track-status')} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.navTrack}</button>
+                        <button onClick={() => router.push('/history')} className="px-4 py-2.5 text-left text-sm font-semibold text-primary bg-primary/10 rounded-lg">{t.navHistory}</button>
                         <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
                       </div>
                       
+                      {/* Language Toggle */}
                       <div className="px-2 py-2">
                         <p className="text-[10px] font-bold uppercase text-outline mb-2 px-2 tracking-wider">{t.langLabel}</p>
                         <div className="flex bg-surface-container rounded-lg p-1">
@@ -321,6 +349,7 @@ const TransactionHistory: React.FC = () => {
 
                       <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
                       
+                      {/* Logout Button */}
                       <button onClick={handleLogoutClick} className="mx-2 px-3 py-2.5 mt-1 text-sm text-left text-red-600 font-bold hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors">
                         <span className="material-symbols-outlined text-[18px]">logout</span>
                         {t.logout}
@@ -330,10 +359,14 @@ const TransactionHistory: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="h-[3px] w-full flex">
-              <div className="h-full w-1/3 bg-secondary-container"></div>
-              <div className="h-full w-1/3 bg-error"></div>
-              <div className="h-full w-1/3 bg-tertiary-fixed"></div>
+            
+            {/* ✅ FIXED: 3-color line inilagay sa loob ng max-w para kapantay ng layout */}
+            <div className="max-w-7xl mx-auto w-full">
+              <div className="h-[3px] w-full flex">
+                <div className="h-full w-1/3 bg-secondary-container"></div>
+                <div className="h-full w-1/3 bg-error"></div>
+                <div className="h-full w-1/3 bg-tertiary-fixed"></div>
+              </div>
             </div>
           </header>
 
@@ -543,7 +576,7 @@ const TransactionHistory: React.FC = () => {
             </div>
           </main>
 
-          {/* ✅ FOOTER (PINASIMPLE — KATULAD NG SA TRACK STATUS) */}
+          {/* ✅ FOOTER */}
           <footer className="w-full bg-primary text-on-primary pt-8 pb-6 shadow-[0_-2px_12px_rgba(0,0,0,0.05)] mt-auto">
             <div className="max-w-7xl mx-auto px-4 text-center text-xs text-primary-fixed">
               <p>© 2025 Barangay Malinao, Naujan. All Rights Reserved. BarangayEase Digital Civic Portal.</p>

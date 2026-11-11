@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { IonContent, IonPage } from '@ionic/react';
+import { IonContent, IonPage, useIonRouter } from '@ionic/react'; // ✅ useIonRouter
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { auth, db } from '../firebase'; 
 import logoImage from '../assets/logo.png';
@@ -216,6 +216,8 @@ const translations = {
 };
 
 const TrackStatus: React.FC = () => {
+  const router = useIonRouter(); // ✅ Tamang navigation
+
   // --- STATES ---
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -489,6 +491,7 @@ const TrackStatus: React.FC = () => {
             {/* MAIN NAV BAR */}
             <div className="h-16 md:h-20 max-w-7xl mx-auto px-4 md:px-margin flex items-center justify-between gap-4">
               
+              {/* Logo */}
               <div className="flex items-center gap-2 shrink-0">
                 <img alt="Logo" className="h-10 w-10 md:h-14 md:w-14 rounded-full object-cover bg-white shadow-sm" src={logoImage}/>
                 <div className="flex flex-col">
@@ -497,14 +500,38 @@ const TrackStatus: React.FC = () => {
                 </div>
               </div>
 
-              <nav className="hidden md:flex items-center justify-center gap-1 flex-1">
-                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/dashboard">{t.navDashboard}</a>
-                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/documents">{t.navRequest}</a>
-                <a className="px-3 py-2 transition-colors bg-primary text-on-primary font-bold rounded-lg shadow-sm text-sm whitespace-nowrap" href="/track-status">{t.navTrack}</a>
-                <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/history">{t.navHistory}</a>
-              </nav>
+              {/* ✅ RIGHT SIDE: PILL-SHAPED NAVIGATION + HAMBURGER */}
+              <div className="flex items-center justify-end gap-3 flex-1">
+                
+                {/* Desktop Navigation (Option 2 Pill Tabs, naka-right side) */}
+                <nav className="hidden md:flex items-center gap-1.5">
+                  <button 
+                    onClick={() => router.push('/dashboard')} 
+                    className="px-4 py-2 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all font-semibold text-sm whitespace-nowrap"
+                  >
+                    {t.navDashboard}
+                  </button>
+                  <button 
+                    onClick={() => router.push('/documents')} 
+                    className="px-4 py-2 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all font-semibold text-sm whitespace-nowrap"
+                  >
+                    {t.navRequest}
+                  </button>
+                  <button 
+                    onClick={() => router.push('/track-status')} 
+                    className="px-4 py-2 rounded-full bg-blue-50 text-primary font-bold text-sm whitespace-nowrap shadow-sm border border-blue-100"
+                  >
+                    {t.navTrack}
+                  </button>
+                  <button 
+                    onClick={() => router.push('/history')} 
+                    className="px-4 py-2 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all font-semibold text-sm whitespace-nowrap"
+                  >
+                    {t.navHistory}
+                  </button>
+                </nav>
 
-              <div className="flex items-center justify-end gap-2 shrink-0">
+                {/* Hamburger Menu (Mobile & Desktop) */}
                 <div className="relative">
                   <details className="group [&_summary::-webkit-details-marker]:hidden">
                     <summary className="list-none outline-none p-2 text-primary cursor-pointer hover:bg-surface-container rounded-lg focus:outline-none transition-colors">
@@ -514,14 +541,16 @@ const TrackStatus: React.FC = () => {
                     
                     <div className="absolute right-0 mt-2 w-60 bg-surface-container-lowest rounded-xl shadow-xl border border-outline-variant/50 flex flex-col p-2 z-[100] overflow-hidden">
                       
+                      {/* Mobile Nav Links */}
                       <div className="flex flex-col md:hidden gap-1">
-                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/dashboard">{t.navDashboard}</a>
-                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/documents">{t.navRequest}</a>
-                        <a className="px-4 py-2.5 text-sm font-semibold text-primary bg-primary/10 rounded-lg" href="/track-status">{t.navTrack}</a>
-                        <a className="px-4 py-2.5 text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors" href="/history">{t.navHistory}</a>
+                        <button onClick={() => router.push('/dashboard')} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.navDashboard}</button>
+                        <button onClick={() => router.push('/documents')} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.navRequest}</button>
+                        <button onClick={() => router.push('/track-status')} className="px-4 py-2.5 text-left text-sm font-semibold text-primary bg-primary/10 rounded-lg">{t.navTrack}</button>
+                        <button onClick={() => router.push('/history')} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.navHistory}</button>
                         <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
                       </div>
                       
+                      {/* Language Toggle */}
                       <div className="px-2 py-2">
                         <p className="text-[10px] font-bold uppercase text-outline mb-2 px-2 tracking-wider">{t.langLabel}</p>
                         <div className="flex bg-surface-container rounded-lg p-1">
@@ -542,6 +571,7 @@ const TrackStatus: React.FC = () => {
 
                       <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
                       
+                      {/* Logout Button */}
                       <button onClick={handleLogoutClick} className="mx-2 px-3 py-2.5 mt-1 text-sm text-left text-red-600 font-bold hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors">
                         <span className="material-symbols-outlined text-[18px]">logout</span>
                         {t.logout}
@@ -551,10 +581,14 @@ const TrackStatus: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="h-[3px] w-full flex">
-              <div className="h-full w-1/3 bg-secondary-container"></div>
-              <div className="h-full w-1/3 bg-error"></div>
-              <div className="h-full w-1/3 bg-tertiary-fixed"></div>
+            
+            {/* ✅ FIXED: 3-color line inilagay sa loob ng max-w para kapantay ng layout */}
+            <div className="max-w-7xl mx-auto w-full">
+              <div className="h-[3px] w-full flex">
+                <div className="h-full w-1/3 bg-secondary-container"></div>
+                <div className="h-full w-1/3 bg-error"></div>
+                <div className="h-full w-1/3 bg-tertiary-fixed"></div>
+              </div>
             </div>
           </header>
 
@@ -858,7 +892,7 @@ const TrackStatus: React.FC = () => {
             </div>
           )}
 
-          {/* ✅ CLAIM SLIP MODAL (UPDATED) */}
+          {/* ✅ CLAIM SLIP MODAL */}
           {isClaimSlipOpen && claimRequestData && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary/50 backdrop-blur-sm p-4 print:bg-white print:p-0 print:static">
               
@@ -866,7 +900,6 @@ const TrackStatus: React.FC = () => {
                 ref={claimSlipRef} 
                 className="w-full max-w-md bg-white p-5 sm:p-8 rounded-xl shadow-2xl border-t-8 border-primary print:shadow-none print:rounded-none print:max-w-none print:border-t-0 print:p-4 max-h-[90vh] overflow-y-auto"
               >
-                {/* ✅ ITO YUNG PAPEL NA MAKUKUHA SA PDF/PRINT */}
                 <div id="printable-claim-slip">
                   <div className="text-center border-b-2 border-gray-300 pb-4 mb-4">
                     <img src={logoImage} alt="Logo" style={{ width: '70px', height: '70px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', display: 'block' }} />
@@ -899,7 +932,6 @@ const TrackStatus: React.FC = () => {
                         <p className="font-semibold text-gray-900 text-xs">{claimRequestData.purok || 'N/A'}</p>
                       </div>
                       
-                      {/* ✅ IDINAGDAG NA FEE */}
                       <div className="col-span-2 bg-blue-50/50 p-2.5 rounded-lg border border-blue-100 mt-1">
                         <p className="text-[10px] font-bold text-gray-500 uppercase mb-0.5">Amount to Pay / Fee</p>
                         <p className="font-bold text-blue-900 text-sm">{claimRequestData.fee || '₱0.00'}</p>
@@ -929,7 +961,6 @@ const TrackStatus: React.FC = () => {
                   </div>
                 </div>
 
-                {/* ✅ MGA BUTTONS (Nasa loob para maganda, pero naka-ignore sa Print at PDF) */}
                 <div 
                   className="no-print mt-6 flex flex-wrap justify-end gap-2 bg-gray-50 p-3 rounded-xl border border-gray-200"
                   data-html2canvas-ignore="true"
