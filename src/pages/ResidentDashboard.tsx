@@ -353,6 +353,8 @@ const ResidentDashboard: React.FC = () => {
                 margin: 10mm; 
               }
             }
+            
+            /* ✅ MEDIA QUERY PARA SA BOTTOM NAV */
             @media (max-width: 768px) {
                .bottom-nav { display: flex !important; }
                .main-content-mobile { padding-bottom: 90px !important; }
@@ -701,7 +703,10 @@ const ResidentDashboard: React.FC = () => {
           </footer>
 
           {/* ✅ BOTTOM NAVIGATION BAR (Mobile Only) */}
-          <nav className="bottom-nav md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 justify-around items-center h-16 z-[100]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          <nav 
+            className="bottom-nav fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 justify-around items-center h-16 z-[100]" 
+            style={{ paddingBottom: 'env(safe-area-inset-bottom)', display: 'none' }} // Default na naka-hide para sa Desktop
+          >
             <a href="/dashboard" className="flex flex-col items-center justify-center w-full h-full text-primary">
               <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
               <span className="text-[10px] font-bold mt-1">Home</span>
