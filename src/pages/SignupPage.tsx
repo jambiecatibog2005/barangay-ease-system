@@ -28,16 +28,30 @@ const SignupPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // 1. Gumawa ng account sa Firebase Authentication
+      // ✅ 1. EMAIL VALIDATION GAMIT ANG ABSTRACT API
+      const API_KEY = 'd1628b7a9d6e4fceb1965f5a22fed271'; 
+      const validationRes = await fetch(
+        `https://emailvalidation.abstractapi.com/v1/?api_key=${API_KEY}&email=${encodeURIComponent(email)}`
+      );
+      const validationData = await validationRes.json();
+
+      // Titingnan natin kung DELIVERABLE (totoo at active) ang email
+      if (validationData.deliverability !== "DELIVERABLE") {
+        alert("Invalid Email. Please enter a valid and active email address (e.g., yourname@gmail.com).");
+        setIsLoading(false);
+        return;
+      }
+
+      // ✅ 2. KUNG VALID ANG EMAIL, GAGAWA NA NG ACCOUNT SA FIREBASE
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 2. I-save ang detalye sa Firestore (users collection)
+      // 3. I-save ang detalye sa Firestore (users collection)
       await setDoc(doc(db, "users", user.uid), {
         fullName: fullName,
         email: email,
         purok: purok,
-        password: password, // ✅ IDINAGDAG: Para sa demo login logic natin (dahil naka-bypass tayo sa Auth)
+        password: password, 
         role: "resident", 
         status: "pending", 
         createdAt: new Date()
