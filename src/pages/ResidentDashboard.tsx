@@ -704,7 +704,7 @@ const ResidentDashboard: React.FC = () => {
           <nav className="bottom-nav hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 justify-around items-center h-16 z-[100] pb-safe" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
             <a href="/dashboard" className="flex flex-col items-center justify-center w-full h-full text-primary">
               <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
-              <span className="text-[10px] font-bold mt-1">Home</span>
+              <span className="text-[10px] font-bold mt-1">Dashboard</span>
             </a>
             <a href="/documents" className="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-primary transition-colors">
               <span className="material-symbols-outlined text-[24px]">description</span>
