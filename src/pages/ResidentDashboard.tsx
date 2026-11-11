@@ -362,7 +362,7 @@ const ResidentDashboard: React.FC = () => {
 
         <div className="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col">
           
-          {/* HEADER: Logo lang at Menu icon */}
+          {/* HEADER */}
           <header className="no-print fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
             <div className="bg-primary text-on-primary text-label-sm font-label-sm">
               <div className="max-w-7xl mx-auto px-4 md:px-margin flex flex-col md:flex-row items-center justify-between py-2 md:py-0 md:h-8 gap-1.5 md:gap-0">
@@ -384,7 +384,7 @@ const ResidentDashboard: React.FC = () => {
                 </div>
               </div>
               
-              {/* Desktop Nav */}
+              {/* Desktop Nav (Center) */}
               <nav className="hidden md:flex items-center justify-center gap-1 flex-1">
                 <a className="px-3 py-2 transition-colors bg-primary text-on-primary font-bold rounded-lg shadow-sm text-sm whitespace-nowrap" href="/dashboard">{t.dashboard}</a>
                 <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/documents">{t.requestDocument}</a>
@@ -392,8 +392,11 @@ const ResidentDashboard: React.FC = () => {
                 <a className="px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-sm whitespace-nowrap" href="/history">{t.transactionHistory}</a>
               </nav>
               
-              {/* Mobile Header Menu (For Language & Logout) */}
-              <div className="flex items-center justify-end gap-2 shrink-0 relative">
+              {/* 
+                ✅ FIXED: Naka-hide na ito sa Desktop (md:hidden). 
+                Lalabas lang ang hamburger menu na ito kapag mobile view na. 
+              */}
+              <div className="flex md:hidden items-center justify-end gap-2 shrink-0 relative">
                 <button 
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                   className="p-2 text-primary cursor-pointer hover:bg-surface-container rounded-lg focus:outline-none transition-colors"
@@ -433,10 +436,14 @@ const ResidentDashboard: React.FC = () => {
                 )}
               </div>
             </div>
-            <div className="h-[3px] w-full flex">
-              <div className="h-full w-1/3 bg-secondary-container"></div>
-              <div className="h-full w-1/3 bg-error"></div>
-              <div className="h-full w-1/3 bg-tertiary-fixed"></div>
+            
+            {/* ✅ FIXED: 3-color line inilagay sa loob ng max-w para kapantay ng layout */}
+            <div className="max-w-7xl mx-auto w-full">
+              <div className="h-[3px] w-full flex">
+                <div className="h-full w-1/3 bg-secondary-container"></div>
+                <div className="h-full w-1/3 bg-error"></div>
+                <div className="h-full w-1/3 bg-tertiary-fixed"></div>
+              </div>
             </div>
           </header>
 
