@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IonContent, IonPage, useIonRouter } from '@ionic/react'; // ✅ Idinagdag ang useIonRouter
+import { IonContent, IonPage } from '@ionic/react'; // ✅ Tinanggal ang useIonRouter
 import { collection, addDoc, doc, getDoc, onSnapshot } from "firebase/firestore";
 import { auth, db, logAction } from '../firebase'; 
 import logoImage from '../assets/logo.png';
@@ -72,7 +72,11 @@ const translations = {
 type Language = 'en' | 'fil';
 
 const DocumentCatalog: React.FC = () => {
-  const router = useIonRouter(); // ✅ Tamang navigation para sa Ionic
+  // ✅ CUSTOM NAVIGATION FUNCTION (Gumagana sa App.tsx mo)
+  const navigateTo = (path: string) => {
+    window.history.pushState({}, '', path);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDoc, setSelectedDoc] = useState<DocumentType | null>(null);
@@ -300,25 +304,25 @@ const DocumentCatalog: React.FC = () => {
                 {/* Desktop Navigation (Option 2 Pill Tabs, naka-right side) */}
                 <nav className="hidden md:flex items-center gap-1.5">
                   <button 
-                    onClick={() => router.push('/dashboard')} 
+                    onClick={() => navigateTo('/dashboard')} 
                     className="px-4 py-2 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all font-semibold text-sm whitespace-nowrap"
                   >
                     {t.navDashboard}
                   </button>
                   <button 
-                    onClick={() => router.push('/documents')} 
+                    onClick={() => navigateTo('/documents')} 
                     className="px-4 py-2 rounded-full bg-blue-50 text-primary font-bold text-sm whitespace-nowrap shadow-sm border border-blue-100"
                   >
                     {t.navRequest}
                   </button>
                   <button 
-                    onClick={() => router.push('/track-status')} 
+                    onClick={() => navigateTo('/track-status')} 
                     className="px-4 py-2 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all font-semibold text-sm whitespace-nowrap"
                   >
                     {t.navTrack}
                   </button>
                   <button 
-                    onClick={() => router.push('/history')} 
+                    onClick={() => navigateTo('/history')} 
                     className="px-4 py-2 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all font-semibold text-sm whitespace-nowrap"
                   >
                     {t.navHistory}
@@ -336,10 +340,10 @@ const DocumentCatalog: React.FC = () => {
                       
                       {/* Mobile Nav Links */}
                       <div className="flex flex-col md:hidden gap-1">
-                        <button onClick={() => router.push('/dashboard')} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.navDashboard}</button>
-                        <button onClick={() => router.push('/documents')} className="px-4 py-2.5 text-left text-sm font-semibold text-primary bg-primary/10 rounded-lg">{t.navRequest}</button>
-                        <button onClick={() => router.push('/track-status')} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.navTrack}</button>
-                        <button onClick={() => router.push('/history')} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.navHistory}</button>
+                        <button onClick={() => navigateTo('/dashboard')} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.navDashboard}</button>
+                        <button onClick={() => navigateTo('/documents')} className="px-4 py-2.5 text-left text-sm font-semibold text-primary bg-primary/10 rounded-lg">{t.navRequest}</button>
+                        <button onClick={() => navigateTo('/track-status')} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.navTrack}</button>
+                        <button onClick={() => navigateTo('/history')} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.navHistory}</button>
                         <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
                       </div>
 

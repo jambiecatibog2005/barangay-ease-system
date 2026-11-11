@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { IonContent, IonPage, useIonRouter } from '@ionic/react'; // ✅ useIonRouter para sa smooth navigation
+import { IonContent, IonPage } from '@ionic/react'; // ✅ Tinanggal ang useIonRouter
 import { collection, onSnapshot, query, where, doc, getDoc } from "firebase/firestore";
 import { auth, db } from '../firebase'; 
 import logoImage from '../assets/logo.png';
@@ -73,7 +73,11 @@ const translations = {
 type Language = 'en' | 'fil';
 
 const ResidentDashboard: React.FC = () => {
-  const router = useIonRouter(); // ✅ Tamang navigation para sa Ionic
+  // ✅ CUSTOM NAVIGATION FUNCTION (gumagana sa App.tsx mo na gumagamit ng popstate)
+  const navigateTo = (path: string) => {
+    window.history.pushState({}, '', path);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
 
   const [filter, setFilter] = useState('all');
   const [isClaimSlipOpen, setIsClaimSlipOpen] = useState(false);
@@ -395,25 +399,25 @@ const ResidentDashboard: React.FC = () => {
                 {/* Desktop Navigation (Option 2 Pill Tabs, naka-right side) */}
                 <nav className="hidden md:flex items-center gap-1.5">
                   <button 
-                    onClick={() => router.push('/dashboard')} 
+                    onClick={() => navigateTo('/dashboard')} 
                     className="px-4 py-2 rounded-full bg-blue-50 text-primary font-bold text-sm whitespace-nowrap shadow-sm border border-blue-100"
                   >
                     {t.dashboard}
                   </button>
                   <button 
-                    onClick={() => router.push('/documents')} 
+                    onClick={() => navigateTo('/documents')} 
                     className="px-4 py-2 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all font-semibold text-sm whitespace-nowrap"
                   >
                     {t.requestDocument}
                   </button>
                   <button 
-                    onClick={() => router.push('/track-status')} 
+                    onClick={() => navigateTo('/track-status')} 
                     className="px-4 py-2 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all font-semibold text-sm whitespace-nowrap"
                   >
                     {t.trackStatus}
                   </button>
                   <button 
-                    onClick={() => router.push('/history')} 
+                    onClick={() => navigateTo('/history')} 
                     className="px-4 py-2 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all font-semibold text-sm whitespace-nowrap"
                   >
                     {t.transactionHistory}
@@ -436,10 +440,10 @@ const ResidentDashboard: React.FC = () => {
                       
                       {/* Mobile Nav Links */}
                       <div className="flex flex-col md:hidden gap-1">
-                        <button onClick={() => { router.push('/dashboard'); setIsMobileMenuOpen(false); }} className="px-4 py-2.5 text-left text-sm font-semibold text-primary bg-primary/10 rounded-lg">{t.dashboard}</button>
-                        <button onClick={() => { router.push('/documents'); setIsMobileMenuOpen(false); }} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.requestDocument}</button>
-                        <button onClick={() => { router.push('/track-status'); setIsMobileMenuOpen(false); }} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.trackStatus}</button>
-                        <button onClick={() => { router.push('/history'); setIsMobileMenuOpen(false); }} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.transactionHistory}</button>
+                        <button onClick={() => { navigateTo('/dashboard'); setIsMobileMenuOpen(false); }} className="px-4 py-2.5 text-left text-sm font-semibold text-primary bg-primary/10 rounded-lg">{t.dashboard}</button>
+                        <button onClick={() => { navigateTo('/documents'); setIsMobileMenuOpen(false); }} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.requestDocument}</button>
+                        <button onClick={() => { navigateTo('/track-status'); setIsMobileMenuOpen(false); }} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.trackStatus}</button>
+                        <button onClick={() => { navigateTo('/history'); setIsMobileMenuOpen(false); }} className="px-4 py-2.5 text-left text-sm font-semibold text-on-surface hover:bg-surface-container rounded-lg transition-colors">{t.transactionHistory}</button>
                         <div className="h-px bg-outline-variant/50 my-1 mx-2"></div>
                       </div>
                       
@@ -574,10 +578,10 @@ const ResidentDashboard: React.FC = () => {
 
                 {/* QUICK ACTIONS */}
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <button onClick={() => router.push('/documents')} className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-surface-container-lowest text-primary font-bold text-sm shadow-sm border border-outline-variant/50 hover:bg-surface-container transition-colors">
+                  <button onClick={() => navigateTo('/documents')} className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-surface-container-lowest text-primary font-bold text-sm shadow-sm border border-outline-variant/50 hover:bg-surface-container transition-colors">
                     <span className="material-symbols-outlined text-[20px]">add_circle</span><span>{t.requestNewDoc}</span>
                   </button>
-                  <button onClick={() => router.push('/track-status')} className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-surface-container-lowest text-secondary font-bold text-sm shadow-sm border border-outline-variant/50 hover:bg-surface-container transition-colors">
+                  <button onClick={() => navigateTo('/track-status')} className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-surface-container-lowest text-secondary font-bold text-sm shadow-sm border border-outline-variant/50 hover:bg-surface-container transition-colors">
                     <span className="material-symbols-outlined text-[20px]">track_changes</span><span>{t.trackMyRequests}</span>
                   </button>
                 </div>
